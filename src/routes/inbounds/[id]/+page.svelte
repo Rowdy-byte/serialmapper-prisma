@@ -28,7 +28,7 @@
 
 <h1 class="py-4 text-xl font-bold">Inbound Details</h1>
 
-<main class="flex flex-col gap-4">
+<main class="flex flex-col gap-12">
 	<section class="max-w-sm">
 		<h1 class="font-bold">Inbound</h1>
 		<form class="flex flex-col gap-4" method="post">
@@ -61,18 +61,7 @@
 			>
 		</form>
 	</section>
-	<section>
-		<!-- delete inbound -->
-		<form method="post">
-			<button
-				formaction="?/deleteInbound"
-				onclick={handleDeleteInbound}
-				class="rounded-md border
-			border-gray-300 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-gray-100 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				type="submit">Delete</button
-			>
-		</form>
-	</section>
+
 	<section class="max-w-sm">
 		<h1 class="font-bold">Add Product to Inbound</h1>
 		<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
@@ -127,5 +116,20 @@
 				{/each}
 			</tbody>
 		</table>
+	</section>
+	<section>
+		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
+			<legend>Delete Inbound</legend>
+			<form method="post">
+				<button
+					formaction="?/deleteInbound"
+					onclick={handleDeleteInbound}
+					class="rounded-md border
+			border-gray-300 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-gray-100 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					type="submit">Delete</button
+				>
+			</form>
+			<p>This will permanently delete this Inbound!</p>
+		</fieldset>
 	</section>
 </main>

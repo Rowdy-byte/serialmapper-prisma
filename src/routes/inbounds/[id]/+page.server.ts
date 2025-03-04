@@ -1,6 +1,5 @@
 import type { PageServerLoad } from "./$types";
 import { db } from "$lib/server/db";
-import { redirect } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async ({ params }) => {
     const clients = await db.client.findMany();
@@ -49,7 +48,7 @@ export const actions = {
             success: true,
             inbound
         }
-        throw redirect(301, '/inbounds');
+
     },
 
     async deleteInbound({ params }) {
@@ -63,13 +62,21 @@ export const actions = {
             where: { id: inboundId }
         });
 
-        if (!inbound) {
+        // if the inbound was not deleted, return an error
+        if (inbound) {
             return {
-                status: 200,
-                success: true
+                status: 500,
+                success: false,
+                message: 'Inbound was not deleted'
             }
         }
-        throw redirect(301, '/inbounds');
+
+        // if the inbound was deleted, return a success message
+        return {
+            status: 200,
+            success: true,
+            message: 'Inbound was deleted'
+        }
     },
 
     // Add a product to the inbound with inboundId

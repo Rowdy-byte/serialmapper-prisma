@@ -32,7 +32,7 @@ model InboundProduct {
   serialnumber String
   createdAt    DateTime @default(now())
   inboundId    Int
-  inbound      Inbound  @relation(fields: [inboundId], references: [id])
+  inbound      Inbound  @relation(fields: [inboundId], references: [id], onDelete: Cascade)
 }
 
 model Product {

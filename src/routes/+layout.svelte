@@ -3,7 +3,7 @@
 	let { children } = $props();
 </script>
 
-<nav class="flex items-center justify-between p-4">
+<nav class="relative flex items-center justify-between p-4">
 	<section>
 		<a href="/">Home</a>
 	</section>

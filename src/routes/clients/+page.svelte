@@ -27,7 +27,7 @@
 		</form>
 	</section>
 	<section>
-		<h1 class="font-bold">Client List</h1>
+		<h1 class="font-bold">Clients List</h1>
 		<ul class="flex flex-col gap-2">
 			{#each clients as client, i}
 				<li class="flex flex-row gap-2">

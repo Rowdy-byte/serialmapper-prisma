@@ -7,7 +7,7 @@
 	let { statsName, statsValue }: StatsProps = $props();
 </script>
 
-<section>
+<section class="flex aspect-square flex-col items-center justify-center rounded-lg p-4 shadow-md">
 	<h1>{statsName}</h1>
-	<p>{statsValue}</p>
+	<p class="text-4xl">{statsValue}</p>
 </section>

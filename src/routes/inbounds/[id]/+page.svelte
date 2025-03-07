@@ -78,6 +78,8 @@
 					<option value={product.name}>{product.number}</option>
 				{/each}
 			</select>
+			<!-- input for quantity -->
+
 			<textarea
 				name="serialnumber"
 				placeholder="Serialnumber"
@@ -98,7 +100,7 @@
 				<tr>
 					<th class="border border-gray-300 p-2">Product</th>
 					<th class="border border-gray-300 p-2">Serialnumbers</th>
-					<th class="border border-gray-300 p-2">details</th>
+					<th class="border border-gray-300 p-2">Details</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -109,7 +111,7 @@
 							<td class="border border-gray-300 p-2">{inboundProduct.product}</td>
 							<td class="border border-gray-300 p-2">{inboundProduct.serialnumber}</td>
 							<td class="border border-gray-300 p-2">
-								<a href={`products/${inboundProduct.id}`}>Details</a>
+								<a href={`/inbounds/${inbound.id}/inbound-product/${inboundProduct.id}`}>Details</a>
 							</td>
 						</tr>
 					{/if}

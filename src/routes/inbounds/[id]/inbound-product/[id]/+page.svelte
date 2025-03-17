@@ -35,7 +35,7 @@
 </h1>
 
 <main class="flex flex-col gap-12">
-	<section class="max-w-sm rounded-lg bg-slate-700 p-4 shadow-md">
+	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="pb-6 font-bold">Inbound Product</h1>
 		{#each inboundProducts as inboundProduct}
 			{#if inboundProduct.id === Number(params.id)}
@@ -68,9 +68,9 @@
 		{/each}
 	</section>
 
-	<section class="rounded-lg bg-slate-700 p-4 shadow-md">
+	<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
-			<legend>Delete Inbound</legend>
+			<legend>Delete Product from Inbound</legend>
 			<form method="post">
 				<button
 					formaction="?/deleteInboundProduct"

@@ -38,7 +38,7 @@
 			</thead>
 			<tbody>
 				{#each clients as client}
-					<tr>
+					<tr class="hover:bg-slate-800">
 						<td class="border border-gray-300 p-2">{client.name}</td>
 						<td class="border border-gray-300 p-2">
 							<a

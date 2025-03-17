@@ -55,7 +55,7 @@
 			</thead>
 			<tbody>
 				{#each products as product}
-					<tr>
+					<tr class="hover:bg-slate-800">
 						<td class="border border-gray-300 p-2">{product.name}</td>
 						<td class="border border-gray-300 p-2">{product.description}</td>
 						<td class="border border-gray-300 p-2">{product.number}</td>

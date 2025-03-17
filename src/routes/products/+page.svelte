@@ -11,7 +11,7 @@
 <h1 class="py-4 text-xl font-bold">Products</h1>
 
 <main class="flex flex-col gap-12">
-	<section class="max-w-sm">
+	<section class="max-w-sm rounded-lg p-4 pb-6 shadow-md">
 		<h1 class="font-bold">Create Product</h1>
 		<form class="flex flex-col gap-4" action="?/createProduct" method="post">
 			<input

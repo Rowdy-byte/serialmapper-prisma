@@ -35,8 +35,8 @@
 
 <h1 class="py-4 text-xl font-bold">Inbound Details</h1>
 
-<main class="flex flex-col gap-12">
-	<section class="max-w-sm rounded-lg p-4 shadow-md">
+<main class="flex flex-col">
+	<section class="max-w-sm rounded-lg p-4 pb-6 shadow-md">
 		<h1 class="pb-4 font-bold">Inbound</h1>
 		<form class="flex flex-col gap-4" method="post">
 			<select
@@ -68,8 +68,8 @@
 		</form>
 	</section>
 
-	<section class="max-w-sm rounded-lg p-4 shadow-md">
-		<h1 class="pb-4 font-bold">Add Single Product to Inbound</h1>
+	<section class="max-w-sm rounded-lg p-4 pb-6 shadow-md">
+		<h1 class="pb-4 font-bold">Add single Product to Inbound</h1>
 		<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
 
@@ -78,7 +78,7 @@
             border-gray-300 p-2 text-gray-800"
 				name="product"
 			>
-				<option value="products">--Select Product--</option>
+				<option value="products">-- Select Product --</option>
 				<!-- fetch data from db with sveltekit loadfunction -->
 				{#each products as product}
 					<option value={product.name}>{product.number}</option>
@@ -97,7 +97,7 @@
 				type="submit">Add</button
 			>
 			<section class="flex max-w-sm flex-col gap-4 pt-8">
-				<h1 class="font-bold">Add Multiple Products to Inbound</h1>
+				<h1 class="font-bold">Add multiple Products to Inbound</h1>
 				<textarea
 					name="batch"
 					placeholder="Batch Serialnumbers "
@@ -115,7 +115,7 @@
 	</section>
 
 	<section>
-		<h1 class="font-bold">Products in this Inbound</h1>
+		<h1 class="pb-6 font-bold">Products in this Inbound</h1>
 		{#if inboundProducts.length === 0}
 			<p>No products in this inbound.</p>
 		{/if}
@@ -146,7 +146,7 @@
 			</tbody>
 		</table>
 	</section>
-	<section>
+	<section class="flex flex-col gap-4 p-4 pt-6">
 		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
 			<legend>Delete Inbound</legend>
 			<form method="post">

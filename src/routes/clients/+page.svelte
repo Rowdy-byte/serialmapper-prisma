@@ -9,7 +9,7 @@
 <h1 class="py-4 text-xl font-bold">Clients</h1>
 
 <main class="flex flex-col gap-12">
-	<section class="max-w-sm">
+	<section class="max-w-sm rounded-lg p-4 pb-6 shadow-md">
 		<h1 class="font-bold">Create New Client</h1>
 		<form class="flex flex-col gap-4" action="" method="post">
 			<input

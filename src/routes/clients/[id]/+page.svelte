@@ -22,8 +22,8 @@
 </script>
 
 <main class="flex flex-col gap-12">
-	<section class="max-w-sm">
-		<h1 class="font-bold">Edit Client</h1>
+	<section class="max-w-sm rounded-lg p-4 pb-6 shadow-md">
+		<h1 class="pb-4 font-bold">Edit Client</h1>
 		<form class="flex flex-col gap-4" method="post">
 			<input
 				type="text"

@@ -10,18 +10,19 @@
 	const { data, form }: PageProps = $props();
 	let { inboundProducts } = data;
 
-	function handleUpdateInboundProduct() {
-		form?.success;
-	}
-
-	function handleDeleteInboundProduct() {
-		if (confirm('Are you sure you want to delete this inbound product?')) {
-			form?.success;
-			goto(`/inbounds/${inboundId}`);
+	function handleUpdateInboundProduct(event: Event) {
+		if (!confirm('Are you sure you want to update this inbound product?')) {
+			event.preventDefault();
 		}
 	}
 
-	console.log(data);
+	function handleDeleteInboundProduct(event: Event) {
+		if (!confirm('Are you sure you want to delete this inbound product?')) {
+			event.preventDefault();
+			return;
+		}
+		goto(`/inbounds/${inboundId}`);
+	}
 </script>
 
 <h1 class="py-4 text-xl font-bold">

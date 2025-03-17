@@ -35,8 +35,8 @@
 
 <h1 class="py-4 text-xl font-bold">Inbound Details</h1>
 
-<main class="flex flex-col">
-	<section class="max-w-sm rounded-lg p-4 pb-6 shadow-md">
+<main class="flex flex-col gap-2">
+	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="pb-4 font-bold">Inbound</h1>
 		<form class="flex flex-col gap-4" method="post">
 			<select
@@ -68,7 +68,7 @@
 		</form>
 	</section>
 
-	<section class="max-w-sm rounded-lg p-4 pb-6 shadow-md">
+	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="pb-4 font-bold">Add single Product to Inbound</h1>
 		<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
@@ -114,12 +114,10 @@
 		</form>
 	</section>
 
-	<section>
+	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<h1 class="py-6 font-bold">Products in this Inbound</h1>
-		{#if inboundProducts.length === 0}
-			<p>No products in this inbound.</p>
-		{/if}
-		<table class="w-full">
+
+		<table class="table w-full">
 			<thead>
 				<tr>
 					<th class="border border-gray-300 p-2"></th>
@@ -132,7 +130,7 @@
 				<!-- only products with inboundId -->
 				{#each inboundProducts as inboundProduct, i}
 					{#if inboundProduct.inboundId === inbound?.id}
-						<tr>
+						<tr class="hover:bg-slate-600">
 							<td class="border border-gray-300 p-2">{i + 1}</td>
 							<td class="border border-gray-300 p-2">{inboundProduct.product}</td>
 							<td class="border border-gray-300 p-2">{inboundProduct.serialnumber}</td>
@@ -147,8 +145,11 @@
 				{/each}
 			</tbody>
 		</table>
+		{#if inboundProducts.length === 0}
+			<p class="mt-2 border border-gray-300 p-2">No products found.</p>
+		{/if}
 	</section>
-	<section class="flex flex-col gap-4 rounded-lg p-4 pt-6 pb-6 shadow-md">
+	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
 			<legend>Delete Inbound</legend>
 			<form method="post">

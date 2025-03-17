@@ -12,8 +12,8 @@
 <h1 class=" py-4 text-xl font-bold">Inbounds</h1>
 
 <main class="flex flex-col gap-12">
-	<section class="max-w-sm rounded-lg p-4 shadow-md">
-		<h1 class="font-bold">Create Inbound</h1>
+	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
+		<h1 class="py-6 font-bold">Create Inbound</h1>
 		<form class="flex flex-col gap-4" action="?/createInbound" method="post">
 			<select class="rounded-md border border-gray-300 p-2 text-gray-800" name="clientName">
 				<option value="">-- Select Client --</option>
@@ -36,9 +36,9 @@
 		</form>
 	</section>
 
-	<section>
-		<h1 class="font-bold">Inbounds List</h1>
-		<table class="w-full border border-gray-300">
+	<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+		<h1 class="py-6 font-bold">Inbounds List</h1>
+		<table class="table w-full border border-gray-300">
 			<thead>
 				<tr>
 					<th class="border border-gray-300 p-2">Client</th>
@@ -49,7 +49,7 @@
 			</thead>
 			<tbody>
 				{#each inbounds as inbound}
-					<tr>
+					<tr class="hover:bg-slate-800">
 						<td class="border border-gray-300 p-2">{inbound.clientName}</td>
 						<td class="border border-gray-300 p-2">{inbound.description}</td>
 						<td class="border border-gray-300 p-2"
@@ -62,5 +62,8 @@
 				{/each}
 			</tbody>
 		</table>
+		{#if inbounds.length === 0}
+			<p class="mt-2 border border-gray-300 p-2">No inbounds found.</p>
+		{/if}
 	</section>
 </main>

@@ -8,7 +8,7 @@
 </script>
 
 <section
-	class="flex aspect-square w-full flex-col items-center justify-center rounded-lg p-4 shadow-md"
+	class="flex aspect-square w-full flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
 >
 	<h1>{statsName}</h1>
 	<p class="text-4xl">{statsValue}</p>

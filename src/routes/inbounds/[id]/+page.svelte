@@ -24,6 +24,13 @@
 			goto('/inbounds');
 		}
 	}
+
+	function handleAddBatch() {
+		if (confirm('Are you sure you want to add this batch to this inbound?')) {
+			form?.success;
+			goto('/inbounds');
+		}
+	}
 </script>
 
 <h1 class="py-4 text-xl font-bold">Inbound Details</h1>
@@ -56,7 +63,7 @@
 				formaction="?/updateInbound"
 				onclick={handleUpdateInbound}
 				class="rounded-md border
-            border-gray-300 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-gray-100 hover:text-gray-800 hover:shadow-md hover:transition-all"
+            border-gray-300 bg-green-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Update</button
 			>
 		</form>
@@ -88,8 +95,15 @@
 			></textarea>
 			<button
 				class="rounded-md border
-			border-gray-300 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-gray-100 hover:text-gray-800 hover:shadow-md hover:transition-all"
+			border-gray-300 bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Add</button
+			>
+			<button
+				formaction="?/addInboundProductBatchToInbound"
+				onclick={handleAddBatch}
+				class="rounded-md border
+		border-gray-300 bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				type="submit">Add Batch</button
 			>
 		</form>
 	</section>
@@ -127,7 +141,7 @@
 					formaction="?/deleteInbound"
 					onclick={handleDeleteInbound}
 					class="rounded-md border
-			border-gray-300 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-gray-100 hover:text-gray-800 hover:shadow-md hover:transition-all"
+			border-gray-300 bg-red-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit">Delete</button
 				>
 			</form>

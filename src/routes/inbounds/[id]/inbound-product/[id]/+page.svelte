@@ -31,7 +31,7 @@
 		><span class="rounded-lg bg-orange-500 px-4 py-1"> {inboundId}</span></a
 	>
 	| product >
-	<span class="rounded-xs= bg-yellow-500 px-4 py-1"> {params.id}</span>
+	<span class="rounded-lg bg-yellow-500 px-4 py-1"> {params.id}</span>
 </h1>
 
 <main class="flex flex-col gap-12">

@@ -122,6 +122,7 @@
 		<table class="w-full">
 			<thead>
 				<tr>
+					<th class="border border-gray-300 p-2"></th>
 					<th class="border border-gray-300 p-2">Product</th>
 					<th class="border border-gray-300 p-2">Serialnumbers</th>
 					<th class="border border-gray-300 p-2">Actions</th>
@@ -129,9 +130,10 @@
 			</thead>
 			<tbody>
 				<!-- only products with inboundId -->
-				{#each inboundProducts as inboundProduct}
+				{#each inboundProducts as inboundProduct, i}
 					{#if inboundProduct.inboundId === inbound?.id}
 						<tr>
+							<td class="border border-gray-300 p-2">{i + 1}</td>
 							<td class="border border-gray-300 p-2">{inboundProduct.product}</td>
 							<td class="border border-gray-300 p-2">{inboundProduct.serialnumber}</td>
 							<td class="border border-gray-300 p-2">
@@ -146,7 +148,7 @@
 			</tbody>
 		</table>
 	</section>
-	<section class="flex flex-col gap-4 p-4 pt-6">
+	<section class="flex flex-col gap-4 rounded-lg p-4 pt-6 pb-6 shadow-md">
 		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
 			<legend>Delete Inbound</legend>
 			<form method="post">

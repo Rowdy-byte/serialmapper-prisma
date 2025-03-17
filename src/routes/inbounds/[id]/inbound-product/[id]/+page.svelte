@@ -28,10 +28,10 @@
 	<!-- link to inbound -->
 	Inbound >
 	<a href={`/inbounds/${inboundId}`}
-		><span class="rounded-xs bg-orange-500 p-1"> {inboundId}</span></a
+		><span class="rounded-lg bg-orange-500 px-4 py-1"> {inboundId}</span></a
 	>
 	| product >
-	<span class="rounded-xs bg-yellow-500 p-1"> {params.id}</span>
+	<span class="rounded-xs= bg-yellow-500 px-4 py-1"> {params.id}</span>
 </h1>
 
 <main class="flex flex-col gap-12">
@@ -68,7 +68,7 @@
 		{/each}
 	</section>
 
-	<section>
+	<section class="rounded-lg p-4 shadow-md">
 		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
 			<legend>Delete Inbound</legend>
 			<form method="post">

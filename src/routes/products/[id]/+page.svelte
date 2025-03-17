@@ -25,7 +25,7 @@
 <h1 class="py-4 text-xl font-bold">Product Details</h1>
 
 <main class="flex flex-col gap-4">
-	<section class="max-w-sm rounded-lg bg-slate-700 p-4 pb-6 shadow-md">
+	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="pb-6 font-bold">Product</h1>
 		<form class="flex flex-col gap-4" method="post">
 			<input
@@ -61,7 +61,7 @@
 			>
 		</form>
 	</section>
-	<section class="rounded-lg bg-slate-700 p-4 pb-6 shadow-md">
+	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
 			<legend>Delete Product</legend>
 			<form method="post">

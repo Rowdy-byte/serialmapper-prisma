@@ -11,7 +11,7 @@
 <h1 class="py-4 text-xl font-bold">Products</h1>
 
 <main class="flex flex-col gap-12">
-	<section class="max-w-sm rounded-lg bg-slate-700 p-4 pb-6 shadow-md">
+	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="pb-6 font-bold">Create Product</h1>
 		<form class="flex flex-col gap-4" action="?/createProduct" method="post">
 			<input
@@ -42,7 +42,7 @@
 			>
 		</form>
 	</section>
-	<section class="rounded-lg bg-slate-700 p-4 pb-6 shadow-md">
+	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="pb-6 font-bold">Products List</h1>
 		<table class="table w-full">
 			<thead>

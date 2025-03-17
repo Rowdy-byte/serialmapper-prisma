@@ -115,7 +115,7 @@
 	</section>
 
 	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<h1 class="py-6 font-bold">Products in this Inbound</h1>
+		<h1 class="pb-6 font-bold">Products in this Inbound</h1>
 
 		<table class="table w-full">
 			<thead>

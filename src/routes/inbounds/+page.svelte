@@ -13,7 +13,7 @@
 
 <main class="flex flex-col gap-12">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
-		<h1 class="py-6 font-bold">Create Inbound</h1>
+		<h1 class="pb-6 font-bold">Create Inbound</h1>
 		<form class="flex flex-col gap-4" action="?/createInbound" method="post">
 			<select class="rounded-md border border-gray-300 p-2 text-gray-800" name="clientName">
 				<option value="">-- Select Client --</option>
@@ -36,8 +36,8 @@
 		</form>
 	</section>
 
-	<section class="rounded-lg bg-gray-900 p-4 shadow-md">
-		<h1 class="py-6 font-bold">Inbounds List</h1>
+	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
+		<h1 class="pb-6 font-bold">Inbounds List</h1>
 		<table class="table w-full border border-gray-300">
 			<thead>
 				<tr>

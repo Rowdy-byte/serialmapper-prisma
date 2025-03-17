@@ -57,21 +57,24 @@
 				formaction="?/updateProduct"
 				onclick={handleUpdateProduct}
 				class="rounded-md border
-            border-gray-300 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-gray-100 hover:text-gray-800 hover:shadow-md hover:transition-all"
+            border-gray-300 bg-green-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Update</button
 			>
 		</form>
 	</section>
 	<section>
-		<h1 class="font-bold">Delete Product</h1>
-		<form method="post">
-			<button
-				onclick={handleDeleteProduct}
-				formaction="?/deleteProduct"
-				class="rounded-md border
-            border-gray-300 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-gray-100 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				type="submit">Delete</button
-			>
-		</form>
+		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
+			<legend>Delete Product</legend>
+			<form method="post">
+				<button
+					onclick={handleDeleteProduct}
+					formaction="?/deleteProduct"
+					class="rounded-md border
+			border-gray-300 bg-red-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					type="submit">Delete</button
+				>
+			</form>
+			<p>This will permanently delete this product!</p>
+		</fieldset>
 	</section>
 </main>

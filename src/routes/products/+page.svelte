@@ -60,7 +60,7 @@
 						<td class="border border-gray-300 p-2">{product.description}</td>
 						<td class="border border-gray-300 p-2">{product.number}</td>
 						<td class="border border-gray-300 p-2">
-							<a href={`products/${product.id}`}>Details</a>
+							<a class="text-blue-500 underline" href={`products/${product.id}`}>Details</a>
 						</td>
 					</tr>
 				{/each}

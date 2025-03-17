@@ -37,7 +37,7 @@
 
 <main class="flex flex-col gap-12">
 	<section class="max-w-sm">
-		<h1 class="font-bold">Inbound</h1>
+		<h1 class="pb-4 font-bold">Inbound</h1>
 		<form class="flex flex-col gap-4" method="post">
 			<select
 				class="rounded-md border
@@ -70,7 +70,7 @@
 	</section>
 
 	<section class="max-w-sm">
-		<h1 class="font-bold">Add Product to Inbound</h1>
+		<h1 class="pb-4 font-bold">Add Single Product to Inbound</h1>
 		<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
 
@@ -98,29 +98,36 @@
 			border-gray-300 bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Add</button
 			>
-			<textarea
-				name="batch"
-				placeholder="Batch Serialnumbers "
-				class="rounded-md border
-			border-gray-300 p-2 text-gray-800"
-			></textarea>
-			<button
-				formaction="?/addBatchInboundProductToInbound"
-				onclick={handleAddBatch}
-				class="rounded-md border
-		border-gray-300 bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				type="submit">Add Batch</button
-			>
+			<section class="flex max-w-sm flex-col gap-4 pt-8">
+				<h1 class="font-bold">Add Multiple Products to Inbound</h1>
+				<textarea
+					name="batch"
+					placeholder="Batch Serialnumbers "
+					class="rounded-md border
+	border-gray-300 p-2 text-gray-800"
+				></textarea>
+				<button
+					formaction="?/addBatchInboundProductToInbound"
+					onclick={handleAddBatch}
+					class="rounded-md border
+border-gray-300 bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					type="submit">Add Batch</button
+				>
+			</section>
 		</form>
 	</section>
+
 	<section>
 		<h1 class="font-bold">Products in this Inbound</h1>
+		{#if inboundProducts.length === 0}
+			<p>No products in this inbound.</p>
+		{/if}
 		<table class="w-full">
 			<thead>
 				<tr>
 					<th class="border border-gray-300 p-2">Product</th>
 					<th class="border border-gray-300 p-2">Serialnumbers</th>
-					<th class="border border-gray-300 p-2">Details</th>
+					<th class="border border-gray-300 p-2">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -133,7 +140,7 @@
 							<td class="border border-gray-300 p-2">
 								<a
 									class="text-blue-500 underline"
-									href={`/inbounds/${inbound.id}/inbound-product/${inboundProduct.id}`}>Details</a
+									href={`/inbounds/${inbound.id}/inbound-product/${inboundProduct.id}`}>View</a
 								>
 							</td>
 						</tr>

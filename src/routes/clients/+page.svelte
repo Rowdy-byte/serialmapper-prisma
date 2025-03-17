@@ -28,13 +28,27 @@
 	</section>
 	<section>
 		<h1 class="font-bold">Clients List</h1>
-		<ul class="flex flex-col gap-2">
-			{#each clients as client, i}
-				<li class="flex flex-row gap-2">
-					<span>{i + 1}</span>
-					<a href="/clients/{client.id}" aria-label="link-to-details"><span>{client.name}</span></a>
-				</li>
-			{/each}
-		</ul>
+		<!-- show clientlist in a table -->
+		<table class="w-full">
+			<thead>
+				<tr>
+					<th class="border border-gray-300 p-2">Name</th>
+					<th class="border border-gray-300 p-2">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each clients as client}
+					<tr>
+						<td class="border border-gray-300 p-2">{client.name}</td>
+						<td class="border border-gray-300 p-2">
+							<a
+								href="/clients/{client.id}"
+								class="text-blue-500 hover:cursor-pointer hover:text-blue-800">View</a
+							>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
 	</section>
 </main>

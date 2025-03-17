@@ -44,7 +44,7 @@
 					<th class="border border-gray-300 p-2">Client</th>
 					<th class="border border-gray-300 p-2">Description</th>
 					<th class="border border-gray-300 p-2">Created</th>
-					<th class="border border-gray-300 p-2">Details</th>
+					<th class="border border-gray-300 p-2">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -56,7 +56,7 @@
 							>{new Date(inbound.createdAt).toLocaleDateString()}</td
 						>
 						<td class="border border-gray-300 p-2">
-							<a href={`/inbounds/${inbound.id}`} class="text-blue-500 underline">Details</a>
+							<a href={`/inbounds/${inbound.id}`} class="text-blue-500 underline">View</a>
 						</td>
 					</tr>
 				{/each}

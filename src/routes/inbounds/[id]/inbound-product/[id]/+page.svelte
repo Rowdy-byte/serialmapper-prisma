@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 
 	const { params, url } = page;
 	const urlArray = url.pathname.split('/');
@@ -13,6 +14,13 @@
 		form?.success;
 	}
 
+	function handleDeleteInboundProduct() {
+		if (confirm('Are you sure you want to delete this inbound product?')) {
+			form?.success;
+			goto(`/inbounds/${inboundId}`);
+		}
+	}
+
 	console.log(data);
 </script>
 
@@ -21,7 +29,6 @@
 <main class="flex flex-col gap-12">
 	<section class="max-w-sm">
 		<h1 class="font-bold">Inbound Product</h1>
-		<!-- form for showing Inbound product details and functionality for updating -->
 		{#each inboundProducts as inboundProduct}
 			{#if inboundProduct.id === Number(params.id)}
 				<form class="flex flex-col gap-4" method="post">
@@ -52,5 +59,21 @@
 				</form>
 			{/if}
 		{/each}
+	</section>
+
+	<section>
+		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
+			<legend>Delete Inbound</legend>
+			<form method="post">
+				<button
+					formaction="?/deleteInboundProduct"
+					onclick={handleDeleteInboundProduct}
+					class="rounded-md border
+			border-gray-300 bg-red-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					type="submit">Delete</button
+				>
+			</form>
+			<p>This will permanently delete this product from inbound!</p>
+		</fieldset>
 	</section>
 </main>

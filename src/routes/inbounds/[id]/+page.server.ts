@@ -115,37 +115,49 @@ export const actions = {
     // Add many products to the inbound with inboundId
     // split input by space, newline, each number is a product
     async addBatchInboundProductToInbound({ params, request }: { params: { id: string }, request: Request }) {
-
         const inboundId = Number(params.id);
         const formData = await request.formData();
-        const batch = (formData.get('batch') as string).split(/\s+/);
-        const product = formData.get('product');
+        const batch = (formData.get('batch') as string)
+            .split(/\s+/) // Split by spaces/newlines
+            .map(serialnumber => serialnumber.trim()) // Trim whitespace
+            .filter(serialnumber => serialnumber.length > 0); // Remove empty values
 
-        const inboundProducts = await Promise.all(
-            batch.map(async (serialnumber) => {
-                return await db.inboundProduct.create(
-                    {
-                        data: {
-                            product: product as string,
-                            serialnumber: serialnumber, // Add the serialnumber here
-                            inbound: {
-                                connect: {
-                                    id: inboundId
-                                }
-                            }
-                        }
-                    }
-                );
-            })
+        const product = formData.get('product') as string;
+
+        // 🔎 Step 1: Get existing serial numbers from DB
+        const existingSerialNumbers = new Set(
+            (await db.inboundProduct.findMany({
+                where: { serialnumber: { in: batch } },
+                select: { serialnumber: true }
+            })).map(({ serialnumber }) => serialnumber)
         );
+
+        // 🛑 Step 2: Filter out duplicates
+        const uniqueSerialNumbers = batch.filter(serialnumber => !existingSerialNumbers.has(serialnumber));
+
+        if (uniqueSerialNumbers.length === 0) {
+            return {
+                status: 400,
+                success: false,
+                message: 'All serial numbers already exist.'
+            };
+        }
+
+        // ✅ Step 3: Insert only unique serial numbers
+        const inboundProducts = await db.inboundProduct.createMany({
+            data: uniqueSerialNumbers.map(serialnumber => ({
+                product,
+                serialnumber,
+                inboundId
+            }))
+        });
 
         return {
             status: 200,
             success: true,
             inboundProducts
-        }
-
-
+        };
     }
+
 
 }

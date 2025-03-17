@@ -111,6 +111,41 @@ export const actions = {
             inboundProduct
         }
 
+    },
+    // Add many products to the inbound with inboundId
+    // split input by space, newline, each number is a product
+    async addBatchInboundProductToInbound({ params, request }: { params: { id: string }, request: Request }) {
+
+        const inboundId = Number(params.id);
+        const formData = await request.formData();
+        const batch = (formData.get('batch') as string).split(/\s+/);
+        const product = formData.get('product');
+
+        const inboundProducts = await Promise.all(
+            batch.map(async (serialnumber) => {
+                return await db.inboundProduct.create(
+                    {
+                        data: {
+                            product: product as string,
+                            serialnumber: serialnumber, // Add the serialnumber here
+                            inbound: {
+                                connect: {
+                                    id: inboundId
+                                }
+                            }
+                        }
+                    }
+                );
+            })
+        );
+
+        return {
+            status: 200,
+            success: true,
+            inboundProducts
+        }
+
+
     }
 
 }

@@ -46,7 +46,7 @@
 						formaction="?/updateInboundProduct"
 						onclick={handleUpdateInboundProduct}
 						class="rounded-md border
-            border-gray-300 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-gray-100 hover:text-gray-800 hover:shadow-md hover:transition-all"
+            border-gray-300 bg-green-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit">Update</button
 					>
 				</form>

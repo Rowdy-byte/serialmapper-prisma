@@ -98,8 +98,14 @@
 			border-gray-300 bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Add</button
 			>
+			<textarea
+				name="batch"
+				placeholder="Batch Serialnumbers "
+				class="rounded-md border
+			border-gray-300 p-2 text-gray-800"
+			></textarea>
 			<button
-				formaction="?/addInboundProductBatchToInbound"
+				formaction="?/addBatchInboundProductToInbound"
 				onclick={handleAddBatch}
 				class="rounded-md border
 		border-gray-300 bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
@@ -125,7 +131,10 @@
 							<td class="border border-gray-300 p-2">{inboundProduct.product}</td>
 							<td class="border border-gray-300 p-2">{inboundProduct.serialnumber}</td>
 							<td class="border border-gray-300 p-2">
-								<a href={`/inbounds/${inbound.id}/inbound-product/${inboundProduct.id}`}>Details</a>
+								<a
+									class="text-blue-500 underline"
+									href={`/inbounds/${inbound.id}/inbound-product/${inboundProduct.id}`}>Details</a
+								>
 							</td>
 						</tr>
 					{/if}

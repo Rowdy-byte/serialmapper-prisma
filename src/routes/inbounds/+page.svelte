@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
+
 	import { goto } from '$app/navigation';
 	let { data, form }: PageProps = $props();
 	const clients = data.clients;

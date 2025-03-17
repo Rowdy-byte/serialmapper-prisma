@@ -12,7 +12,7 @@
 <h1 class=" py-4 text-xl font-bold">Inbounds</h1>
 
 <main class="flex flex-col gap-12">
-	<section class="max-w-sm">
+	<section class="max-w-sm rounded-lg p-4 shadow-md">
 		<h1 class="font-bold">Create Inbound</h1>
 		<form class="flex flex-col gap-4" action="?/createInbound" method="post">
 			<select class="rounded-md border border-gray-300 p-2 text-gray-800" name="clientName">

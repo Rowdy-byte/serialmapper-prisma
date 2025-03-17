@@ -62,8 +62,7 @@
 			<button
 				formaction="?/updateInbound"
 				onclick={handleUpdateInbound}
-				class="rounded-md border
-            border-gray-300 bg-green-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-green-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Update</button
 			>
 		</form>
@@ -94,8 +93,7 @@
 			border-gray-300 p-2 text-gray-800"
 			></textarea>
 			<button
-				class="rounded-md border
-			border-gray-300 bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Add</button
 			>
 			<section class="flex max-w-sm flex-col gap-4 pt-8">
@@ -109,8 +107,7 @@
 				<button
 					formaction="?/addBatchInboundProductToInbound"
 					onclick={handleAddBatch}
-					class="rounded-md border
-border-gray-300 bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit">Add Batch</button
 				>
 			</section>
@@ -156,8 +153,7 @@ border-gray-300 bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gra
 				<button
 					formaction="?/deleteInbound"
 					onclick={handleDeleteInbound}
-					class="rounded-md border
-			border-gray-300 bg-red-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-md bg-red-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit">Delete</button
 				>
 			</form>

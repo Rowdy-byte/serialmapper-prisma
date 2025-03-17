@@ -24,10 +24,18 @@
 	console.log(data);
 </script>
 
-<h1 class="py-4 text-xl font-bold">Inbound: {inboundId} product: {params.id}</h1>
+<h1 class="py-4 text-xl font-bold">
+	<!-- link to inbound -->
+	Inbound >
+	<a href={`/inbounds/${inboundId}`}
+		><span class="rounded-xs bg-orange-500 p-1"> {inboundId}</span></a
+	>
+	| product >
+	<span class="rounded-xs bg-yellow-500 p-1"> {params.id}</span>
+</h1>
 
 <main class="flex flex-col gap-12">
-	<section class="max-w-sm">
+	<section class="max-w-sm rounded-lg p-4 shadow-md">
 		<h1 class="font-bold">Inbound Product</h1>
 		{#each inboundProducts as inboundProduct}
 			{#if inboundProduct.id === Number(params.id)}
@@ -52,8 +60,7 @@
 					<button
 						formaction="?/updateInboundProduct"
 						onclick={handleUpdateInboundProduct}
-						class="rounded-md border
-            border-gray-300 bg-green-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-md bg-green-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit">Update</button
 					>
 				</form>
@@ -68,8 +75,7 @@
 				<button
 					formaction="?/deleteInboundProduct"
 					onclick={handleDeleteInboundProduct}
-					class="rounded-md border
-			border-gray-300 bg-red-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-md bg-red-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit">Delete</button
 				>
 			</form>

@@ -56,8 +56,7 @@
 			<button
 				formaction="?/updateProduct"
 				onclick={handleUpdateProduct}
-				class="rounded-md border
-            border-gray-300 bg-green-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-green-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Update</button
 			>
 		</form>
@@ -69,8 +68,7 @@
 				<button
 					onclick={handleDeleteProduct}
 					formaction="?/deleteProduct"
-					class="rounded-md border
-			border-gray-300 bg-red-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-md bg-red-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit">Delete</button
 				>
 			</form>

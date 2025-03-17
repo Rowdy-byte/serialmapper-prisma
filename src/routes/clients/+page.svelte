@@ -20,7 +20,7 @@
             border-gray-300 p-2 text-gray-800"
 			/>
 			<button
-				class="rounded-md border border-gray-300
+				class="rounded-md
             bg-blue-500 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Create</button
 			>

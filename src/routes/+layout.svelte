@@ -4,10 +4,10 @@
 </script>
 
 <nav class="relative flex items-center justify-between p-4">
-	<section>
-		<a href="/">Home</a>
+	<section class="flex items-center justify-center gap-2">
+		<a class="text-center text-2xl font-bold" href="/">serialmapper</a>
 	</section>
-	<section class="flex gap-2">
+	<section class="flex items-center justify-center gap-2 text-center">
 		<a href="/inbounds">Inbounds</a>
 		|
 		<a href="/clients">Clients</a>

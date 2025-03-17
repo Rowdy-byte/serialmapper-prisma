@@ -115,7 +115,7 @@
 	</section>
 
 	<section>
-		<h1 class="pb-6 font-bold">Products in this Inbound</h1>
+		<h1 class="py-6 font-bold">Products in this Inbound</h1>
 		{#if inboundProducts.length === 0}
 			<p>No products in this inbound.</p>
 		{/if}

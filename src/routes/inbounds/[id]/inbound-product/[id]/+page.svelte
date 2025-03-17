@@ -36,7 +36,7 @@
 
 <main class="flex flex-col gap-12">
 	<section class="max-w-sm rounded-lg p-4 shadow-md">
-		<h1 class="font-bold">Inbound Product</h1>
+		<h1 class="pb-6 font-bold">Inbound Product</h1>
 		{#each inboundProducts as inboundProduct}
 			{#if inboundProduct.id === Number(params.id)}
 				<form class="flex flex-col gap-4" method="post">

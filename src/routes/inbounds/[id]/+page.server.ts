@@ -82,36 +82,45 @@ export const actions = {
     // Add a product to the inbound with inboundId
     async addInboundProductToInbound({ request }: { params: { id: string }, request: Request }) {
 
-
         const formData = await request.formData();
         const inboundId = Number(formData.get('inboundId'));
         const product = formData.get('product');
-        const serialnumber = formData.get('serialnumber');
+        const serialnumber = formData.get('serialnumber') as string;
 
+        // 🔎 Step 1: Check if the serial number already exists
+        const existingProduct = await db.inboundProduct.findFirst({
+            where: { serialnumber: serialnumber },
+        });
 
-        const inboundProduct = await db.inboundProduct.create(
-            {
-                data: {
+        // 🛑 Step 2: If a product with the same serialnumber exists, return an error
+        if (existingProduct) {
+            return {
+                status: 400,
+                success: false,
+                message: 'Duplicate serial number. This product already exists in the database.'
+            };
+        }
 
-                    serialnumber: serialnumber as string,
-                    product: product as string,
-                    inbound: {
-                        connect: {
-                            id: inboundId
-                        }
+        // ✅ Step 3: Proceed with creating the new inbound product
+        const inboundProduct = await db.inboundProduct.create({
+            data: {
+                serialnumber,
+                product: product as string,
+                inbound: {
+                    connect: {
+                        id: inboundId
                     }
-
                 }
             }
-        );
+        });
 
         return {
             status: 200,
             success: true,
             inboundProduct
-        }
-
+        };
     },
+
     // Add many products to the inbound with inboundId
     // split input by space, newline, each number is a product
     async addBatchInboundProductToInbound({ params, request }: { params: { id: string }, request: Request }) {

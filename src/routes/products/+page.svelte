@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { goto } from '$app/navigation';
+	import { Eye } from '@lucide/svelte';
+
 	let { data, form }: PageProps = $props();
 
 	const products = data.products;
@@ -56,7 +58,7 @@
 					<th class="border border-gray-300 p-2">Name</th>
 					<th class="border border-gray-300 p-2">Description</th>
 					<th class="border border-gray-300 p-2">Number</th>
-					<th class="border border-gray-300 p-2">details</th>
+					<th class="border border-gray-300 p-2">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -66,7 +68,9 @@
 						<td class="border border-gray-300 p-2">{product.description}</td>
 						<td class="border border-gray-300 p-2">{product.number}</td>
 						<td class="border border-gray-300 p-2">
-							<a class="text-blue-500 underline" href={`products/${product.id}`}>Details</a>
+							<a class="text-blue-500 underline" href={`products/${product.id}`}>
+								<Eye size="16" />
+							</a>
 						</td>
 					</tr>
 				{/each}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
+	import { Eye } from '@lucide/svelte';
 
 	let { data }: PageProps = $props();
 
@@ -50,8 +51,10 @@
 						<td class="border border-gray-300 p-2">
 							<a
 								href="/clients/{client.id}"
-								class="text-blue-500 hover:cursor-pointer hover:text-blue-800">View</a
+								class="text-blue-500 hover:cursor-pointer hover:text-blue-800"
 							>
+								<Eye size="16" />
+							</a>
 						</td>
 					</tr>
 				{/each}

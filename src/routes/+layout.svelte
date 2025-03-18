@@ -18,6 +18,6 @@
 	</section>
 </nav>
 
-<main class="p-4">
+<main class="relative h-screen p-4">
 	{@render children()}
 </main>

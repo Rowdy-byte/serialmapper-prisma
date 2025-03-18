@@ -1,5 +1,6 @@
 import type { PageServerLoad, Actions } from "./$types";
 import { db } from "$lib/server/db";
+import { error } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async () => {
     const clients = await db.client.findMany();
@@ -13,12 +14,17 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
     async createInbound({ request }) {
+
         const formData = await request.formData();
         const clientName = formData.get('clientName');
         const description = formData.get('description');
 
-
-
+        if (!clientName || !description) {
+            error(404, 'Client name and description are required');
+            return {
+                error: true,
+            }
+        }
 
         await db.inbound.create({
             data: {
@@ -31,4 +37,4 @@ export const actions: Actions = {
             success: true
         };
     }
-};
+}

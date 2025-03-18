@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { title } from 'process';
 	import type { PageProps } from './$types';
 
 	import { Eye } from '@lucide/svelte';
 
-	let { data, form }: PageProps = $props();
+	let { data }: PageProps = $props();
 
 	const client = data.client;
 	const clients = data.clients;
@@ -73,7 +72,6 @@
 		<h1 class="pb-4 font-bold">Add single Product to Inbound</h1>
 		<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
-
 			<select
 				class="rounded-md border
             border-gray-300 p-2 text-gray-800"

@@ -70,7 +70,18 @@
 
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="font-bold">Add single Product to Inbound</h1>
-		<p class="pb-4 text-xs">Each product holds a serialnumber.</p>
+
+		<ul class="pt-4 pb-4 pl-3 text-xs">
+			<li class="pb-1">
+				<p>1. Select the product you want to add.</p>
+			</li>
+			<li class="pb-1">
+				<p>2. Enter the serialnumber of the product.</p>
+			</li>
+			<li class="pb-1">
+				<p>3. Click on Add.</p>
+			</li>
+		</ul>
 		<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
 			<select

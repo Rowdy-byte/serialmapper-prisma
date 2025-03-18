@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 
-	import { goto } from '$app/navigation';
 	import { Eye } from '@lucide/svelte';
 	let { data, form }: PageProps = $props();
 	const clients = data.clients;
@@ -19,6 +18,16 @@
 <main class="flex flex-col gap-12">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="pb-6 font-bold">Create Inbound</h1>
+		<!-- {#if !form?.success}
+			<p class="mb-4 rounded-md border border-red-500 bg-red-100 p-2 text-red-500">
+				{form?.error}
+			</p>
+		{/if}
+		{#if form.success}
+			<p class="mb-4 rounded-md border border-green-500 bg-green-100 p-2 text-green-500">
+				Inbound created successfully!
+			</p>
+		{/if} -->
 		<form class="flex flex-col gap-4" action="?/createInbound" method="post">
 			<select class="rounded-md border border-gray-300 p-2 text-gray-800" name="clientName">
 				<option value="">-- Select Client --</option>

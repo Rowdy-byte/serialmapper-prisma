@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import type { PageProps } from './$types';
+
 	let { data, form }: PageProps = $props();
 
 	const client = data.client;
@@ -11,24 +12,23 @@
 
 	console.log(data);
 
-	function handleDeleteInbound() {
-		if (confirm('Are you sure you want to delete this inbound?')) {
-			form?.success;
-			goto('/inbounds');
+	function handleDeleteInbound(event: Event) {
+		if (!confirm('Are you sure you want to delete this inbound?')) {
+			event.preventDefault();
+			return;
+		}
+		goto('/inbounds');
+	}
+
+	function handleUpdateInbound(event: Event) {
+		if (!confirm('Are you sure you want to update this inbound?')) {
+			event.preventDefault();
 		}
 	}
 
-	function handleUpdateInbound() {
-		if (confirm('Are you sure you want to update this inbound?')) {
-			form?.success;
-			goto('/inbounds');
-		}
-	}
-
-	function handleAddBatch() {
-		if (confirm('Are you sure you want to add this batch to this inbound?')) {
-			form?.success;
-			goto('/inbounds');
+	function handleAddBatch(event: Event) {
+		if (!confirm('Are you sure you want to add this batch to this inbound?')) {
+			event.preventDefault();
 		}
 	}
 </script>

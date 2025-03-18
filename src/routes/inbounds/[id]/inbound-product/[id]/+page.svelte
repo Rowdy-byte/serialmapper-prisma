@@ -7,7 +7,7 @@
 	const urlArray = url.pathname.split('/');
 	const inboundId = urlArray[2];
 
-	const { data, form }: PageProps = $props();
+	const { data }: PageProps = $props();
 	let { inboundProducts } = data;
 
 	function handleUpdateInboundProduct(event: Event) {

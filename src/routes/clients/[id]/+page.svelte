@@ -6,24 +6,26 @@
 	let client = data.client;
 	let success = form?.success;
 
-	function handleDelete() {
-		if (confirm('Are you sure you want to delete this client?')) {
-			form?.success;
-			goto('/clients');
+	function handleDelete(event: Event) {
+		if (!confirm('Are you sure you want to delete this client?')) {
+			event.preventDefault();
 		}
+		goto('/clients');
 	}
 
-	function handleUpdate() {
-		if (confirm('Are you sure you want to update this client?')) {
-			form?.success;
-			goto('/clients');
+	function handleUpdate(event: Event) {
+		if (!confirm('Are you sure you want to update this client?')) {
+			event.preventDefault();
 		}
+		goto('/clients');
 	}
 </script>
 
+<h1 class="py-4 text-xl font-bold">Client Details</h1>
+
 <main class="flex flex-col gap-12">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="pb-4 font-bold">Edit Client</h1>
+		<h1 class="pb-6 font-bold">Edit Client</h1>
 		<form class="flex flex-col gap-4" method="post">
 			<input
 				type="text"

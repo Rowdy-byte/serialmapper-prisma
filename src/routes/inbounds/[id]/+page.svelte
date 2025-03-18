@@ -34,7 +34,12 @@
 </script>
 
 <!-- this also needs to be breadcrums -->
-<h1 class="py-4 text-xl font-bold">Inbound Details</h1>
+
+<section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
+	<ul class="text-gray-500">
+		<li>Inbound {inbound?.id}</li>
+	</ul>
+</section>
 
 <main class="flex flex-col gap-2">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">

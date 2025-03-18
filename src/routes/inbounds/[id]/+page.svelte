@@ -2,9 +2,20 @@
 	import { goto } from '$app/navigation';
 	import type { PageProps } from './$types';
 
-	import { Eye } from '@lucide/svelte';
+	import { CircleHelp, Eye } from '@lucide/svelte';
 
 	let { data }: PageProps = $props();
+
+	let singleSectionOpen = $state(false);
+	let multiSectionOpen = $state(false);
+
+	function toggleSingleSection() {
+		singleSectionOpen = !singleSectionOpen;
+	}
+
+	function toggleMultiSection() {
+		multiSectionOpen = !multiSectionOpen;
+	}
 
 	const client = data.client;
 	const clients = data.clients;
@@ -75,19 +86,28 @@
 	</section>
 
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="font-bold">Add single Product to Inbound</h1>
-
-		<ul class="pt-4 pb-4 pl-3 text-xs">
-			<li class="pb-1">
-				<p>1. Select the product you want to add.</p>
-			</li>
-			<li class="pb-1">
-				<p>2. Enter the serialnumber of the product.</p>
-			</li>
-			<li class="pb-1">
-				<p>3. Click on Add.</p>
-			</li>
-		</ul>
+		<h1 class="flex items-center justify-between pb-4 font-bold">
+			Add single Product to Inbound<button
+				onclick={toggleSingleSection}
+				class="text-gray-500 hover:text-gray-800"
+				aria-label="Toggle Section"
+			>
+				<CircleHelp size="14" />
+			</button>
+		</h1>
+		{#if singleSectionOpen}
+			<ul class=" pb-4 pl-3 text-xs">
+				<li class="pb-1">
+					<p>1. Select the product you want to add.</p>
+				</li>
+				<li class="pb-1">
+					<p>2. Enter the serialnumber of the product.</p>
+				</li>
+				<li class="pb-1">
+					<p>3. Click on Add.</p>
+				</li>
+			</ul>
+		{/if}
 		<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
 			<select
@@ -112,18 +132,29 @@
 			>
 			<section class="flex max-w-sm flex-col gap-4 pt-8">
 				<div>
-					<h1 class="font-bold">Add multiple Products to Inbound</h1>
-					<ul class="pt-4 pl-3 text-xs">
-						<li class="pb-1">
-							<p>1. Select the product you want to add.</p>
-						</li>
-						<li class="pb-1">
-							<p>2. Enter the serialnumbers of the product, separated by a space.</p>
-						</li>
-						<li class="pb-1">
-							<p>3. Click on Add Batch.</p>
-						</li>
-					</ul>
+					<h1 class="flex items-center justify-between font-bold">
+						Add multiple Products to Inbound
+						<button
+							onclick={toggleMultiSection}
+							class="text-gray-500 hover:text-gray-800"
+							aria-label="Toggle Section"
+						>
+							<CircleHelp size="14" />
+						</button>
+					</h1>
+					{#if multiSectionOpen}
+						<ul class="pt-4 pl-3 text-xs">
+							<li class="pb-1">
+								<p>1. Select the product you want to add.</p>
+							</li>
+							<li class="pb-1">
+								<p>2. Enter the serialnumbers of the product, separated by a space.</p>
+							</li>
+							<li class="pb-1">
+								<p>3. Click on Add Batch.</p>
+							</li>
+						</ul>
+					{/if}
 				</div>
 
 				<textarea

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import '../app.css';
+	import Footer from '$lib/components/Footer.svelte';
+
 	let { children } = $props();
 </script>
 
@@ -18,6 +20,7 @@
 	</section>
 </nav>
 
-<main class="relative h-screen p-4">
+<main class=" h-full p-4">
 	{@render children()}
 </main>
+<Footer />

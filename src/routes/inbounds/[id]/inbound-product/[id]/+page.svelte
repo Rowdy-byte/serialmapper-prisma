@@ -30,15 +30,15 @@
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="flex items-center gap-2">
 		<li>
-			<a href={`/inbounds/${inboundId}`} class="text-gray-500 hover:text-gray-800"
-				>Inbound {inboundId}</a
+			<a href={`/inbounds/${inboundId}`} class="text-gray-500 hover:text-blue-500">
+				Inbound {inboundId}</a
 			>
 		</li>
 		<li>
 			<MoveRight size="24" class="px-1" />
 		</li>
 		<li>
-			<p class="text-gray-500 hover:text-gray-800">
+			<p class="text-gray-500">
 				Inbound Product {params.id}
 			</p>
 		</li>
@@ -79,7 +79,7 @@
 	</section>
 
 	<section class="rounded-lg bg-gray-900 p-4 shadow-md">
-		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
+		<fieldset class="flex items-center gap-2 border border-gray-500 p-2">
 			<legend>Delete Product from Inbound</legend>
 			<form method="post">
 				<button
@@ -89,7 +89,7 @@
 					type="submit">Delete</button
 				>
 			</form>
-			<p>This will permanently delete this product from inbound!</p>
+			<p>This will permanently delete this product from this inbound!</p>
 		</fieldset>
 	</section>
 </main>

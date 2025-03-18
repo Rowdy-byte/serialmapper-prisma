@@ -69,7 +69,8 @@
 	</section>
 
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="pb-4 font-bold">Add single Product to Inbound</h1>
+		<h1 class="font-bold">Add single Product to Inbound</h1>
+		<p class="pb-4 text-xs">Each product holds a serialnumber.</p>
 		<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
 			<select
@@ -93,7 +94,21 @@
 				type="submit">Add</button
 			>
 			<section class="flex max-w-sm flex-col gap-4 pt-8">
-				<h1 class="font-bold">Add multiple Products to Inbound</h1>
+				<div>
+					<h1 class="font-bold">Add multiple Products to Inbound</h1>
+					<ul class="pt-4 pl-3 text-xs">
+						<li class="pb-1">
+							<p>1. Select the product you want to add.</p>
+						</li>
+						<li class="pb-1">
+							<p>2. Enter the serialnumbers of the product, separated by a space.</p>
+						</li>
+						<li class="pb-1">
+							<p>3. Click on Add Batch.</p>
+						</li>
+					</ul>
+				</div>
+
 				<textarea
 					name="batch"
 					placeholder="Batch Serialnumbers "

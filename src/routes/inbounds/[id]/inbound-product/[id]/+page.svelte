@@ -26,16 +26,24 @@
 	}
 </script>
 
-<h1 class="text-md flex items-center py-4 text-center font-bold">
-	<!-- link to inbound -->
-	Inbound <MoveRight size="24" class="px-1" />
-	<a class="pr-2" href={`/inbounds/${inboundId}`}
-		><span class="rounded-lg bg-orange-500 px-4 py-1"> {inboundId}</span></a
-	>
-	product <MoveRight class="px-1" />
-	<span class="rounded-lg bg-yellow-500 px-4 py-1"> {params.id}</span>
-</h1>
-
+<!-- replace h1 navigation with daisy ui breadcrums -->
+<section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
+	<ul class="flex items-center gap-2">
+		<li>
+			<a href={`/inbounds/${inboundId}`} class="text-gray-500 hover:text-gray-800"
+				>Inbound {inboundId}</a
+			>
+		</li>
+		<li>
+			<MoveRight size="24" class="px-1" />
+		</li>
+		<li>
+			<p class="text-gray-500 hover:text-gray-800">
+				Inbound Product {params.id}
+			</p>
+		</li>
+	</ul>
+</section>
 <main class="flex flex-col gap-12">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="pb-6 font-bold">Inbound Product</h1>

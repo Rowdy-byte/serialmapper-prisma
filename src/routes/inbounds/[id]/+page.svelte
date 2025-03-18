@@ -33,6 +33,7 @@
 	}
 </script>
 
+<!-- this also needs to be breadcrums -->
 <h1 class="py-4 text-xl font-bold">Inbound Details</h1>
 
 <main class="flex flex-col gap-2">

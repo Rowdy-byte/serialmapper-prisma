@@ -2,6 +2,7 @@
 	import type { PageProps } from './$types';
 
 	import { goto } from '$app/navigation';
+	import { Eye } from '@lucide/svelte';
 	let { data, form }: PageProps = $props();
 	const clients = data.clients;
 	const inbounds = data.inbounds;
@@ -61,7 +62,11 @@
 							>{new Date(inbound.createdAt).toLocaleDateString()}</td
 						>
 						<td class="border border-gray-300 p-2">
-							<a href={`/inbounds/${inbound.id}`} class="text-blue-500 underline">View</a>
+							<a
+								href={`/inbounds/${inbound.id}`}
+								class="text-blue-500 underline"
+								title="View Inbound"><Eye size="16" /></a
+							>
 						</td>
 					</tr>
 				{/each}

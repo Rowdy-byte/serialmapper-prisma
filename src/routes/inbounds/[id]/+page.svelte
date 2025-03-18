@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { title } from 'process';
 	import type { PageProps } from './$types';
+
+	import { Eye } from '@lucide/svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -9,8 +12,6 @@
 	const inbound = data.inbound;
 	const products = data.products;
 	const inboundProducts = data.inboundProducts;
-
-	console.log(data);
 
 	function handleDeleteInbound(event: Event) {
 		if (!confirm('Are you sure you want to delete this inbound?')) {
@@ -79,13 +80,10 @@
 				name="product"
 			>
 				<option value="products">-- Select Product --</option>
-				<!-- fetch data from db with sveltekit loadfunction -->
 				{#each products as product}
 					<option value={product.name}>{product.number}</option>
 				{/each}
 			</select>
-			<!-- input for quantity -->
-
 			<textarea
 				name="serialnumber"
 				placeholder="Serialnumber"
@@ -137,7 +135,8 @@
 							<td class="border border-gray-300 p-2">
 								<a
 									class="text-blue-500 underline"
-									href={`/inbounds/${inbound.id}/inbound-product/${inboundProduct.id}`}>View</a
+									href={`/inbounds/${inbound.id}/inbound-product/${inboundProduct.id}`}
+									title="View Product Details"><Eye size="16" /></a
 								>
 							</td>
 						</tr>

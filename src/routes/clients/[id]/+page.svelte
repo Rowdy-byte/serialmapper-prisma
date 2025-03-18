@@ -16,6 +16,7 @@
 	function handleUpdate(event: Event) {
 		if (!confirm('Are you sure you want to update this client?')) {
 			event.preventDefault();
+			return;
 		}
 		goto('/clients');
 	}

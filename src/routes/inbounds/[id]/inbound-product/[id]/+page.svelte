@@ -2,6 +2,7 @@
 	import type { PageProps } from './$types';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { MoveRight } from '@lucide/svelte';
 
 	const { params, url } = page;
 	const urlArray = url.pathname.split('/');
@@ -25,14 +26,14 @@
 	}
 </script>
 
-<h1 class="py-4 text-xl font-bold">
+<h1 class="text-md flex items-center py-4 text-center font-bold">
 	<!-- link to inbound -->
-	Inbound >
-	<a href={`/inbounds/${inboundId}`}
-		><span class="rounded-lg bg-orange-500 px-4"> {inboundId}</span></a
+	Inbound <MoveRight size="24" class="px-1" />
+	<a class="pr-2" href={`/inbounds/${inboundId}`}
+		><span class="rounded-lg bg-orange-500 px-4 py-1"> {inboundId}</span></a
 	>
-	| product >
-	<span class="rounded-lg bg-yellow-500 px-4"> {params.id}</span>
+	product <MoveRight class="px-1" />
+	<span class="rounded-lg bg-yellow-500 px-4 py-1"> {params.id}</span>
 </h1>
 
 <main class="flex flex-col gap-12">

@@ -5,7 +5,12 @@
 
 	const products = data.products;
 
-	console.log(data);
+	function handleCreateProduct(event: Event) {
+		if (!confirm('Are you sure you want to create this product?')) {
+			event.preventDefault();
+		}
+		goto('/products');
+	}
 </script>
 
 <h1 class="py-4 text-xl font-bold">Products</h1>
@@ -36,6 +41,7 @@
             border-gray-300 p-2 text-gray-800"
 			/>
 			<button
+				onclick={handleCreateProduct}
 				class="rounded-md
             bg-blue-500 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Create Product</button

@@ -5,18 +5,19 @@
 
 	const product = data.product;
 
-	function handleDeleteProduct() {
-		if (confirm('Are you sure you want to delete this product?')) {
-			form?.success;
-			goto('/products');
+	function handleDeleteProduct(event: Event) {
+		if (!confirm('Are you sure you want to delete this product?')) {
+			event.preventDefault();
 		}
+		goto('/products');
 	}
 
-	function handleUpdateProduct() {
-		if (confirm('Are you sure you want to update this product?')) {
-			form?.success;
-			goto('/products');
+	function handleUpdateProduct(event: Event) {
+		if (!confirm('Are you sure you want to update this product?')) {
+			event.preventDefault();
+			return;
 		}
+		goto('/products');
 	}
 
 	console.log(data);

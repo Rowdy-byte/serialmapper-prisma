@@ -1,6 +1,9 @@
-import { PrismaClient } from '@prisma/client'
+import pkg from "@prisma/client";
+const { PrismaClient } = pkg;
 
-export const db = new PrismaClient()
+const db = new PrismaClient();
+export default db;
+
 
 async function main() {
     // ... you will write your Prisma Client queries here

@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { db } from '$lib/server/db';
+import db from '$lib/server/db';
 
 export const actions: Actions = {
 

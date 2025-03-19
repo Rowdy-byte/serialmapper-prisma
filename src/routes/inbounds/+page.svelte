@@ -1,10 +1,13 @@
 <script lang="ts">
-	import type { PageProps } from './$types';
+	import type { PageProps, SubmitFunction } from './$types';
 	import { Eye } from '@lucide/svelte';
 	import { enhance } from '$app/forms';
 	import { fade, fly, slide } from 'svelte/transition';
+	import Toast from '$lib/components/Toast.svelte';
+	import toast from 'svelte-french-toast';
 
 	let { data, form }: PageProps = $props();
+
 	let loading = $state(false);
 
 	const clients = data.clients;
@@ -15,7 +18,34 @@
 			event.preventDefault();
 		}
 	}
+
+	const submitCreateInbound: SubmitFunction = async ({
+		formElement,
+		formData,
+		action,
+		cancel,
+		submitter
+	}) => {
+		const { clientName, description } = Object.fromEntries(formData);
+		loading = true;
+
+		if ((description as string).length < 2) {
+			cancel();
+			toast.error('Description must be at least 2 characters long.');
+			return;
+		}
+
+		return async ({ result, update }) => {
+			loading = false;
+
+			await update();
+		};
+	};
 </script>
+
+{#if loading}
+	<Toast text="Inbound Succesful Created!" backgroundColor="bg-green-500" />
+{/if}
 
 <h1 class="py-4 text-xl font-bold">Inbounds</h1>
 
@@ -27,14 +57,7 @@
 			class="flex flex-col gap-4"
 			action="?/createInbound"
 			method="post"
-			use:enhance={() => {
-				loading = true;
-
-				return async ({ update }) => {
-					await update();
-					loading = false;
-				};
-			}}
+			use:enhance={submitCreateInbound}
 		>
 			<select
 				disabled={loading}
@@ -60,11 +83,7 @@
 				onclick={handleCreateInbound}
 				type="submit"
 				class="rounded-md bg-blue-500 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				class:bg-green-500={loading}
-				class:hover:bg-green-500={loading}
-				class:text-white={loading}
 				class:hover:text-white={loading}
-				class:bg-red-500={form?.error}
 			>
 				{loading ? 'Successful!' : 'Create Inbound'}
 			</button>

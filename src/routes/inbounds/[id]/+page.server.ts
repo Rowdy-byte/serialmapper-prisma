@@ -35,16 +35,26 @@ export const actions = {
         const description = formData.get('description');
 
 
-        const inbound = await db.inbound.update({
-            where: {
-                id: inboundId
-            },
-            data: {
+        const client = await db.client.findUnique({
+            where: { name: clientName as string }
+        });
 
+        if (!client) {
+            return {
+                status: 400,
+                success: false,
+                message: 'Client does not exist'
+            };
+        }
+
+        const inbound = await db.inbound.update({
+            where: { id: inboundId },
+            data: {
                 description: description as string,
-                clientName: clientName as string
+                clientName: client.name // Gebruik de ID als foreign key
             }
         });
+
 
         return {
             status: 200,
@@ -126,8 +136,7 @@ export const actions = {
         };
     },
 
-    // Add many products to the inbound with inboundId
-    // split input by space, newline, each number is a product
+
     async addBatchInboundProductToInbound({ params, request }: { params: { id: string }, request: Request }) {
 
         await new Promise((fulfil) => setTimeout(fulfil, 3000));

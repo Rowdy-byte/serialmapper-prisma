@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
-	import type { PageProps } from './$types';
+	import type { PageProps, SubmitFunction } from './$types';
 
 	import { CircleHelp, Eye } from '@lucide/svelte';
+	import Toast from '$lib/components/Toast.svelte';
 
-	let { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 
 	let singleSectionOpen = $state(false);
 	let multiSectionOpen = $state(false);
@@ -13,7 +14,7 @@
 	let isUpdatingInbound = $state(false);
 	let isAddingInboundProduct = $state(false);
 	let isAddingBatchInboundProduct = $state(false);
-	let isDeletingInbound = $state(false);
+	let isDeleting = $state(false);
 
 	const client = data.client;
 	const clients = data.clients;
@@ -40,7 +41,41 @@
 			event.preventDefault();
 		}
 	}
+
+	const addEdhanceSingle: SubmitFunction = ({ formElement, formData, action }) => {
+		console.log('form', formElement);
+		console.log('data', formData);
+		console.log('action', action);
+
+		isAddingInboundProduct = true;
+
+		return async function ({ update }: { update: () => Promise<void> }) {
+			await update();
+			isAddingInboundProduct = false;
+		};
+	};
+
+	function addEdhanceBatch() {
+		isAddingBatchInboundProduct = true;
+
+		return async ({ update }: { update: () => Promise<void> }) => {
+			await update();
+			isAddingBatchInboundProduct = false;
+		};
+	}
 </script>
+
+{#if isUpdatingInbound && form?.success === true}
+	<Toast text="Inbound Succesful Updated!" backgroundColor="bg-green-500" />
+{/if}
+
+{#if isAddingInboundProduct}
+	<Toast text="Product(s) Succesful Added!" backgroundColor="bg-green-500" />
+{/if}
+
+{#if form?.message && isUpdatingInbound}
+	<Toast text={form?.message} backgroundColor="bg-red-500" />
+{/if}
 
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="text-gray-500">
@@ -88,21 +123,20 @@
 				formaction="?/updateInbound"
 				onclick={handleUpdateInbound}
 				class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				class:bg-green-500={isUpdatingInbound}
 				type="submit"
 			>
-				{isUpdatingInbound ? 'Successful!' : 'Update Inbound'}
+				Update
 			</button>
 		</form>
 	</section>
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="flex items-center justify-between pb-4 font-bold">
 			Add single Product to Inbound
-			<CircleHelp
+			<!-- <CircleHelp
 				class="transition-all hover:cursor-pointer hover:text-yellow-500"
 				onclick={() => (singleSectionOpen = !singleSectionOpen)}
 				size="14"
-			/>
+			/> -->
 		</h1>
 		<ul class=" pb-4 pl-3 text-xs text-yellow-500" class:hidden={!singleSectionOpen}>
 			<li class="pb-1">
@@ -119,14 +153,7 @@
 			class="flex flex-col gap-4"
 			action="?/addInboundProductToInbound"
 			method="post"
-			use:enhance={() => {
-				isAddingInboundProduct = true;
-
-				return async ({ update }) => {
-					await update();
-					isAddingInboundProduct = false;
-				};
-			}}
+			use:enhance={addEdhanceSingle}
 		>
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
 			<select
@@ -151,19 +178,18 @@
 				disabled={isAddingInboundProduct}
 				class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit"
-				class:bg-green-500={isAddingInboundProduct}
 			>
-				{isAddingInboundProduct ? 'Successful!' : 'Add'}
+				Add Single
 			</button>
 			<section class="flex max-w-sm flex-col gap-4 pt-8">
 				<div>
 					<h1 class="flex items-center justify-between font-bold">
 						Add multiple Products to Inbound
-						<CircleHelp
+						<!-- <CircleHelp
 							class="transition-all hover:cursor-pointer hover:text-yellow-500"
 							onclick={() => (multiSectionOpen = !multiSectionOpen)}
 							size="14"
-						/>
+						/> -->
 					</h1>
 
 					<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!multiSectionOpen}>
@@ -193,7 +219,7 @@
 					class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit"
 				>
-					{isAddingBatchInboundProduct ? 'Successful!' : 'Add Batch'}
+					Add Batch
 				</button>
 			</section>
 		</form>

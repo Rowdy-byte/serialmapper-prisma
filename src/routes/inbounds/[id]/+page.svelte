@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
 
 	import { CircleHelp, Eye } from '@lucide/svelte';
@@ -9,13 +10,10 @@
 	let singleSectionOpen = $state(false);
 	let multiSectionOpen = $state(false);
 
-	function toggleSingleSection() {
-		singleSectionOpen = !singleSectionOpen;
-	}
-
-	function toggleMultiSection() {
-		multiSectionOpen = !multiSectionOpen;
-	}
+	let isUpdatingInbound = $state(false);
+	let isAddingInboundProduct = $state(false);
+	let isAddingBatchInboundProduct = $state(false);
+	let isDeletingInbound = $state(false);
 
 	const client = data.client;
 	const clients = data.clients;
@@ -44,19 +42,28 @@
 	}
 </script>
 
-<!-- this also needs to be breadcrums -->
-
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="text-gray-500">
 		<li>Inbound {inbound?.id}</li>
 	</ul>
 </section>
-
 <main class="flex flex-col gap-2">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="pb-4 font-bold">Inbound</h1>
-		<form class="flex flex-col gap-4" method="post">
+		<form
+			class="flex flex-col gap-4"
+			method="post"
+			use:enhance={() => {
+				isUpdatingInbound = true;
+
+				return async ({ update }) => {
+					await update();
+					isUpdatingInbound = false;
+				};
+			}}
+		>
 			<select
+				disabled={isUpdatingInbound}
 				class="rounded-md border
             border-gray-300 p-2 text-gray-800"
 				name="clientName"
@@ -68,6 +75,7 @@
 				{/each}
 			</select>
 			<input
+				disabled={isUpdatingInbound}
 				type="text"
 				name="description"
 				value={inbound?.description}
@@ -75,42 +83,54 @@
 				class="rounded-md border
             border-gray-300 p-2 text-gray-800"
 			/>
-
 			<button
+				disabled={isUpdatingInbound}
 				formaction="?/updateInbound"
 				onclick={handleUpdateInbound}
-				class="rounded-md bg-green-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				type="submit">Update</button
+				class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class:bg-green-500={isUpdatingInbound}
+				type="submit"
 			>
+				{isUpdatingInbound ? 'Successful!' : 'Update Inbound'}
+			</button>
 		</form>
 	</section>
-
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="flex items-center justify-between pb-4 font-bold">
-			Add single Product to Inbound<button
-				onclick={toggleSingleSection}
-				class="text-gray-500 hover:text-gray-800"
-				aria-label="Toggle Section"
-			>
-				<CircleHelp size="14" />
-			</button>
+			Add single Product to Inbound
+			<CircleHelp
+				class="transition-all hover:cursor-pointer hover:text-yellow-500"
+				onclick={() => (singleSectionOpen = !singleSectionOpen)}
+				size="14"
+			/>
 		</h1>
-		{#if singleSectionOpen}
-			<ul class=" pb-4 pl-3 text-xs">
-				<li class="pb-1">
-					<p>1. Select the product you want to add.</p>
-				</li>
-				<li class="pb-1">
-					<p>2. Enter the serialnumber of the product.</p>
-				</li>
-				<li class="pb-1">
-					<p>3. Click on Add.</p>
-				</li>
-			</ul>
-		{/if}
-		<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
+		<ul class=" pb-4 pl-3 text-xs text-yellow-500" class:hidden={!singleSectionOpen}>
+			<li class="pb-1">
+				<p>1. Select the product you want to add.</p>
+			</li>
+			<li class="pb-1">
+				<p>2. Enter the serialnumber of the product.</p>
+			</li>
+			<li class="pb-1">
+				<p>3. Click on Add.</p>
+			</li>
+		</ul>
+		<form
+			class="flex flex-col gap-4"
+			action="?/addInboundProductToInbound"
+			method="post"
+			use:enhance={() => {
+				isAddingInboundProduct = true;
+
+				return async ({ update }) => {
+					await update();
+					isAddingInboundProduct = false;
+				};
+			}}
+		>
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
 			<select
+				disabled={isAddingInboundProduct}
 				class="rounded-md border
             border-gray-300 p-2 text-gray-800"
 				name="product"
@@ -121,54 +141,60 @@
 				{/each}
 			</select>
 			<textarea
+				disabled={isAddingInboundProduct}
 				name="serialnumber"
 				placeholder="Serialnumber"
 				class="rounded-md border
 			border-gray-300 p-2 text-gray-800"
 			></textarea>
 			<button
+				disabled={isAddingInboundProduct}
 				class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				type="submit">Add</button
+				type="submit"
+				class:bg-green-500={isAddingInboundProduct}
 			>
+				{isAddingInboundProduct ? 'Successful!' : 'Add'}
+			</button>
 			<section class="flex max-w-sm flex-col gap-4 pt-8">
 				<div>
 					<h1 class="flex items-center justify-between font-bold">
 						Add multiple Products to Inbound
-						<button
-							onclick={toggleMultiSection}
-							class="text-gray-500 hover:text-gray-800"
-							aria-label="Toggle Section"
-						>
-							<CircleHelp size="14" />
-						</button>
+						<CircleHelp
+							class="transition-all hover:cursor-pointer hover:text-yellow-500"
+							onclick={() => (multiSectionOpen = !multiSectionOpen)}
+							size="14"
+						/>
 					</h1>
-					{#if multiSectionOpen}
-						<ul class="pt-4 pl-3 text-xs">
-							<li class="pb-1">
-								<p>1. Select the product you want to add.</p>
-							</li>
-							<li class="pb-1">
-								<p>2. Enter the serialnumbers of the product, separated by a space.</p>
-							</li>
-							<li class="pb-1">
-								<p>3. Click on Add Batch.</p>
-							</li>
-						</ul>
-					{/if}
+
+					<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!multiSectionOpen}>
+						<li class="pb-1">
+							<p>1. Select the product you want to add.</p>
+						</li>
+						<li class="pb-1">
+							<p>2. Enter the serialnumbers of the product, separated by a space.</p>
+						</li>
+						<li class="pb-1">
+							<p>3. Click on Add Batch.</p>
+						</li>
+					</ul>
 				</div>
 
 				<textarea
+					disabled={isAddingBatchInboundProduct}
 					name="batch"
 					placeholder="Batch Serialnumbers "
 					class="rounded-md border
 	border-gray-300 p-2 text-gray-800"
 				></textarea>
 				<button
+					disabled={isAddingBatchInboundProduct}
 					formaction="?/addBatchInboundProductToInbound"
 					onclick={handleAddBatch}
 					class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit">Add Batch</button
+					type="submit"
 				>
+					{isAddingBatchInboundProduct ? 'Successful!' : 'Add Batch'}
+				</button>
 			</section>
 		</form>
 	</section>

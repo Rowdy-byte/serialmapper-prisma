@@ -2,9 +2,10 @@
 	import type { PageProps } from './$types';
 	import { Eye } from '@lucide/svelte';
 	import { enhance } from '$app/forms';
-	import { fade, fly } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 
 	let { data, form }: PageProps = $props();
+	let loading = $state(false);
 
 	const clients = data.clients;
 	const inbounds = data.inbounds;
@@ -22,8 +23,21 @@
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="pb-6 font-bold">Create Inbound</h1>
 
-		<form class="flex flex-col gap-4" use:enhance action="?/createInbound" method="post">
+		<form
+			class="flex flex-col gap-4"
+			action="?/createInbound"
+			method="post"
+			use:enhance={() => {
+				loading = true;
+
+				return async ({ update }) => {
+					await update();
+					loading = false;
+				};
+			}}
+		>
 			<select
+				disabled={loading}
 				class="rounded-md border border-gray-300 p-2 text-gray-800"
 				name="clientName"
 				required
@@ -34,6 +48,7 @@
 				{/each}
 			</select>
 			<input
+				disabled={loading}
 				type="text"
 				name="description"
 				placeholder="Description"
@@ -41,13 +56,17 @@
 				required
 			/>
 			<button
+				disabled={loading}
 				onclick={handleCreateInbound}
 				type="submit"
 				class="rounded-md bg-blue-500 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				class:bg-green-500={form?.success}
+				class:bg-green-500={loading}
+				class:hover:bg-green-500={loading}
+				class:text-white={loading}
+				class:hover:text-white={loading}
 				class:bg-red-500={form?.error}
 			>
-				{form?.success ? 'Successful!' : 'Create Inbound'}
+				{loading ? 'Successful!' : 'Create Inbound'}
 			</button>
 		</form>
 	</section>
@@ -65,7 +84,7 @@
 			</thead>
 			<tbody>
 				{#each inbounds as inbound}
-					<tr class="hover:bg-slate-800">
+					<tr in:fly={{ y: 20 }} out:slide class="hover:bg-slate-800">
 						<td class="border border-gray-300 p-2">{inbound.clientName}</td>
 						<td class="border border-gray-300 p-2">{inbound.description}</td>
 						<td class="border border-gray-300 p-2"

@@ -26,6 +26,9 @@ export const load: PageServerLoad = async ({ params }) => {
 
 export const actions = {
     async updateInbound({ params, request }: { params: { id: string }, request: Request }) {
+
+        await new Promise((fulfil) => setTimeout(fulfil, 3000));
+
         const inboundId = Number(params.id);
         const formData = await request.formData();
         const clientName = formData.get('clientName');
@@ -82,6 +85,8 @@ export const actions = {
     // Add a product to the inbound with inboundId
     async addInboundProductToInbound({ request }: { params: { id: string }, request: Request }) {
 
+        await new Promise((fulfil) => setTimeout(fulfil, 3000));
+
         const formData = await request.formData();
         const inboundId = Number(formData.get('inboundId'));
         const product = formData.get('product');
@@ -124,6 +129,9 @@ export const actions = {
     // Add many products to the inbound with inboundId
     // split input by space, newline, each number is a product
     async addBatchInboundProductToInbound({ params, request }: { params: { id: string }, request: Request }) {
+
+        await new Promise((fulfil) => setTimeout(fulfil, 3000));
+
         const inboundId = Number(params.id);
         const formData = await request.formData();
         const batch = (formData.get('batch') as string)

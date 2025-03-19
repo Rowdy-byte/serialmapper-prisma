@@ -14,6 +14,6 @@
 >
 	<Stats statsName="Inbounds" statsValue={inbounds.length} />
 	<Stats statsName="Clients" statsValue={clients.length} />
-	<Stats statsName="Products In" statsValue={inboundProducts.length} />
 	<Stats statsName="Products" statsValue={products.length} />
+	<Stats statsName="Products In" statsValue={inboundProducts.length} />
 </main>

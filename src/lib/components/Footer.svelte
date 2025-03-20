@@ -3,7 +3,7 @@
 
 <!-- copyright snm is part of livecargo -->
 <footer
-	class="sticky bottom-0 left-0 flex w-full items-center justify-center bg-gray-950 text-xs text-slate-500"
+	class="absolute bottom-0 left-0 flex w-full items-center justify-center bg-gray-950 text-xs text-slate-500"
 >
 	<p class="p-2 text-center">
 		Copyright &copy; 2025 SNM | All rights reserved | SNM is part of LiveCargo | Developed by Rowdy

@@ -8,7 +8,8 @@
 <nav class="relative flex items-center justify-between p-4">
 	<section class="flex items-center justify-center gap-2">
 		<a class="text-center text-2xl font-bold" href="/"
-			>SNM <span class="text-xs text-slate-500">beta version 1.0</span></a
+			>SN<span class="text-md text-orange-500">mapper</span>
+			<span class="text-xs text-slate-500">beta version 1.0</span></a
 		>
 	</section>
 	<section class="flex items-center justify-center gap-2 text-center">

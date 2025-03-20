@@ -84,6 +84,9 @@ importers:
       svelte-check:
         specifier: ^4.0.0
         version: 4.1.4(picomatch@4.0.2)(svelte@5.20.5)(typescript@5.8.2)
+      svelte-hamburgers:
+        specifier: ^5.0.0
+        version: 5.0.0(svelte@5.20.5)
       tailwindcss:
         specifier: ^4.0.0
         version: 4.0.9
@@ -1696,6 +1699,11 @@ packages:
     peerDependencies:
       svelte: ^3.57.0 || ^4.0.0
 
+  svelte-hamburgers@5.0.0:
+    resolution: {integrity: sha512-MMb47VCozKDgn/jtmeqw+CbI3cZmkDXd/FG3VCkReMdw2YCSOaWYLsqsXiWTWoQE/oSmw1vH/Tm5mChqlsldHQ==}
+    peerDependencies:
+      svelte: ^5.0.0
+
   svelte-writable-derived@3.1.1:
     resolution: {integrity: sha512-w4LR6/bYZEuCs7SGr+M54oipk/UQKtiMadyOhW0PTwAtJ/Ai12QS77sLngEcfBx2q4H8ZBQucc9ktSA5sUGZWw==}
     peerDependencies:
@@ -3223,6 +3231,10 @@ snapshots:
     dependencies:
       svelte: 5.20.5
       svelte-writable-derived: 3.1.1(svelte@5.20.5)
+
+  svelte-hamburgers@5.0.0(svelte@5.20.5):
+    dependencies:
+      svelte: 5.20.5
 
   svelte-writable-derived@3.1.1(svelte@5.20.5):
     dependencies:

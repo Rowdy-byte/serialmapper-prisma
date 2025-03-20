@@ -49,7 +49,7 @@
 
 <h1 class="py-4 text-xl font-bold">Inbounds</h1>
 
-<main class="flex flex-col gap-12">
+<main class="max-auto flex max-w-3xl flex-col gap-12">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="pb-6 font-bold">Create Inbound</h1>
 

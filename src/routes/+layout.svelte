@@ -27,7 +27,7 @@
 	</section>
 </nav>
 
-<main class=" h-full bg-gray-950 p-4">
+<main class="flex min-h-screen flex-grow flex-col bg-gray-950 p-4">
 	{@render children()}
 </main>
 <Footer />

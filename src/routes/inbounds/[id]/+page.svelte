@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps, SubmitFunction } from './$types';
 
@@ -31,6 +31,7 @@
 		if (!confirm('Are you sure you want to update this inbound?')) {
 			event.preventDefault();
 		}
+
 		goto(`/inbounds/${inbound?.id}`);
 	}
 
@@ -90,6 +91,7 @@
 
 				return async ({ update }) => {
 					await update();
+					await invalidate('inbound');
 					isUpdatingInbound = false;
 				};
 			}}

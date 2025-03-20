@@ -31,6 +31,7 @@
 		if (!confirm('Are you sure you want to update this inbound?')) {
 			event.preventDefault();
 		}
+		goto(`/inbounds/${inbound?.id}`);
 	}
 
 	function handleAddBatch(event: Event) {

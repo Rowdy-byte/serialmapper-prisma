@@ -29,8 +29,9 @@ export const actions = {
 
         await new Promise((fulfil) => setTimeout(fulfil, 3000));
 
-        const inboundId = Number(params.id);
         const formData = await request.formData();
+
+        const inboundId = Number(params.id);
         const clientName = formData.get('clientName');
         const description = formData.get('description');
 
@@ -51,7 +52,7 @@ export const actions = {
             where: { id: inboundId },
             data: {
                 description: description as string,
-                clientId: client.id // Gebruik de ID als foreign key
+                clientName: client.name // Gebruik de ID als foreign key
             }
         });
 

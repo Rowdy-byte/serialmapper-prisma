@@ -21,6 +21,7 @@ export const actions: Actions = {
         const clientName = formData.get('clientName');
         const description = formData.get('description');
 
+
         if (!clientName || !description) {
             error(404, 'Client name and description are required');
             return {
@@ -31,7 +32,8 @@ export const actions: Actions = {
         await db.inbound.create({
             data: {
                 description: description as string,
-                clientName: clientName as string
+                clientName: clientName as string,
+
             }
         });
 

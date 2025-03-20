@@ -14,9 +14,6 @@
 	let isUpdatingInbound = $state(false);
 	let isAddingInboundProduct = $state(false);
 	let isAddingBatchInboundProduct = $state(false);
-	let isDeleting = $state(false);
-
-	const client = data.client;
 	const clients = data.clients;
 	const inbound = data.inbound;
 	const products = data.products;
@@ -57,15 +54,14 @@
 
 	function addEdhanceBatch() {
 		isAddingBatchInboundProduct = true;
-
-		return async ({ update }: { update: () => Promise<void> }) => {
+		return async function ({ update }: { update: () => Promise<void> }) {
 			await update();
 			isAddingBatchInboundProduct = false;
 		};
 	}
 </script>
 
-{#if isUpdatingInbound && form?.success === true}
+{#if form?.message && isAddingBatchInboundProduct}
 	<Toast text="Inbound Succesful Updated!" backgroundColor="bg-green-500" />
 {/if}
 
@@ -103,7 +99,7 @@
             border-gray-300 p-2 text-gray-800"
 				name="clientName"
 			>
-				<option value="clientName">{client?.clientName}</option>
+				<option value="clientName">{inbound?.clientName}</option>
 				<!-- fetch data from db with sveltekit loadfunction -->
 				{#each clients as client}
 					<option value={client.name}>{client.name}</option>
@@ -114,7 +110,6 @@
 				type="text"
 				name="description"
 				value={inbound?.description}
-				placeholder="Description"
 				class="rounded-md border
             border-gray-300 p-2 text-gray-800"
 			/>

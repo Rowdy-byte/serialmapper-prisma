@@ -51,7 +51,7 @@ export const actions = {
             where: { id: inboundId },
             data: {
                 description: description as string,
-                clientName: client.name // Gebruik de ID als foreign key
+                clientId: client.id // Gebruik de ID als foreign key
             }
         });
 

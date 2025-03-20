@@ -15,28 +15,28 @@
 
 	function handleCreateInbound(event: Event) {
 		if (!confirm('Are you sure you want to create this inbound?')) {
-			event.preventDefault();
 		}
+		window.location.reload();
 	}
 
-	const submitCreateInbound: SubmitFunction = async ({
-		formElement,
-		formData,
-		action,
-		cancel,
-		submitter
-	}) => {
-		// const { clientName, description } = Object.fromEntries(formData);
-		loading = true;
+	// const submitCreateInbound: SubmitFunction = async ({
+	// 	formElement,
+	// 	formData,
+	// 	action,
+	// 	cancel,
+	// 	submitter
+	// }) => {
+	// 	// const { clientName, description } = Object.fromEntries(formData);
+	// 	loading = true;
 
-		return async ({ result, update }) => {
-			loading = false;
+	// 	return async ({ result, update }) => {
+	// 		loading = false;
 
-			await update();
+	// 		await update();
 
-			window.location.reload();
-		};
-	};
+	// 		window.location.reload();
+	// 	};
+	// };
 </script>
 
 {#if loading}
@@ -49,12 +49,7 @@
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="pb-6 font-bold">Create Inbound</h1>
 
-		<form
-			class="flex flex-col gap-4"
-			action="?/createInbound"
-			method="post"
-			use:enhance={submitCreateInbound}
-		>
+		<form class="flex flex-col gap-4" action="?/createInbound" method="post">
 			<select
 				disabled={loading}
 				class="rounded-md border border-gray-300 p-2 text-gray-800"

@@ -20,7 +20,7 @@
 	</section>
 </nav>
 
-<main class=" h-full p-4">
+<main class=" h-full bg-gray-950 p-4">
 	{@render children()}
 </main>
 <Footer />

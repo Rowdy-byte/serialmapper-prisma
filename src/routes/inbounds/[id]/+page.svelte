@@ -132,11 +132,11 @@
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="flex items-center justify-between pb-4 font-bold">
 			Add single Product to Inbound
-			<!-- <CircleHelp
+			<CircleHelp
 				class="transition-all hover:cursor-pointer hover:text-yellow-500"
 				onclick={() => (singleSectionOpen = !singleSectionOpen)}
 				size="14"
-			/> -->
+			/>
 		</h1>
 		<ul class=" pb-4 pl-3 text-xs text-yellow-500" class:hidden={!singleSectionOpen}>
 			<li class="pb-1">
@@ -185,11 +185,11 @@
 				<div>
 					<h1 class="flex items-center justify-between font-bold">
 						Add multiple Products to Inbound
-						<!-- <CircleHelp
+						<CircleHelp
 							class="transition-all hover:cursor-pointer hover:text-yellow-500"
 							onclick={() => (multiSectionOpen = !multiSectionOpen)}
 							size="14"
-						/> -->
+						/>
 					</h1>
 
 					<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!multiSectionOpen}>
@@ -264,7 +264,7 @@
 	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
 			<legend>Delete Inbound</legend>
-			<form method="post">
+			<form use:enhance method="post">
 				<button
 					formaction="?/deleteInbound"
 					onclick={handleDeleteInbound}

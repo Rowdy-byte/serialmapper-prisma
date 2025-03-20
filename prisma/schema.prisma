@@ -22,7 +22,7 @@ model Inbound {
   clientName  String
   createdAt   DateTime @default(now())
 
-  client          Client           @relation(fields: [clientName], references: [name])
+  client          Client           @relation(fields: [clientName], references: [name], onDelete: Cascade)
   inboundProducts InboundProduct[]
 }
 

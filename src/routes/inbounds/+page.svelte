@@ -26,19 +26,15 @@
 		cancel,
 		submitter
 	}) => {
-		const { clientName, description } = Object.fromEntries(formData);
+		// const { clientName, description } = Object.fromEntries(formData);
 		loading = true;
-
-		if ((description as string).length < 2) {
-			cancel();
-			toast.error('Description must be at least 2 characters long.');
-			return;
-		}
 
 		return async ({ result, update }) => {
 			loading = false;
 
 			await update();
+
+			window.location.reload();
 		};
 	};
 </script>

@@ -4,7 +4,7 @@
 	let open = $state(false);
 </script>
 
-<Hamburger bind:open --color="white" />
+<Hamburger bind:open --layer-width="24px" --layer-height="1px" --color="white" />
 
 {#if open}
 	<nav

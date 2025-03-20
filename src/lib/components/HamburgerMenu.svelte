@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Hamburger } from 'svelte-hamburgers';
 
-	let open = $state(true);
+	let open = $state(false);
 </script>
 
 <Hamburger bind:open --color="white" />

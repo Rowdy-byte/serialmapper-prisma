@@ -24,7 +24,9 @@
 	const products = data.products;
 	const inboundProducts = data.inboundProducts;
 
-	let count = $state(1);
+	const filteredInboundProducts = inboundProducts.filter(
+		(product) => product.inboundId === inbound?.id
+	);
 
 	function handleDeleteInbound(event: Event) {
 		if (!confirm('Are you sure you want to delete this inbound?')) {
@@ -71,7 +73,7 @@
 		const worksheet = utils.json_to_sheet(inboundProducts);
 		const workbook = utils.book_new();
 		utils.book_append_sheet(workbook, worksheet, 'Inbound Products');
-		writeFileXLSX(workbook, `inbound-${inbound?.id}-products.xlsx`);
+		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
 	}
 </script>
 
@@ -253,26 +255,25 @@
 				</tr>
 			</thead>
 			<tbody>
-				<!-- only products with inboundId -->
-				{#each inboundProducts as inboundProduct, i}
-					{#if inboundProduct.inboundId === inbound?.id}
-						<tr class="text-sm hover:bg-slate-600">
-							<!-- replace with a count that always starts at 1, count foreach count++ -->
-							<td class="border border-gray-300 p-2">{i + 1}</td>
-							<td class="border border-gray-300 p-2">{inboundProduct.product}</td>
-							<td class="border border-gray-300 p-2">{inboundProduct.serialnumber}</td>
-							<td class="border border-gray-300 p-2">
-								<a
-									class="text-blue-500 underline"
-									href={`/inbounds/${inbound.id}/inbound-product/${inboundProduct.id}`}
-									title="View Product Details"><Eye size="16" /></a
-								>
-							</td>
-						</tr>
-					{/if}
+				{#each filteredInboundProducts as inboundProduct, i}
+					<tr class="text-sm hover:bg-slate-600">
+						<td class="border border-gray-300 p-2">{i + 1}</td>
+						<td class="border border-gray-300 p-2">{inboundProduct.product}</td>
+						<td class="border border-gray-300 p-2">{inboundProduct.serialnumber}</td>
+						<td class="border border-gray-300 p-2">
+							<a
+								class="text-blue-500 underline"
+								href={`/inbounds/${inbound?.id}/inbound-product/${inboundProduct.id}`}
+								title="View Product Details"
+							>
+								<Eye size="16" />
+							</a>
+						</td>
+					</tr>
 				{/each}
 			</tbody>
 		</table>
+
 		{#if inboundProducts.filter((product) => product.inboundId === inbound?.id).length === 0}
 			<p class="mt-2 border border-gray-300 p-2">No products found.</p>
 		{/if}

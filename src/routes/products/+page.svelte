@@ -19,7 +19,7 @@
 
 <main class="flex flex-col gap-12">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="pb-6 font-bold">Create Product</h1>
+		<h1 class="pb-4 font-bold">Create Product</h1>
 		<form class="flex flex-col gap-4" action="?/createProduct" method="post">
 			<input
 				type="text"
@@ -51,10 +51,10 @@
 		</form>
 	</section>
 	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="pb-6 font-bold">Products List</h1>
-		<table class="table w-full">
+		<h1 class="pb-4 font-bold">Products List</h1>
+		<table class="w-full text-sm">
 			<thead>
-				<tr>
+				<tr class="text-left text-sm font-bold text-gray-400">
 					<th class="border border-gray-300 p-2">Name</th>
 					<th class="border border-gray-300 p-2">Description</th>
 					<th class="border border-gray-300 p-2">Number</th>

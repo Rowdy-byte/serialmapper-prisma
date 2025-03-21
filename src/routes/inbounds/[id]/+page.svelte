@@ -87,7 +87,7 @@
 
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="text-gray-500">
-		<li>Inbound {inbound?.id}</li>
+		<li class="font-bold">Inbound {inbound?.id}</li>
 	</ul>
 </section>
 <main class="flex flex-col gap-2">
@@ -241,9 +241,9 @@
 	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<h1 class="font-bold">Products in this Inbound</h1>
 
-		<table class="table">
+		<table class="">
 			<thead>
-				<tr>
+				<tr class="text-left text-sm text-gray-500">
 					<th class="border border-gray-300 p-2"></th>
 					<th class="border border-gray-300 p-2">Product</th>
 					<th class="border border-gray-300 p-2">Serialnumbers</th>
@@ -254,8 +254,8 @@
 				<!-- only products with inboundId -->
 				{#each inboundProducts as inboundProduct, i}
 					{#if inboundProduct.inboundId === inbound?.id}
-						<tr class="hover:bg-slate-600">
-							<td class="border border-gray-300 p-2">{i + 1}</td>
+						<tr class="text-sm hover:bg-slate-600">
+							<td class="border border-gray-300 p-2 text-sm">{i + 1}</td>
 							<td class="border border-gray-300 p-2">{inboundProduct.product}</td>
 							<td class="border border-gray-300 p-2">{inboundProduct.serialnumber}</td>
 							<td class="border border-gray-300 p-2">
@@ -298,7 +298,7 @@
 					type="submit">Delete</button
 				>
 			</form>
-			<p>This will permanently delete this Inbound!</p>
+			<p class="text-sm">This will permanently delete this Inbound!</p>
 		</fieldset>
 	</section>
 </main>

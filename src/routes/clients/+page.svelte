@@ -17,7 +17,7 @@
 
 <main class="flex flex-col gap-12">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="pb-6 font-bold">Create New Client</h1>
+		<h1 class="pb-4 font-bold">Create New Client</h1>
 		<form class="flex flex-col gap-4" action="" method="post">
 			<input
 				type="text"
@@ -35,11 +35,11 @@
 		</form>
 	</section>
 	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="pb-6 font-bold">Clients List</h1>
+		<h1 class="pb-4 font-bold">Clients List</h1>
 		<!-- show clientlist in a table -->
-		<table class="table w-full">
+		<table class="w-full border text-sm">
 			<thead>
-				<tr>
+				<tr class="text-gray-500">
 					<th class="border border-gray-300 p-2">Name</th>
 					<th class="border border-gray-300 p-2">Actions</th>
 				</tr>

@@ -38,7 +38,7 @@
 
 <main class="max-auto flex max-w-3xl flex-col gap-12">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
-		<h1 class="pb-6 font-bold">Create Inbound</h1>
+		<h1 class="pb-4 font-bold">Create Inbound</h1>
 
 		<form class="flex flex-col gap-4" action="?/createInbound" method="post">
 			<select
@@ -76,10 +76,10 @@
 	</section>
 
 	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="pb-6 font-bold">Inbounds List</h1>
-		<table class="table w-full border border-gray-300">
+		<h1 class="pb-4 font-bold">Inbounds List</h1>
+		<table class="w-full text-left text-sm">
 			<thead>
-				<tr>
+				<tr class="text-gray-500">
 					<th class="border border-gray-300 p-2">Client</th>
 					<th class="border border-gray-300 p-2">Description</th>
 					<th class="border border-gray-300 p-2">Created</th>

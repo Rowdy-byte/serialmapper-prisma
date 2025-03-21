@@ -27,7 +27,7 @@
 
 <main class="flex flex-col gap-4">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="pb-6 font-bold">Product</h1>
+		<h1 class="pb-4 font-bold">Product</h1>
 		<form class="flex flex-col gap-4" method="post">
 			<input
 				type="text"
@@ -62,8 +62,8 @@
 			>
 		</form>
 	</section>
-	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
+	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
+		<fieldset class="flex items-center gap-2 rounded-lg border border-gray-300 p-2">
 			<legend>Delete Product</legend>
 			<form method="post">
 				<button
@@ -73,7 +73,7 @@
 					type="submit">Delete</button
 				>
 			</form>
-			<p>This will permanently delete this product!</p>
+			<p class="text-sm">This will permanently delete this product!</p>
 		</fieldset>
 	</section>
 </main>

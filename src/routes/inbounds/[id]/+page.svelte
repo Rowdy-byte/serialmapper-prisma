@@ -87,7 +87,7 @@
 
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="text-gray-500">
-		<li class="font-bold">Inbound {inbound?.id}</li>
+		<li class="font-bold">Inbound {inbound?.inboundNumber}</li>
 	</ul>
 </section>
 <main class="flex flex-col gap-2">

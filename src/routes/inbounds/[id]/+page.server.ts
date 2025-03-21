@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ params }) => {
 export const actions = {
     async updateInbound({ params, request }: { params: { id: string }, request: Request }) {
 
-        await new Promise((fulfil) => setTimeout(fulfil, 3000));
+        // await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
         const formData = await request.formData();
 
@@ -48,11 +48,14 @@ export const actions = {
             };
         }
 
-        const inbound = await db.inbound.update({
+        const formattedNumber = `IN-${String(params.id).padStart(6, '0')}`;
+
+        await db.inbound.update({
             where: { id: inboundId },
             data: {
                 description: description as string,
-                clientName: client.name // Gebruik de ID als foreign key
+                clientName: client.name,
+                inboundNumber: formattedNumber
             }
         });
 
@@ -60,7 +63,7 @@ export const actions = {
         return {
             status: 200,
             success: true,
-            inbound
+
         }
 
     },

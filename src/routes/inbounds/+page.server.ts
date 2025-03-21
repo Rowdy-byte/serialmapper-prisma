@@ -22,6 +22,7 @@ export const actions: Actions = {
         const description = formData.get('description');
 
 
+
         if (!clientName || !description) {
             error(404, 'Client name and description are required');
             return {
@@ -33,6 +34,7 @@ export const actions: Actions = {
             data: {
                 description: description as string,
                 clientName: clientName as string,
+                inboundNumber: '',
 
             }
         });

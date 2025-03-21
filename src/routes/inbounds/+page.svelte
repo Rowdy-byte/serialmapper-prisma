@@ -80,18 +80,20 @@
 		<table class="w-full text-left text-sm">
 			<thead>
 				<tr class="text-gray-500">
+					<th class="border border-gray-300 p-2">No</th>
 					<th class="border border-gray-300 p-2">Client</th>
-					<th class="border border-gray-300 p-2">Description</th>
-					<th class="border border-gray-300 p-2">Created</th>
+					<th class="hidden border border-gray-300 p-2">Description</th>
+					<th class="hidden border border-gray-300 p-2">Created</th>
 					<th class="border border-gray-300 p-2">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
 				{#each inbounds as inbound}
 					<tr in:fly={{ y: 20 }} out:slide class="hover:bg-slate-800">
+						<td class="border border-gray-300 p-2">{inbound.inboundNumber}</td>
 						<td class="border border-gray-300 p-2">{inbound.clientName}</td>
-						<td class="border border-gray-300 p-2">{inbound.description}</td>
-						<td class="border border-gray-300 p-2"
+						<td class="hidden border border-gray-300 p-2">{inbound.description}</td>
+						<td class="hidden border border-gray-300 p-2"
 							>{new Date(inbound.createdAt).toLocaleDateString()}</td
 						>
 						<td class="border border-gray-300 p-2">

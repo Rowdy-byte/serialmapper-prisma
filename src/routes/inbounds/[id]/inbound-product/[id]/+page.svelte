@@ -14,6 +14,7 @@
 
 	const { data }: PageProps = $props();
 	let { inboundProducts } = data;
+	let { inbound } = data;
 
 	function handleUpdateInboundProduct(event: Event) {
 		if (!confirm('Are you sure you want to update this inbound product?')) {
@@ -34,7 +35,7 @@
 	<ul class="flex items-center gap-2">
 		<li>
 			<a href={`/inbounds/${inboundId}`} class="text-gray-500 hover:text-blue-500">
-				Inbound {inboundId}</a
+				Inbound {inbound?.inboundNumber}</a
 			>
 		</li>
 		<li>

@@ -2,11 +2,20 @@ import type { PageServerLoad, Actions } from "./$types";
 import db from "$lib/server/db";
 import { redirect } from "@sveltejs/kit";
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url }) => {
+    const { pathname } = url;
+    const segments = pathname.split('/');
+    const basePath = `${segments[2]}`;
+
     const inboundProducts = await db.inboundProduct.findMany()
 
+    const inbound = await db.inbound.findUnique({
+        where: { id: Number(basePath) },
+    })
+
     return {
-        inboundProducts
+        inboundProducts,
+        inbound
     }
 }
 

@@ -91,7 +91,7 @@
 
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="text-gray-500">
-		<li class="font-bold">Inbound {inbound?.inboundNumber}</li>
+		<li class="font-bold">Inbound: {inbound?.inboundNumber}</li>
 	</ul>
 </section>
 <main class="flex flex-col gap-2">
@@ -250,7 +250,7 @@
 				<tr class="text-left text-sm text-gray-500">
 					<th class="border border-gray-300 p-2"></th>
 					<th class="border border-gray-300 p-2">Product</th>
-					<th class="border border-gray-300 p-2">Serialnumbers</th>
+					<th class="border border-gray-300 p-2">Serialnumber</th>
 					<th class="border border-gray-300 p-2">Actions</th>
 				</tr>
 			</thead>

@@ -16,7 +16,7 @@ model Client {
 
 model Inbound {
   id            Int      @id @default(autoincrement())
-  description   String
+  description   String?
   clientName    String
   inboundNumber String   @unique
   createdAt     DateTime @default(now())

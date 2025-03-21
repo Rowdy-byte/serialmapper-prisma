@@ -39,7 +39,7 @@
 	<ul class="flex items-center gap-2">
 		<li>
 			<a href={`/inbounds/${inboundId}`} class="text-gray-500 hover:text-blue-500">
-				<span class="hidden md:inline">Inbound:</span> {inbound?.inboundNumber}</a
+				<span class="hidden md:inline">Inbound: </span> {inbound?.inboundNumber}</a
 			>
 		</li>
 		<li>
@@ -71,7 +71,7 @@
 						value={inboundProduct?.product}
 						placeholder="Product"
 						class="rounded-md border
-            border-gray-300 p-2 text-gray-800"
+			border-gray-300 p-2 text-gray-800"
 					/>
 					<input
 						type="text"
@@ -79,7 +79,7 @@
 						value={inboundProduct?.serialnumber}
 						placeholder="Serialnumber"
 						class="rounded-md border
-            border-gray-300 p-2 text-gray-800"
+			border-gray-300 p-2 text-gray-800"
 					/>
 
 					<button
@@ -93,7 +93,7 @@
 		{/each}
 	</section>
 
-	<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+	<section class="mt-auto items-end rounded-lg bg-gray-900 p-4 shadow-md">
 		<fieldset class="flex items-center gap-2 rounded-lg border border-gray-500 p-2">
 			<legend class="font-bold">Delete Product from Inbound</legend>
 			<form method="post">

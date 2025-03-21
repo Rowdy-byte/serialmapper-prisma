@@ -24,6 +24,8 @@
 	const products = data.products;
 	const inboundProducts = data.inboundProducts;
 
+	let count = $state(1);
+
 	function handleDeleteInbound(event: Event) {
 		if (!confirm('Are you sure you want to delete this inbound?')) {
 			event.preventDefault();
@@ -255,7 +257,8 @@
 				{#each inboundProducts as inboundProduct, i}
 					{#if inboundProduct.inboundId === inbound?.id}
 						<tr class="text-sm hover:bg-slate-600">
-							<td class="border border-gray-300 p-2 text-sm">{i + 1}</td>
+							<!-- replace with a count that always starts at 1, count foreach count++ -->
+							<td class="border border-gray-300 p-2">{i + 1}</td>
 							<td class="border border-gray-300 p-2">{inboundProduct.product}</td>
 							<td class="border border-gray-300 p-2">{inboundProduct.serialnumber}</td>
 							<td class="border border-gray-300 p-2">

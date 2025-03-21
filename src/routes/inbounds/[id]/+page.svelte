@@ -2,53 +2,16 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
+	import { page } from '$app/state';
 
 	import { CircleHelp, Eye } from '@lucide/svelte';
 	import Toast from '$lib/components/Toast.svelte';
 
 	import { utils, writeFileXLSX } from 'xlsx';
-	import { BrowserMultiFormatReader } from '@zxing/browser';
 
 	let { data, form }: PageProps = $props();
 
-	let videoElem: HTMLVideoElement = $state('');
-	let scannedResult: string = $state('');
-	let codeReader: BrowserMultiFormatReader = $state('');
-	let selectedDeviceId: string = $state('');
-
-	$effect(() => {
-		async () => {
-			// Initialiseer de code reader
-			codeReader = new BrowserMultiFormatReader();
-			console.log('BrowserMultiFormatReader gestart');
-
-			try {
-				// Verkrijg de beschikbare video-apparaten
-				const videoInputDevices = await codeReader.listVideoInputDevices();
-				if (videoInputDevices.length === 0) {
-					console.error('Geen video devices gevonden');
-					return;
-				}
-				// Kies het eerste apparaat (je kunt dit aanpassen als je meerdere camera's hebt)
-				selectedDeviceId = videoInputDevices[0].deviceId;
-
-				// Start de decoder en koppel deze aan het video-element
-				codeReader.decodeFromVideoDevice(selectedDeviceId, videoElem, (result, error) => {
-					if (result) {
-						scannedResult = result.getText();
-						console.log('Gescande code:', scannedResult);
-					}
-					if (error) {
-						// In de meeste frames is er geen code, dus dit kan normaal gesproken een foutmelding geven.
-						// Voor debugging kun je hier de error loggen.
-						// console.error(error);
-					}
-				});
-			} catch (err) {
-				console.error('Fout bij het initialiseren van de scanner:', err);
-			}
-		};
-	});
+	let pathname = $state(page.url.pathname);
 
 	let singleSectionOpen = $state(false);
 	let multiSectionOpen = $state(false);
@@ -226,10 +189,6 @@
 			</button>
 
 			<section class="flex max-w-sm flex-col gap-4 pt-8">
-				<video class="w-full max-w-3xl" bind:this={videoElem} autoplay muted playsinline></video>
-				<p>Gescande code: {scannedResult}</p>
-			</section>
-			<section class="flex max-w-sm flex-col gap-4 pt-8">
 				<div>
 					<h1 class="flex items-center justify-between font-bold">
 						Add multiple Products to Inbound
@@ -280,9 +239,9 @@
 	</section>
 
 	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<h1 class="pb-6 font-bold">Products in this Inbound</h1>
+		<h1 class="font-bold">Products in this Inbound</h1>
 
-		<table class="table w-full">
+		<table class="table">
 			<thead>
 				<tr>
 					<th class="border border-gray-300 p-2"></th>
@@ -316,7 +275,7 @@
 		{/if}
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<h1 class="pb-6 font-bold">Map Serialnumbers to Worksheet</h1>
+		<h1 class=" font-bold">Map Serialnumbers to Worksheet</h1>
 
 		<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
@@ -329,8 +288,8 @@
 		</form>
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
-			<legend>Delete Inbound</legend>
+		<fieldset class="flex items-center gap-2 rounded-lg border border-gray-300 p-2">
+			<legend class="font-bold">Delete Inbound</legend>
 			<form use:enhance method="post">
 				<button
 					formaction="?/deleteInbound"

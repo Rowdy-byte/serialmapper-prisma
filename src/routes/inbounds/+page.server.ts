@@ -15,7 +15,7 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
     async createInbound({ request }) {
 
-        await new Promise((fulfil) => setTimeout(fulfil, 1000));
+        await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
         const formData = await request.formData();
         const clientName = formData.get('clientName');

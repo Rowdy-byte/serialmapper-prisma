@@ -1,5 +1,6 @@
 import type { PageServerLoad, Actions } from "./$types";
 import db from "$lib/server/db";
+import { redirect } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async () => {
     const inboundProducts = await db.inboundProduct.findMany()
@@ -10,12 +11,20 @@ export const load: PageServerLoad = async () => {
 }
 
 export const actions: Actions = {
-    async deleteInboundProduct({ params }) {
+    async deleteInboundProduct({ params, url }) {
+        const { pathname } = url;
+        const segments = pathname.split('/');
+        const basePath = `/${segments[1]}/${segments[2]}`;
+
+        console.log('basePath', basePath)
+
         await db.inboundProduct.delete({
             where: {
                 id: Number(params.id)
             }
         })
+
+        throw redirect(303, basePath);
 
         return {
             status: 200,

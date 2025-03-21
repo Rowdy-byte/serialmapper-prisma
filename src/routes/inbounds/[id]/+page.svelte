@@ -2,6 +2,7 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps, SubmitFunction } from './$types';
+	import { page, navigating, updated } from '$app/state';
 
 	import { CircleHelp, Eye } from '@lucide/svelte';
 	import Toast from '$lib/components/Toast.svelte';
@@ -24,7 +25,6 @@
 			event.preventDefault();
 			return;
 		}
-
 		goto('/inbounds');
 	}
 

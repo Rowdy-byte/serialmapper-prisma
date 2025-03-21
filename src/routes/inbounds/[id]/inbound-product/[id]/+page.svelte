@@ -1,12 +1,16 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import { page } from '$app/state';
+	import { page, navigating, updated } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { MoveRight } from '@lucide/svelte';
 
 	const { params, url } = page;
 	const urlArray = url.pathname.split('/');
 	const inboundId = urlArray[2];
+
+	const { pathname } = page.url;
+	const segments = pathname.split('/');
+	const basePath = `/${segments[1]}/${segments[2]}`;
 
 	const { data }: PageProps = $props();
 	let { inboundProducts } = data;
@@ -16,18 +20,12 @@
 			console.log('Update inbound product cancelled');
 			event.preventDefault();
 		}
-		console.log('Update inbound product confirmed');
 	}
 
 	function handleDeleteInboundProduct(event: Event) {
 		if (!confirm('Are you sure you want to delete this inbound product?')) {
-			console.log('Delete inbound product cancelled');
 			event.preventDefault();
-			return;
 		}
-		event.preventDefault();
-		console.log('Delete inbound product confirmed');
-		goto(`/inbounds/${inboundId}`);
 	}
 </script>
 

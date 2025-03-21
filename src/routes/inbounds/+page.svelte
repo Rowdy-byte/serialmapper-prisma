@@ -23,7 +23,7 @@
 			formSuccess = true;
 			setTimeout(() => {
 				formSuccess = false;
-			}, 2000);
+			}, 3000);
 		}
 	});
 </script>

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
-	import type { PageProps, SubmitFunction } from './$types';
-	import { page, navigating, updated } from '$app/state';
+	import type { PageProps } from './$types';
 
 	import { CircleHelp, Eye } from '@lucide/svelte';
 	import Toast from '$lib/components/Toast.svelte';
+
+	import { utils, writeFileXLSX } from 'xlsx';
 
 	let { data, form }: PageProps = $props();
 
@@ -33,7 +34,6 @@
 			event.preventDefault();
 			return;
 		}
-
 		window.location.reload();
 	}
 
@@ -47,6 +47,15 @@
 		if (!confirm('Are you sure you want to add this batch to this inbound?')) {
 			event.preventDefault();
 		}
+	}
+
+	// Map all serialnumber from inboundProducts to worksheet using xlsx
+	// and download it as an xlsx file
+	function mapSerialToWorksheet() {
+		const worksheet = utils.json_to_sheet(inboundProducts);
+		const workbook = utils.book_new();
+		utils.book_append_sheet(workbook, worksheet, 'Inbound Products');
+		writeFileXLSX(workbook, `inbound-${inbound?.id}-products.xlsx`);
 	}
 </script>
 
@@ -103,6 +112,7 @@
 				class="rounded-md border
             border-gray-300 p-2 text-gray-800"
 			/>
+
 			<button
 				disabled={isUpdatingInbound}
 				formaction="?/updateInbound"
@@ -154,14 +164,20 @@
 				class="rounded-md border
 			border-gray-300 p-2 text-gray-800"
 			></textarea>
-			<button
-				disabled={isAddingInboundProduct}
-				class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				onclick={handleAddSingle}
-				type="submit"
-			>
-				Add Single
-			</button>
+			<div class="flex gap-4">
+				<button
+					disabled={isAddingInboundProduct}
+					class="w-full rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					onclick={handleAddSingle}
+					type="submit"
+				>
+					Add Single
+				</button>
+				<button
+					class="w-full rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					>Scan Barcode</button
+				>
+			</div>
 			<section class="flex max-w-sm flex-col gap-4 pt-8">
 				<div>
 					<h1 class="flex items-center justify-between font-bold">
@@ -193,15 +209,21 @@
 					class="rounded-md border
 	border-gray-300 p-2 text-gray-800"
 				></textarea>
-				<button
-					disabled={isAddingBatchInboundProduct}
-					formaction="?/addBatchInboundProductToInbound"
-					onclick={handleAddBatch}
-					class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit"
-				>
-					Add Batch
-				</button>
+				<div class="flex gap-4">
+					<button
+						disabled={isAddingBatchInboundProduct}
+						formaction="?/addBatchInboundProductToInbound"
+						onclick={handleAddBatch}
+						class="w-full rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						type="submit"
+					>
+						Add Batch
+					</button>
+					<button
+						class="w-full rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						>Scan QR code</button
+					>
+				</div>
 			</section>
 		</form>
 	</section>
@@ -238,11 +260,24 @@
 				{/each}
 			</tbody>
 		</table>
-		{#if inboundProducts.length === 0}
+		{#if inboundProducts.filter((product) => product.inboundId === inbound?.id).length === 0}
 			<p class="mt-2 border border-gray-300 p-2">No products found.</p>
 		{/if}
 	</section>
-	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
+	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
+		<h1 class="pb-6 font-bold">Map Serialnumbers to Worksheet</h1>
+
+		<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
+			<input hidden type="text" name="inboundId" value={inbound?.id} />
+
+			<button
+				class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				onclick={mapSerialToWorksheet}
+				type="button">Map</button
+			>
+		</form>
+	</section>
+	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<fieldset class="flex items-center gap-2 border border-gray-300 p-2">
 			<legend>Delete Inbound</legend>
 			<form use:enhance method="post">

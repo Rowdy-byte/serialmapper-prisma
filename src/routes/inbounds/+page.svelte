@@ -66,9 +66,11 @@
 				onclick={handleCreateInbound}
 				type="submit"
 				class="rounded-md bg-blue-500 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				class:hover:text-white={formSuccess}
+				class:text-white={formSuccess}
+				class:font-bold={formSuccess}
+				class:bg-green-500={formSuccess}
 			>
-				Create Inbound
+				{formSuccess ? 'Inbound Created!' : 'Create Inbound'}
 			</button>
 		</form>
 	</section>

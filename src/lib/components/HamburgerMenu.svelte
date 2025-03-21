@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Hamburger } from 'svelte-hamburgers';
 	import { page } from '$app/state';
+	import { fade } from 'svelte/transition';
 
 	let open = $state(false);
 
@@ -16,6 +17,22 @@
 		open = !open;
 	}
 
+	function clickOutside(node: HTMLElement) {
+		function handleClick(event: MouseEvent) {
+			if (!node.contains(event.target as Node)) {
+				open = false;
+			}
+		}
+
+		document.addEventListener('click', handleClick, true);
+
+		return {
+			destroy() {
+				document.removeEventListener('click', handleClick, true);
+			}
+		};
+	}
+
 	$effect(() => {
 		pathname = page.url.pathname;
 	});
@@ -25,6 +42,8 @@
 
 {#if open}
 	<nav
+		use:clickOutside
+		transition:fade={{ duration: 200 }}
 		class=" absolute top-24 left-0 z-10 flex w-full border-b-1 border-slate-500 bg-gray-950 text-white"
 	>
 		<div class="flex flex-col gap-1 p-4 text-start text-xl font-bold">

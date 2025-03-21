@@ -16,6 +16,10 @@
 	let { inboundProducts } = data;
 	let { inbound } = data;
 
+	const filteredInboundProducts = inboundProducts.filter(
+		(product) => product.inboundId === inbound?.id
+	);
+
 	function handleUpdateInboundProduct(event: Event) {
 		if (!confirm('Are you sure you want to update this inbound product?')) {
 			console.log('Update inbound product cancelled');
@@ -42,8 +46,15 @@
 			<MoveRight size="24" class="px-1" />
 		</li>
 		<li>
+			<!-- filter product that q -->
 			<p class="text-gray-500">
-				Inbound Product {params.id}
+				{#each filteredInboundProducts as inboundProduct, i}
+					{#if inboundProduct.id === Number(params.id)}
+						<span class="text-gray-500 hover:text-blue-500">
+							{i + 1}
+						</span>
+					{/if}
+				{/each}
 			</p>
 		</li>
 	</ul>

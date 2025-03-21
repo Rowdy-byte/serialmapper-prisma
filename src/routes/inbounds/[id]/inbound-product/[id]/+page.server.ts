@@ -7,10 +7,7 @@ export const load: PageServerLoad = async () => {
     return {
         inboundProducts
     }
-
-
 }
-
 
 export const actions: Actions = {
     async deleteInboundProduct({ params }) {
@@ -26,6 +23,7 @@ export const actions: Actions = {
 
         }
     },
+
     async updateInboundProduct({ request, params }) {
         const formData = await request.formData();
 

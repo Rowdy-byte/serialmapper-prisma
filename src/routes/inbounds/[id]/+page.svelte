@@ -24,42 +24,29 @@
 			event.preventDefault();
 			return;
 		}
+
 		goto('/inbounds');
 	}
 
 	function handleUpdateInbound(event: Event) {
 		if (!confirm('Are you sure you want to update this inbound?')) {
 			event.preventDefault();
+			return;
 		}
 
-		goto(`/inbounds/${inbound?.id}`);
+		window.location.reload();
+	}
+
+	function handleAddSingle(event: Event) {
+		if (!confirm('Are you sure you want to add this product to this inbound?')) {
+			event.preventDefault();
+		}
 	}
 
 	function handleAddBatch(event: Event) {
 		if (!confirm('Are you sure you want to add this batch to this inbound?')) {
 			event.preventDefault();
 		}
-	}
-
-	const addEdhanceSingle: SubmitFunction = ({ formElement, formData, action }) => {
-		console.log('form', formElement);
-		console.log('data', formData);
-		console.log('action', action);
-
-		isAddingInboundProduct = true;
-
-		return async function ({ update }: { update: () => Promise<void> }) {
-			await update();
-			isAddingInboundProduct = false;
-		};
-	};
-
-	function addEdhanceBatch() {
-		isAddingBatchInboundProduct = true;
-		return async function ({ update }: { update: () => Promise<void> }) {
-			await update();
-			isAddingBatchInboundProduct = false;
-		};
 	}
 </script>
 
@@ -147,12 +134,7 @@
 				<p>3. Click on Add.</p>
 			</li>
 		</ul>
-		<form
-			class="flex flex-col gap-4"
-			action="?/addInboundProductToInbound"
-			method="post"
-			use:enhance={addEdhanceSingle}
-		>
+		<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
 			<select
 				disabled={isAddingInboundProduct}
@@ -175,6 +157,7 @@
 			<button
 				disabled={isAddingInboundProduct}
 				class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				onclick={handleAddSingle}
 				type="submit"
 			>
 				Add Single

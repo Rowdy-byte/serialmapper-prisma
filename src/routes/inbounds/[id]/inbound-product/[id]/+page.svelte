@@ -13,15 +13,20 @@
 
 	function handleUpdateInboundProduct(event: Event) {
 		if (!confirm('Are you sure you want to update this inbound product?')) {
+			console.log('Update inbound product cancelled');
 			event.preventDefault();
 		}
+		console.log('Update inbound product confirmed');
 	}
 
 	function handleDeleteInboundProduct(event: Event) {
 		if (!confirm('Are you sure you want to delete this inbound product?')) {
+			console.log('Delete inbound product cancelled');
 			event.preventDefault();
 			return;
 		}
+		event.preventDefault();
+		console.log('Delete inbound product confirmed');
 		goto(`/inbounds/${inboundId}`);
 	}
 </script>

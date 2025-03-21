@@ -1,46 +1,37 @@
 <script lang="ts">
 	import type { PageProps, SubmitFunction } from './$types';
 	import { Eye } from '@lucide/svelte';
-	import { enhance } from '$app/forms';
-	import { fade, fly, slide } from 'svelte/transition';
+	import { fly, slide } from 'svelte/transition';
 	import Toast from '$lib/components/Toast.svelte';
-	import toast from 'svelte-french-toast';
 
 	let { data, form }: PageProps = $props();
 
-	let loading = $state(false);
+	let formSuccess = $state(false);
 
 	const clients = data.clients;
 	const inbounds = data.inbounds;
 
 	function handleCreateInbound(event: Event) {
 		if (!confirm('Are you sure you want to create this inbound?')) {
+			event.preventDefault();
+			return;
 		}
-		window.location.reload();
 	}
 
-	// const submitCreateInbound: SubmitFunction = async ({
-	// 	formElement,
-	// 	formData,
-	// 	action,
-	// 	cancel,
-	// 	submitter
-	// }) => {
-	// 	// const { clientName, description } = Object.fromEntries(formData);
-	// 	loading = true;
-
-	// 	return async ({ result, update }) => {
-	// 		loading = false;
-
-	// 		await update();
-
-	// 		window.location.reload();
-	// 	};
-	// };
+	$effect(() => {
+		if (form?.success) {
+			formSuccess = true;
+			setTimeout(() => {
+				formSuccess = false;
+			}, 2000);
+		}
+	});
 </script>
 
-{#if loading}
-	<Toast text="Inbound Succesful Created!" backgroundColor="bg-green-500" />
+{#if formSuccess}
+	<div>
+		<Toast text="Inbound Succesful Created!" backgroundColor="bg-green-500" />
+	</div>
 {/if}
 
 <h1 class="py-4 text-xl font-bold">Inbounds</h1>
@@ -51,7 +42,7 @@
 
 		<form class="flex flex-col gap-4" action="?/createInbound" method="post">
 			<select
-				disabled={loading}
+				disabled={formSuccess}
 				class="rounded-md border border-gray-300 p-2 text-gray-800"
 				name="clientName"
 				required
@@ -63,7 +54,7 @@
 			</select>
 
 			<input
-				disabled={loading}
+				disabled={formSuccess}
 				type="text"
 				name="description"
 				placeholder="Description"
@@ -71,13 +62,13 @@
 				required
 			/>
 			<button
-				disabled={loading}
+				disabled={formSuccess}
 				onclick={handleCreateInbound}
 				type="submit"
 				class="rounded-md bg-blue-500 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				class:hover:text-white={loading}
+				class:hover:text-white={formSuccess}
 			>
-				{loading ? 'Successful!' : 'Create Inbound'}
+				Create Inbound
 			</button>
 		</form>
 	</section>

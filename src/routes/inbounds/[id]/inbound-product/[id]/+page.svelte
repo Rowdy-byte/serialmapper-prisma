@@ -39,18 +39,18 @@
 	<ul class="flex items-center gap-2">
 		<li>
 			<a href={`/inbounds/${inboundId}`} class="text-gray-500 hover:text-blue-500">
-				Inbound {inbound?.inboundNumber}</a
+				<span class="hidden md:inline">Inbound:</span> {inbound?.inboundNumber}</a
 			>
 		</li>
 		<li>
 			<MoveRight size="24" class="px-1" />
 		</li>
 		<li>
-			<!-- filter product that q -->
 			<p class="text-gray-500">
 				{#each filteredInboundProducts as inboundProduct, i}
 					{#if inboundProduct.id === Number(params.id)}
-						<span class="text-gray-500 hover:text-blue-500">
+						<span class="text-gray-500">
+							<span class="hidden md:inline">Inbound Product:</span>
 							{i + 1}
 						</span>
 					{/if}

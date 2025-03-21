@@ -50,6 +50,8 @@
 	"dependencies": {
 		"@lucide/svelte": "^0.482.0",
 		"@prisma/client": "6.5.0",
+		"@zxing/browser": "^0.1.5",
+		"@zxing/library": "^0.21.3",
 		"lucide-svelte": "^0.482.0",
 		"svelte-french-toast": "^1.2.0",
 		"xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"

@@ -7,8 +7,48 @@
 	import Toast from '$lib/components/Toast.svelte';
 
 	import { utils, writeFileXLSX } from 'xlsx';
+	import { BrowserMultiFormatReader } from '@zxing/browser';
 
 	let { data, form }: PageProps = $props();
+
+	let videoElem: HTMLVideoElement = $state('');
+	let scannedResult: string = $state('');
+	let codeReader: BrowserMultiFormatReader = $state('');
+	let selectedDeviceId: string = $state('');
+
+	$effect(() => {
+		async () => {
+			// Initialiseer de code reader
+			codeReader = new BrowserMultiFormatReader();
+			console.log('BrowserMultiFormatReader gestart');
+
+			try {
+				// Verkrijg de beschikbare video-apparaten
+				const videoInputDevices = await codeReader.listVideoInputDevices();
+				if (videoInputDevices.length === 0) {
+					console.error('Geen video devices gevonden');
+					return;
+				}
+				// Kies het eerste apparaat (je kunt dit aanpassen als je meerdere camera's hebt)
+				selectedDeviceId = videoInputDevices[0].deviceId;
+
+				// Start de decoder en koppel deze aan het video-element
+				codeReader.decodeFromVideoDevice(selectedDeviceId, videoElem, (result, error) => {
+					if (result) {
+						scannedResult = result.getText();
+						console.log('Gescande code:', scannedResult);
+					}
+					if (error) {
+						// In de meeste frames is er geen code, dus dit kan normaal gesproken een foutmelding geven.
+						// Voor debugging kun je hier de error loggen.
+						// console.error(error);
+					}
+				});
+			} catch (err) {
+				console.error('Fout bij het initialiseren van de scanner:', err);
+			}
+		};
+	});
 
 	let singleSectionOpen = $state(false);
 	let multiSectionOpen = $state(false);
@@ -47,6 +87,17 @@
 		if (!confirm('Are you sure you want to add this batch to this inbound?')) {
 			event.preventDefault();
 		}
+	}
+
+	function scanBarcodetoSingleTextarea() {}
+
+	function scanBarcodetoBatchTextarea() {}
+
+	function handleMapSerialToWorksheet(event: Event) {
+		if (!confirm('Are you sure you want to map the serialnumbers to a worksheet?')) {
+			event.preventDefault();
+		}
+		mapSerialToWorksheet();
 	}
 
 	// Map all serialnumber from inboundProducts to worksheet using xlsx
@@ -164,20 +215,20 @@
 				class="rounded-md border
 			border-gray-300 p-2 text-gray-800"
 			></textarea>
-			<div class="flex gap-4">
-				<button
-					disabled={isAddingInboundProduct}
-					class="w-full rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					onclick={handleAddSingle}
-					type="submit"
-				>
-					Add Single
-				</button>
-				<button
-					class="w-full rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					>Scan Barcode</button
-				>
-			</div>
+
+			<button
+				disabled={isAddingInboundProduct}
+				class="w-full rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				onclick={handleAddSingle}
+				type="submit"
+			>
+				Add Single
+			</button>
+
+			<section class="flex max-w-sm flex-col gap-4 pt-8">
+				<video class="w-full max-w-3xl" bind:this={videoElem} autoplay muted playsinline></video>
+				<p>Gescande code: {scannedResult}</p>
+			</section>
 			<section class="flex max-w-sm flex-col gap-4 pt-8">
 				<div>
 					<h1 class="flex items-center justify-between font-bold">
@@ -272,7 +323,7 @@
 
 			<button
 				class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				onclick={mapSerialToWorksheet}
+				onclick={handleMapSerialToWorksheet}
 				type="button">Map</button
 			>
 		</form>

@@ -133,7 +133,6 @@ export const actions = {
         };
     },
 
-
     async addBatchInboundProductToInbound({ params, request }: { params: { id: string }, request: Request }) {
 
         await new Promise((fulfil) => setTimeout(fulfil, 3000));
@@ -141,13 +140,12 @@ export const actions = {
         const inboundId = Number(params.id);
         const formData = await request.formData();
         const batch = (formData.get('batch') as string)
-            .split(/\s+/) // Split by spaces/newlines
-            .map(serialnumber => serialnumber.trim()) // Trim whitespace
-            .filter(serialnumber => serialnumber.length > 0); // Remove empty values
+            .split(/\s+/)
+            .map(serialnumber => serialnumber.trim())
+            .filter(serialnumber => serialnumber.length > 0);
 
         const product = formData.get('product') as string;
 
-        // 🔎 Step 1: Get existing serial numbers from DB
         const existingSerialNumbers = new Set(
             (await db.inboundProduct.findMany({
                 where: { serialnumber: { in: batch } },
@@ -155,14 +153,13 @@ export const actions = {
             })).map(({ serialnumber }) => serialnumber)
         );
 
-        // 🛑 Step 2: Filter out duplicates
         const uniqueSerialNumbers = batch.filter(serialnumber => !existingSerialNumbers.has(serialnumber));
 
         if (uniqueSerialNumbers.length === 0) {
             return {
                 status: 400,
-                success: false,
-                message: 'All serial numbers already exist.'
+                addBatchToInboundSuccess: false,
+                message: 'Duplicate serialnumbers detected.'
             };
         }
 
@@ -177,7 +174,8 @@ export const actions = {
 
         return {
             status: 200,
-            success: true,
+            addBatchToInboundSuccess: true,
+            message: 'Batch added to inbound successfully.',
             inboundProducts
         };
     }

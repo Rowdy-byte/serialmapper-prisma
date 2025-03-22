@@ -97,6 +97,19 @@
 				});
 				window.location.reload();
 				break;
+			case form?.addBatchToInboundSuccess:
+				toast.success(form?.message, {
+					duration: 3000,
+					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+				});
+				window.location.reload();
+				break;
+			case form?.addBatchToInboundSuccess === false:
+				toast.error(form?.message, {
+					duration: 3000,
+					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+				});
+				break;
 		}
 	});
 </script>

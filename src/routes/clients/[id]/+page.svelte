@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { CircleHelp } from '@lucide/svelte';
 	import type { PageProps } from './$types';
+	import toast from 'svelte-french-toast';
 	let { data, form }: PageProps = $props();
 
 	let client = data.client;
@@ -22,6 +23,15 @@
 			return;
 		}
 	}
+
+	$effect(() => {
+		if (form?.success) {
+			toast.success(form.message, {
+				duration: 3000,
+				style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+		}
+	});
 </script>
 
 <h1 class="py-4 text-lg font-bold">Client Details</h1>

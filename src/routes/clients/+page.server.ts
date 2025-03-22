@@ -7,6 +7,17 @@ export const actions: Actions = {
         const formData = await request.formData();
         const name = formData.get('name');
 
+        // Check if the client already exists
+        const existingClient = await db.client.findUnique({
+            where: { name: name as string }
+        });
+        if (existingClient) {
+            return {
+                status: 400,
+                success: false,
+                message: 'Client already exists'
+            };
+        }
 
         const client = await db.client.create({
             data: {
@@ -16,7 +27,9 @@ export const actions: Actions = {
 
         return {
             status: 201,
-            body: client
+            success: true,
+            message: 'Client created successfully',
+            client: client
         }
     }
 };

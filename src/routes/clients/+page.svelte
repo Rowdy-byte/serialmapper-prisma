@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { Eye } from '@lucide/svelte';
+	import toast from 'svelte-french-toast';
 
-	let { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 
 	let clients = data.clients;
 
@@ -11,6 +12,21 @@
 			event.preventDefault();
 		}
 	}
+
+	$effect(() => {
+		if (form?.success) {
+			toast.success(form.message, {
+				duration: 3000,
+				style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+		}
+		if (form?.success === false) {
+			toast.error(form.message, {
+				duration: 3000,
+				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+		}
+	});
 </script>
 
 <h1 class="py-4 text-lg font-bold">Clients</h1>

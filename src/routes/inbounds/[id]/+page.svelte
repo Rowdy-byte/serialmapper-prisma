@@ -2,16 +2,13 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { page } from '$app/state';
 
 	import { CircleHelp, Eye } from '@lucide/svelte';
-	import Toast from '$lib/components/Toast.svelte';
+	import toast from 'svelte-french-toast';
 
 	import { utils, writeFileXLSX } from 'xlsx';
 
 	let { data, form }: PageProps = $props();
-
-	let pathname = $state(page.url.pathname);
 
 	let singleSectionOpen = $state(false);
 	let multiSectionOpen = $state(false);
@@ -74,19 +71,32 @@
 		utils.book_append_sheet(workbook, worksheet, 'Inbound Products');
 		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
 	}
+
+	$effect(() => {
+		if (form?.inboundUpdateSuccess) {
+			toast.success(form?.message, {
+				duration: 3000,
+				style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+			window.location.reload();
+		}
+
+		if (form?.duplicateSuccess === false) {
+			toast.error(form?.message, {
+				duration: 3000,
+				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+		}
+
+		if (form?.addProductToInboundSuccess) {
+			toast.success(form?.message, {
+				duration: 3000,
+				style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+			window.location.reload();
+		}
+	});
 </script>
-
-{#if form?.message && isAddingBatchInboundProduct}
-	<Toast text="Inbound Succesful Updated!" backgroundColor="bg-green-500" />
-{/if}
-
-{#if isAddingInboundProduct}
-	<Toast text="Product(s) Succesful Added!" backgroundColor="bg-green-500" />
-{/if}
-
-{#if form?.success}
-	<Toast text="Inbound Succesfully updated" backgroundColor="bg-red-500" />
-{/if}
 
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="text-gray-500">

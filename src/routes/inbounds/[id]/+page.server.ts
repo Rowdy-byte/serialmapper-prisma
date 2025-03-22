@@ -1,6 +1,5 @@
 import type { PageServerLoad } from "./$types";
 import db from "$lib/server/db";
-import { redirect } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async ({ params }) => {
     const clients = await db.client.findMany();
@@ -28,14 +27,11 @@ export const load: PageServerLoad = async ({ params }) => {
 export const actions = {
     async updateInbound({ params, request }: { params: { id: string }, request: Request }) {
 
-        // await new Promise((fulfil) => setTimeout(fulfil, 2000));
-
         const formData = await request.formData();
 
         const inboundId = Number(params.id);
         const clientName = formData.get('clientName');
         const description = formData.get('description');
-
 
         const client = await db.client.findUnique({
             where: { name: clientName as string }
@@ -60,12 +56,10 @@ export const actions = {
             }
         });
 
-        throw redirect(303, '/inbounds');
-
-
         return {
             status: 200,
-            success: true,
+            inboundUpdateSuccess: true,
+            message: 'Inbound updated successfully',
 
         }
 
@@ -86,20 +80,19 @@ export const actions = {
         if (inbound) {
             return {
                 status: 500,
-                success: false,
-                message: 'Inbound was not deleted'
+                inboundDeleteSuccess: false,
+                message: 'Inbound delete not successfully.'
             }
         }
 
         // if the inbound was deleted, return a success message
         return {
             status: 200,
-            success: true,
-            message: 'Inbound was deleted'
+            inboundDeletesuccess: true,
+            message: 'Inbound deleted successfully!'
         }
     },
 
-    // Add a product to the inbound with inboundId
     async addInboundProductToInbound({ request }: { params: { id: string }, request: Request }) {
 
         await new Promise((fulfil) => setTimeout(fulfil, 3000));
@@ -109,21 +102,18 @@ export const actions = {
         const product = formData.get('product');
         const serialnumber = formData.get('serialnumber') as string;
 
-        // 🔎 Step 1: Check if the serial number already exists
         const existingProduct = await db.inboundProduct.findFirst({
             where: { serialnumber: serialnumber },
         });
 
-        // 🛑 Step 2: If a product with the same serialnumber exists, return an error
         if (existingProduct) {
             return {
                 status: 400,
-                success: false,
-                message: 'Duplicate serial number. This product already exists in the database.'
+                duplicateSuccess: false,
+                message: 'Duplicate serialnumber detected.'
             };
         }
 
-        // ✅ Step 3: Proceed with creating the new inbound product
         const inboundProduct = await db.inboundProduct.create({
             data: {
                 serialnumber,
@@ -138,7 +128,8 @@ export const actions = {
 
         return {
             status: 200,
-            success: true,
+            addProductToInboundSuccess: true,
+            message: 'Product added to inbound successfully.',
             inboundProduct
         };
     },

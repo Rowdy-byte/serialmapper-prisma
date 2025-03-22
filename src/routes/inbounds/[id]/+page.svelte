@@ -270,22 +270,22 @@
 	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<h1 class="font-bold">Products in this Inbound</h1>
 
-		<table class="">
+		<table class="w-full text-left text-sm">
 			<thead>
 				<tr class="text-left text-sm text-gray-500">
-					<th class="border border-gray-300 p-2"></th>
-					<th class="border border-gray-300 p-2">Product</th>
-					<th class="border border-gray-300 p-2">Serialnumber</th>
-					<th class="border border-gray-300 p-2">Actions</th>
+					<th class="border border-gray-500 p-2"></th>
+					<th class="border border-gray-500 p-2">Product</th>
+					<th class="border border-gray-500 p-2">Serialnumber</th>
+					<th class="border border-gray-500 p-2">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
 				{#each filteredInboundProducts as inboundProduct, i}
 					<tr class="text-sm hover:bg-slate-600">
-						<td class="border border-gray-300 p-2">{i + 1}</td>
-						<td class="border border-gray-300 p-2">{inboundProduct.product}</td>
-						<td class="border border-gray-300 p-2">{inboundProduct.serialnumber}</td>
-						<td class="border border-gray-300 p-2">
+						<td class="border border-gray-500 p-2">{i + 1}</td>
+						<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
+						<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
+						<td class="border border-gray-500 p-2">
 							<a
 								class="text-blue-500 underline"
 								href={`/inbounds/${inbound?.id}/inbound-product/${inboundProduct.id}`}

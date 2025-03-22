@@ -52,19 +52,18 @@
 	</section>
 	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="pb-4 font-bold">Clients List</h1>
-		<!-- show clientlist in a table -->
 		<table class="w-full border text-sm">
 			<thead>
 				<tr class="text-gray-500">
-					<th class="border border-gray-300 p-2">Name</th>
-					<th class="border border-gray-300 p-2">Actions</th>
+					<th class="border border-gray-500 p-2">Name</th>
+					<th class="border border-gray-500 p-2">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
 				{#each clients as client}
 					<tr class="hover:bg-slate-800">
-						<td class="border border-gray-300 p-2">{client.name}</td>
-						<td class="border border-gray-300 p-2">
+						<td class="border border-gray-500 p-2">{client.name}</td>
+						<td class="border border-gray-500 p-2">
 							<a
 								href="/clients/{client.id}"
 								class="text-blue-500 hover:cursor-pointer hover:text-blue-800"

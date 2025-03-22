@@ -40,7 +40,9 @@ export const actions: Actions = {
         });
 
         return {
-            success: true
+            inboundSuccess: true,
+            message: 'Inbound created successfully',
+
         };
     }
 }

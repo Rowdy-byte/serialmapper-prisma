@@ -2,6 +2,7 @@
 	import '../app.css';
 	import Footer from '$lib/components/Footer.svelte';
 	import HamburgerMenu from '$lib/components/HamburgerMenu.svelte';
+	import toast, { Toaster } from 'svelte-french-toast';
 	import { page } from '$app/state';
 
 	let { children } = $props();
@@ -18,6 +19,8 @@
 		{ linkName: 'Products', linkPath: '/products' }
 	];
 </script>
+
+<Toaster />
 
 <nav class="relative flex items-center justify-between p-4">
 	<section class="flex h-full items-center justify-center gap-2">

@@ -2,8 +2,7 @@
 	import type { PageProps, SubmitFunction } from './$types';
 	import { Eye } from '@lucide/svelte';
 	import { fly, slide } from 'svelte/transition';
-	import Toast from '$lib/components/Toast.svelte';
-
+	import toast from 'svelte-french-toast';
 	let { data, form }: PageProps = $props();
 
 	let formSuccess = $state(false);
@@ -19,20 +18,14 @@
 	}
 
 	$effect(() => {
-		if (form?.success) {
-			formSuccess = true;
-			setTimeout(() => {
-				formSuccess = false;
-			}, 3000);
+		if (form?.inboundSuccess) {
+			toast.success(form?.message, {
+				duration: 3000,
+				style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+			});
 		}
 	});
 </script>
-
-{#if formSuccess}
-	<div>
-		<Toast text="Inbound Succesful Created!" backgroundColor="bg-green-500" />
-	</div>
-{/if}
 
 <h1 class="py-4 text-lg font-bold">Inbounds</h1>
 

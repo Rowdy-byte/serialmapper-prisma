@@ -1,5 +1,6 @@
 import type { PageServerLoad } from "./$types";
 import db from "$lib/server/db";
+import { redirect } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async ({ params }) => {
     const clients = await db.client.findMany();
@@ -58,6 +59,8 @@ export const actions = {
                 inboundNumber: formattedNumber
             }
         });
+
+        throw redirect(303, '/inbounds');
 
 
         return {

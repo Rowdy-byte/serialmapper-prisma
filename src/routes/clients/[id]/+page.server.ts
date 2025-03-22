@@ -31,6 +31,8 @@ export const actions: Actions = {
             }
         });
 
+        throw redirect(301, '/clients');
+
         return {
             status: 200,
             success: true,

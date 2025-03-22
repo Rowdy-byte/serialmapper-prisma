@@ -20,6 +20,7 @@
 	let isUpdatingInbound = $state(false);
 	let isAddingInboundProduct = $state(false);
 	let isAddingBatchInboundProduct = $state(false);
+
 	const clients = data.clients;
 	const inbound = data.inbound;
 	const products = data.products;
@@ -42,7 +43,6 @@
 			event.preventDefault();
 			return;
 		}
-		window.location.reload();
 	}
 
 	function handleAddSingle(event: Event) {
@@ -68,8 +68,6 @@
 		mapSerialToWorksheet();
 	}
 
-	// Map all serialnumber from inboundProducts to worksheet using xlsx
-	// and download it as an xlsx file
 	function mapSerialToWorksheet() {
 		const worksheet = utils.json_to_sheet(inboundProducts);
 		const workbook = utils.book_new();
@@ -86,8 +84,8 @@
 	<Toast text="Product(s) Succesful Added!" backgroundColor="bg-green-500" />
 {/if}
 
-{#if form?.message && isUpdatingInbound}
-	<Toast text={form?.message} backgroundColor="bg-red-500" />
+{#if form?.success}
+	<Toast text="Inbound Succesfully updated" backgroundColor="bg-red-500" />
 {/if}
 
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">

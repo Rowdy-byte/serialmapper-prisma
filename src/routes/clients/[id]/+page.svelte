@@ -21,7 +21,6 @@
 			event.preventDefault();
 			return;
 		}
-		goto('/clients');
 	}
 </script>
 

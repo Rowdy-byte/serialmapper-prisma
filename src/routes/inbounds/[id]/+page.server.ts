@@ -85,7 +85,6 @@ export const actions = {
             }
         }
 
-        // if the inbound was deleted, return a success message
         return {
             status: 200,
             inboundDeletesuccess: true,

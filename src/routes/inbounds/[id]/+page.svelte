@@ -32,6 +32,7 @@
 			event.preventDefault();
 			return;
 		}
+
 		goto('/inbounds');
 	}
 
@@ -73,27 +74,29 @@
 	}
 
 	$effect(() => {
-		if (form?.inboundUpdateSuccess) {
-			toast.success(form?.message, {
-				duration: 3000,
-				style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-			});
-			window.location.reload();
-		}
+		switch (true) {
+			case form?.inboundUpdateSuccess:
+				toast.success(form?.message, {
+					duration: 3000,
+					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+				});
+				window.location.reload();
+				break;
 
-		if (form?.duplicateSuccess === false) {
-			toast.error(form?.message, {
-				duration: 3000,
-				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-			});
-		}
+			case form?.duplicateSuccess === false:
+				toast.error(form?.message, {
+					duration: 3000,
+					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+				});
+				break;
 
-		if (form?.addProductToInboundSuccess) {
-			toast.success(form?.message, {
-				duration: 3000,
-				style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-			});
-			window.location.reload();
+			case form?.addProductToInboundSuccess:
+				toast.success(form?.message, {
+					duration: 3000,
+					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+				});
+				window.location.reload();
+				break;
 		}
 	});
 </script>

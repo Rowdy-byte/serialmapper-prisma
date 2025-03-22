@@ -3,6 +3,7 @@
 	import { Eye } from '@lucide/svelte';
 	import { fly, slide } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
+	import { invalidate } from '$app/navigation';
 	let { data, form }: PageProps = $props();
 
 	let formSuccess = $state(false);
@@ -18,6 +19,8 @@
 	}
 
 	$effect(() => {
+		invalidate('inbounds');
+
 		if (form?.inboundSuccess) {
 			toast.success(form?.message, {
 				duration: 3000,

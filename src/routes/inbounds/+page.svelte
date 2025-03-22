@@ -34,7 +34,7 @@
 	</div>
 {/if}
 
-<h1 class="py-4 text-xl font-bold">Inbounds</h1>
+<h1 class="py-4 text-lg font-bold">Inbounds</h1>
 
 <main class="max-auto flex max-w-3xl flex-col gap-12">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
@@ -43,7 +43,7 @@
 		<form class="flex flex-col gap-4" action="?/createInbound" method="post">
 			<select
 				disabled={formSuccess}
-				class="rounded-md border border-gray-300 p-2 text-gray-800"
+				class="rounded-md border border-gray-300 p-3 text-sm text-gray-800"
 				name="clientName"
 				required
 			>
@@ -58,14 +58,14 @@
 				type="text"
 				name="description"
 				placeholder="Description"
-				class="rounded-md border border-gray-300 p-2 text-gray-800"
+				class="rounded-md border border-gray-300 p-3 text-sm text-gray-800"
 				required
 			/>
 			<button
 				disabled={formSuccess}
 				onclick={handleCreateInbound}
 				type="submit"
-				class="rounded-md bg-blue-500 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-blue-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				class:text-white={formSuccess}
 				class:font-bold={formSuccess}
 				class:bg-green-500={formSuccess}

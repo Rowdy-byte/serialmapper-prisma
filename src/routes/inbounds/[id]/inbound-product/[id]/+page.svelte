@@ -2,7 +2,9 @@
 	import type { PageProps } from './$types';
 	import { page, navigating, updated } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { MoveRight } from '@lucide/svelte';
+	import { CircleHelp, MoveRight } from '@lucide/svelte';
+
+	let deleteSectionOpen = $state(false);
 
 	const { params, url } = page;
 	const urlArray = url.pathname.split('/');
@@ -34,7 +36,6 @@
 	}
 </script>
 
-<!-- replace h1 navigation with daisy ui breadcrums -->
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="flex items-center gap-2">
 		<li>
@@ -71,7 +72,7 @@
 						value={inboundProduct?.product}
 						placeholder="Product"
 						class="rounded-md border
-			border-gray-300 p-2 text-gray-800"
+			border-gray-300 p-3 text-sm text-gray-800"
 					/>
 					<input
 						type="text"
@@ -79,13 +80,13 @@
 						value={inboundProduct?.serialnumber}
 						placeholder="Serialnumber"
 						class="rounded-md border
-			border-gray-300 p-2 text-gray-800"
+			border-gray-300 p-3 text-sm text-gray-800"
 					/>
 
 					<button
 						formaction="?/updateInboundProduct"
 						onclick={handleUpdateInboundProduct}
-						class="rounded-md bg-green-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-md bg-green-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit">Update</button
 					>
 				</form>
@@ -93,18 +94,28 @@
 		{/each}
 	</section>
 
-	<section class="mt-auto items-end rounded-lg bg-gray-900 p-4 shadow-md">
-		<fieldset class="flex items-center gap-2 rounded-lg border border-gray-500 p-2">
-			<legend class="font-bold">Delete Product from Inbound</legend>
-			<form method="post">
-				<button
-					formaction="?/deleteInboundProduct"
-					onclick={handleDeleteInboundProduct}
-					class="rounded-md bg-red-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit">Delete</button
-				>
-			</form>
-			<p class="text-sm">This will permanently delete this product from this inbound!</p>
-		</fieldset>
+	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
+		<h1 class="flex w-full items-center justify-between font-bold">
+			Delete product from Inbound<CircleHelp
+				class="transition-all hover:cursor-pointer hover:text-yellow-500"
+				onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
+				size="14"
+			/>
+		</h1>
+		<form method="post" class="flex gap-2">
+			<button
+				formaction="?/deleteInboundProduct"
+				onclick={handleDeleteInboundProduct}
+				class=" rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				type="submit">Delete</button
+			>
+			<div>
+				<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
+					<li class="pb-1">
+						<p class="text-sm">This will permanently delete this Product from inbound!</p>
+					</li>
+				</ul>
+			</div>
+		</form>
 	</section>
 </main>

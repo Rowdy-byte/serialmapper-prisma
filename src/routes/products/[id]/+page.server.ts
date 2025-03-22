@@ -1,5 +1,6 @@
 import type { PageServerLoad } from './$types';
 import db from '$lib/server/db';
+import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params }) => {
 
@@ -31,6 +32,8 @@ export const actions = {
             }
         });
 
+        throw redirect(303, '/products');
+
         return {
             status: 200,
             success: true,
@@ -50,6 +53,8 @@ export const actions = {
                 id: productId
             }
         });
+
+        throw redirect(303, '/products');
 
         if (product) {
             return {

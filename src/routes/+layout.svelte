@@ -21,7 +21,7 @@
 
 <nav class="relative flex items-center justify-between p-4">
 	<section class="flex h-full items-center justify-center gap-2">
-		<a class="text-center text-2xl font-bold" href="/"
+		<a class="text-center text-2xl font-black" href="/"
 			>SN<span class="text-md text-orange-500">mapper</span>
 			<span class="text-xs font-normal text-slate-500">beta version 1.0</span></a
 		>
@@ -31,7 +31,7 @@
 			{#each links as { linkName, linkPath }}
 				{#if pathname !== linkPath}
 					<a
-						class="rounded-md p-2 text-gray-300 hover:cursor-pointer hover:bg-gray-800 hover:text-blue-500"
+						class="rounded-md p-2 font-bold text-gray-300 hover:cursor-pointer hover:bg-gray-800 hover:text-blue-500"
 						href={linkPath}
 						class:selected={pathname === linkPath}>{linkName}</a
 					>
@@ -52,7 +52,7 @@
 	</section>
 </nav>
 
-<main class="flex min-h-screen flex-grow flex-col bg-gray-950 p-4">
+<main class="relative flex min-h-screen flex-grow flex-col bg-gray-950 p-4">
 	{@render children()}
 </main>
 <Footer />

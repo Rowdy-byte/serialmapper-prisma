@@ -8,9 +8,11 @@
 	let { text, backgroundColor, textColor }: ToastProps = $props();
 </script>
 
-<main class="bg-opacity-50 absolute top-14 left-1/2 -translate-x-1/2 transform bg-gray-900">
+<main
+	class="bg-opacity-50 absolute top-14 left-1/2 hidden -translate-x-1/2 transform bg-gray-900 md:inline"
+>
 	<section
-		class={`relative flex w-80 items-center justify-center font-bold ${backgroundColor} rounded-lg p-3 shadow-md`}
+		class={`relative flex w-80 items-center justify-center rounded-lg border-2 border-green-700 p-3 font-bold shadow-md ${backgroundColor} `}
 	>
 		<p class={`text-sm ${textColor}`}>
 			{text}

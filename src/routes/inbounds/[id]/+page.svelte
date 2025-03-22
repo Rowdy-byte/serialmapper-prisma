@@ -15,6 +15,7 @@
 
 	let singleSectionOpen = $state(false);
 	let multiSectionOpen = $state(false);
+	let deleteSectionOpen = $state(false);
 
 	let isUpdatingInbound = $state(false);
 	let isAddingInboundProduct = $state(false);
@@ -113,7 +114,7 @@
 			<select
 				disabled={isUpdatingInbound}
 				class="rounded-md border
-            border-gray-300 p-2 text-gray-800"
+            border-gray-300 p-3 text-sm text-gray-800"
 				name="clientName"
 			>
 				<option value="clientName">{inbound?.clientName}</option>
@@ -128,14 +129,14 @@
 				name="description"
 				value={inbound?.description}
 				class="rounded-md border
-            border-gray-300 p-2 text-gray-800"
+            border-gray-300 p-3 text-sm text-gray-800"
 			/>
 
 			<button
 				disabled={isUpdatingInbound}
 				formaction="?/updateInbound"
 				onclick={handleUpdateInbound}
-				class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit"
 			>
 				Update
@@ -167,7 +168,7 @@
 			<select
 				disabled={isAddingInboundProduct}
 				class="rounded-md border
-            border-gray-300 p-2 text-gray-800"
+            border-gray-300 p-3 text-sm text-gray-800"
 				name="product"
 			>
 				<option value="products">-- Select Product --</option>
@@ -180,12 +181,12 @@
 				name="serialnumber"
 				placeholder="Serialnumber"
 				class="rounded-md border
-			border-gray-300 p-2 text-gray-800"
+			border-gray-300 p-3 text-sm text-gray-800"
 			></textarea>
 
 			<button
 				disabled={isAddingInboundProduct}
-				class="w-full rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				onclick={handleAddSingle}
 				type="submit"
 			>
@@ -221,20 +222,20 @@
 					name="batch"
 					placeholder="Batch Serialnumbers "
 					class="rounded-md border
-	border-gray-300 p-2 text-gray-800"
+	border-gray-300 p-3 text-sm text-gray-800"
 				></textarea>
 				<div class="flex gap-4">
 					<button
 						disabled={isAddingBatchInboundProduct}
 						formaction="?/addBatchInboundProductToInbound"
 						onclick={handleAddBatch}
-						class="w-full rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
 						Add Batch
 					</button>
 					<button
-						class="w-full rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						>Scan QR code</button
 					>
 				</div>
@@ -275,7 +276,7 @@
 		</table>
 
 		{#if inboundProducts.filter((product) => product.inboundId === inbound?.id).length === 0}
-			<p class="mt-2 border border-gray-300 p-2">No products found.</p>
+			<p class="mt-2 border border-gray-300 p-2 text-sm">No products found.</p>
 		{/if}
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
@@ -285,24 +286,34 @@
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
 
 			<button
-				class="rounded-md bg-blue-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				onclick={handleMapSerialToWorksheet}
 				type="button">Map</button
 			>
 		</form>
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<fieldset class="flex items-center gap-2 rounded-lg border border-gray-300 p-2">
-			<legend class="font-bold">Delete Inbound</legend>
-			<form use:enhance method="post">
-				<button
-					formaction="?/deleteInbound"
-					onclick={handleDeleteInbound}
-					class="rounded-md bg-red-500 p-2 text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit">Delete</button
-				>
-			</form>
-			<p class="text-sm">This will permanently delete this Inbound!</p>
-		</fieldset>
+		<h1 class="flex w-full items-center justify-between font-bold">
+			Delete Inbound<CircleHelp
+				class="transition-all hover:cursor-pointer hover:text-yellow-500"
+				onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
+				size="14"
+			/>
+		</h1>
+		<form use:enhance method="post" class="flex gap-2">
+			<button
+				formaction="?/deleteInbound"
+				onclick={handleDeleteInbound}
+				class=" rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				type="submit">Delete</button
+			>
+			<div>
+				<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
+					<li class="pb-1">
+						<p class="text-sm">This will permanently delete this Inbound!</p>
+					</li>
+				</ul>
+			</div>
+		</form>
 	</section>
 </main>

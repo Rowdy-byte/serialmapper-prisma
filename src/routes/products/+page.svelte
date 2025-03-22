@@ -18,7 +18,7 @@
 <h1 class="py-4 text-xl font-bold">Products</h1>
 
 <main class="flex flex-col gap-12">
-	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
+	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="pb-4 font-bold">Create Product</h1>
 		<form class="flex flex-col gap-4" action="?/createProduct" method="post">
 			<input
@@ -26,31 +26,31 @@
 				name="name"
 				placeholder="Name"
 				class="rounded-md border
-            border-gray-300 p-2 text-gray-800"
+            border-gray-300 p-3 text-sm text-gray-800"
 			/>
 			<input
 				type="text"
 				name="description"
 				placeholder="Description"
 				class="rounded-md border
-            border-gray-300 p-2 text-gray-800"
+            border-gray-300 p-3 text-sm text-gray-800"
 			/>
 			<input
 				type="text"
 				name="number"
 				placeholder="Number"
 				class="rounded-md border
-            border-gray-300 p-2 text-gray-800"
+            border-gray-300 p-3 text-sm text-gray-800"
 			/>
 			<button
 				onclick={handleCreateProduct}
 				class="rounded-md
-            bg-blue-500 p-2 hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+            bg-blue-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Create Product</button
 			>
 		</form>
 	</section>
-	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
+	<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="pb-4 font-bold">Products List</h1>
 		<table class="w-full text-sm">
 			<thead>

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@capacitor-community/barcode-scanner':
+        specifier: ^4.0.1
+        version: 4.0.1(@capacitor/core@7.1.0)
       '@capacitor/android':
         specifier: ^7.1.0
         version: 7.1.0(@capacitor/core@7.1.0)
@@ -126,6 +129,11 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
+
+  '@capacitor-community/barcode-scanner@4.0.1':
+    resolution: {integrity: sha512-acuhDU2mqskSeCIQMc5TGNnDszXXs4IqEES+3C2JDiq+MkJMTr+B2Dhq4k55hlkRFMOumMhlnbr2R9G6qyFPhw==}
+    peerDependencies:
+      '@capacitor/core': ^5.0.0
 
   '@capacitor/android@7.1.0':
     resolution: {integrity: sha512-piPgQViWOjh18H7R8wDkh5uaZ5PwRbMxGZFu39ReP8Y0nZwjS8ESUvJuBm38T+HHJnHM6MnDHmCWnW3ixKqeZw==}
@@ -929,6 +937,10 @@ packages:
     resolution: {integrity: sha512-4Lmrn/il4+UNb87Gk8h1iWnhj39TASEHpd91CwwSJtY5u+wa0iH9qS0wNLAWbNVYXR66WmT5uiMhZ7oVTrKfxw==}
     peerDependencies:
       '@zxing/library': ^0.21.0
+
+  '@zxing/library@0.20.0':
+    resolution: {integrity: sha512-6Ev6rcqVjMakZFIDvbUf0dtpPGeZMTfyxYg4HkVWioWeN7cRcnUWT3bU6sdohc82O1nPXcjq6WiGfXX2Pnit6A==}
+    engines: {node: '>= 10.4.0'}
 
   '@zxing/library@0.21.3':
     resolution: {integrity: sha512-hZHqFe2JyH/ZxviJZosZjV+2s6EDSY0O24R+FQmlWZBZXP9IqMo7S3nb3+2LBWxodJQkSurdQGnqE7KXqrYgow==}
@@ -2175,6 +2187,12 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
 
+  '@capacitor-community/barcode-scanner@4.0.1(@capacitor/core@7.1.0)':
+    dependencies:
+      '@capacitor/core': 7.1.0
+      '@zxing/browser': 0.1.5(@zxing/library@0.20.0)
+      '@zxing/library': 0.20.0
+
   '@capacitor/android@7.1.0(@capacitor/core@7.1.0)':
     dependencies:
       '@capacitor/core': 7.1.0
@@ -2898,9 +2916,21 @@ snapshots:
 
   '@xmldom/xmldom@0.8.10': {}
 
+  '@zxing/browser@0.1.5(@zxing/library@0.20.0)':
+    dependencies:
+      '@zxing/library': 0.20.0
+    optionalDependencies:
+      '@zxing/text-encoding': 0.9.0
+
   '@zxing/browser@0.1.5(@zxing/library@0.21.3)':
     dependencies:
       '@zxing/library': 0.21.3
+    optionalDependencies:
+      '@zxing/text-encoding': 0.9.0
+
+  '@zxing/library@0.20.0':
+    dependencies:
+      ts-custom-error: 3.3.1
     optionalDependencies:
       '@zxing/text-encoding': 0.9.0
 

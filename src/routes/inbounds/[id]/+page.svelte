@@ -8,6 +8,8 @@
 
 	import { utils, writeFileXLSX } from 'xlsx';
 
+	import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+
 	let { data, form }: PageProps = $props();
 
 	let singleSectionOpen = $state(false);
@@ -22,6 +24,8 @@
 	const inbound = data.inbound;
 	const products = data.products;
 	const inboundProducts = data.inboundProducts;
+
+	let result = $state('');
 
 	const filteredInboundProducts = inboundProducts.filter(
 		(product) => product.inboundId === inbound?.id
@@ -55,6 +59,23 @@
 		}
 	}
 
+	async function startScan() {
+		const status = await BarcodeScanner.checkPermission({ force: true });
+		if (!status.granted) {
+			result = 'Camera permission denied';
+			return;
+		}
+
+		BarcodeScanner.hideBackground();
+		const scanResult = await BarcodeScanner.startScan();
+
+		if (scanResult.hasContent) {
+			result = scanResult.content;
+		} else {
+			result = 'No content found';
+		}
+	}
+
 	function scanBarcodetoSingleTextarea() {}
 
 	function scanBarcodetoBatchTextarea() {}
@@ -72,6 +93,13 @@
 		utils.book_append_sheet(workbook, worksheet, 'Inbound Products');
 		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
 	}
+
+	$effect(() => {
+		return () => {
+			BarcodeScanner.showBackground;
+			BarcodeScanner.stopScan();
+		};
+	});
 
 	$effect(() => {
 		switch (true) {
@@ -258,13 +286,15 @@
 					>
 						Add Batch
 					</button>
-					<button
-						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						>Scan QR code</button
-					>
 				</div>
 			</section>
 		</form>
+		<button
+			onclick={startScan}
+			class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+			>Scan QR code</button
+		>
+		<p>Result: {result}</p>
 	</section>
 
 	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">

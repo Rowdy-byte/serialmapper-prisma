@@ -1,6 +1,7 @@
 import type { PageServerLoad, Actions } from "./$types";
 import db from "$lib/server/db";
-import { error } from "@sveltejs/kit";
+import { fail } from "@sveltejs/kit";
+import { CreateInboundSchema } from "$lib/zod/zod-schemas";
 
 export const load: PageServerLoad = async () => {
     const clients = await db.client.findMany();
@@ -17,30 +18,26 @@ export const actions: Actions = {
 
         await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
-        const formData = await request.formData();
-        const clientName = formData.get('clientName');
-        const description = formData.get('description');
+        const formData = Object.fromEntries(await request.formData());
 
+        const safeParse = CreateInboundSchema.safeParse(formData);
 
-
-        if (!clientName || !description) {
-            error(404, 'Client name and description are required');
-            return {
-                error: true,
-            }
+        if (!safeParse.success) {
+            return fail(400, { issues: safeParse.error.issues });
         }
+
+        const { description, clientName } = safeParse.data;
 
         await db.inbound.create({
             data: {
                 description: description as string,
                 clientName: clientName as string,
                 inboundNumber: '',
-
             }
         });
 
         return {
-            inboundSuccess: true,
+            success: true,
             message: 'Inbound created successfully',
 
         };

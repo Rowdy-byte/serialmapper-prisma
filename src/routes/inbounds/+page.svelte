@@ -1,13 +1,11 @@
 <script lang="ts">
-	import type { PageProps, SubmitFunction } from './$types';
+	import type { PageProps } from './$types';
 	import { Eye } from '@lucide/svelte';
 	import { fly, slide } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
 	import { invalidate } from '$app/navigation';
 
 	let { data, form }: PageProps = $props();
-
-	let formSuccess = $state(false);
 
 	const clients = data.clients;
 	const inbounds = data.inbounds;
@@ -22,13 +20,22 @@
 	$effect(() => {
 		invalidate('inbounds');
 
-		if (form?.inboundSuccess) {
+		if (form?.success) {
 			toast.success(form?.message, {
 				duration: 3000,
 				style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
 			});
 		}
 	});
+
+	if (form?.issues) {
+		for (const issue of form.issues) {
+			toast.error(issue.message, {
+				duration: 3000,
+				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+		}
+	}
 </script>
 
 <h1 class="py-4 text-lg font-bold">Inbounds</h1>
@@ -39,7 +46,7 @@
 
 		<form class="flex flex-col gap-4" action="?/createInbound" method="post">
 			<select
-				disabled={formSuccess}
+				disabled={form?.success}
 				class="rounded-md border border-gray-300 p-3 text-sm text-gray-800"
 				name="clientName"
 				required
@@ -51,7 +58,7 @@
 			</select>
 
 			<input
-				disabled={formSuccess}
+				disabled={form?.success}
 				type="text"
 				name="description"
 				placeholder="Description"
@@ -59,15 +66,12 @@
 				required
 			/>
 			<button
-				disabled={formSuccess}
+				disabled={form?.success}
 				onclick={handleCreateInbound}
 				type="submit"
 				class="rounded-md bg-blue-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				class:text-white={formSuccess}
-				class:font-bold={formSuccess}
-				class:bg-green-500={formSuccess}
 			>
-				{formSuccess ? 'Inbound Created!' : 'Create Inbound'}
+				Create Inbound
 			</button>
 		</form>
 	</section>

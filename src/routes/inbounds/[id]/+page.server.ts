@@ -1,5 +1,8 @@
 import type { PageServerLoad } from "./$types";
+import { fail } from "@sveltejs/kit";
 import db from "$lib/server/db";
+import { CreateInboundSchema } from "$lib/zod/zod-schemas";
+import { AddSingleProductSchema } from "$lib/zod/zod-schemas";
 
 export const load: PageServerLoad = async ({ params }) => {
     const clients = await db.client.findMany();
@@ -29,11 +32,18 @@ export const actions = {
 
         await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
-        const formData = await request.formData();
+        const formData = Object.fromEntries(await request.formData());
+
+        const safeParse = CreateInboundSchema.safeParse(formData);
+
+        if (!safeParse.success) {
+            return fail(400, { issues: safeParse.error.issues });
+        }
+
+        const { description, clientName } = safeParse.data;
 
         const inboundId = Number(params.id);
-        const clientName = formData.get('clientName');
-        const description = formData.get('description');
+
 
         const client = await db.client.findUnique({
             where: { name: clientName as string }
@@ -67,44 +77,30 @@ export const actions = {
 
     },
 
-    async deleteInbound({ params }: { params: { id: string } }) {
-        const inboundId = Number(params.id);
-        await db.inbound.delete({
-            where: { id: inboundId }
-        });
 
-        // check if the inbound was deleted
-        const inbound = await db.inbound.findUnique({
-            where: { id: inboundId }
-        });
-
-        // if the inbound was not deleted, return an error
-        if (inbound) {
-            return {
-                status: 500,
-                inboundDeleteSuccess: false,
-                message: 'Inbound delete not successfully.'
-            }
-        }
-
-        return {
-            status: 200,
-            inboundDeletesuccess: true,
-            message: 'Inbound deleted successfully!'
-        }
-    },
 
     async addInboundProductToInbound({ request }: { params: { id: string }, request: Request }) {
 
         await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
-        const formData = await request.formData();
-        const inboundId = Number(formData.get('inboundId'));
-        const product = formData.get('product');
-        const serialnumber = formData.get('serialnumber') as string;
+        const formData = Object.fromEntries(await request.formData());
+
+        const safeParse = AddSingleProductSchema.safeParse({
+            ...formData,
+            inboundId: formData.inboundId
+        });
+
+        if (!safeParse.success) {
+            return fail(400, { issues: safeParse.error.issues });
+        }
+
+        const { product, serialnumber, inboundId } = safeParse.data as { product: string; serialnumber: string; inboundId: string };
+
+
+
 
         const existingProduct = await db.inboundProduct.findFirst({
-            where: { serialnumber: serialnumber },
+            where: { serialnumber: serialnumber as string },
         });
 
         if (existingProduct) {
@@ -121,7 +117,7 @@ export const actions = {
                 product: product as string,
                 inbound: {
                     connect: {
-                        id: inboundId
+                        id: Number(inboundId)
                     }
                 }
             }
@@ -179,6 +175,33 @@ export const actions = {
             message: 'Batch added to inbound successfully.',
             inboundProducts
         };
+    },
+
+    async deleteInbound({ params }: { params: { id: string } }) {
+        const inboundId = Number(params.id);
+        await db.inbound.delete({
+            where: { id: inboundId }
+        });
+
+        // check if the inbound was deleted
+        const inbound = await db.inbound.findUnique({
+            where: { id: inboundId }
+        });
+
+        // if the inbound was not deleted, return an error
+        if (inbound) {
+            return {
+                status: 500,
+                inboundDeleteSuccess: false,
+                message: 'Inbound delete not successfully.'
+            }
+        }
+
+        return {
+            status: 200,
+            inboundDeletesuccess: true,
+            message: 'Inbound deleted successfully!'
+        }
     }
 
 

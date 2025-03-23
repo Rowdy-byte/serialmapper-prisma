@@ -20,13 +20,11 @@
 	];
 </script>
 
-<Toaster />
-
 <nav class="relative flex items-center justify-between p-4">
 	<section class="flex h-full items-center justify-center gap-2">
 		<a class="text-center text-2xl font-black" href="/"
 			>SN<span class="text-md text-orange-500">mapper</span>
-			<span class="text-xs font-normal text-slate-500">beta version 1.0</span></a
+			<span class="text-xs font-normal text-gray-500">beta version 1.0</span></a
 		>
 	</section>
 	<section class="flex h-full items-center justify-center gap-2 text-center">
@@ -56,6 +54,7 @@
 </nav>
 
 <main class="relative flex min-h-screen flex-grow flex-col bg-gray-950 p-4">
+	<Toaster />
 	{@render children()}
 </main>
 <Footer />

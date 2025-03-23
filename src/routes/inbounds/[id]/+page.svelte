@@ -73,6 +73,15 @@
 		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
 	}
 
+	if (form?.issues) {
+		for (const issue of form.issues) {
+			toast.error(issue.message, {
+				duration: 3000,
+				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+		}
+	}
+
 	$effect(() => {
 		switch (true) {
 			case form?.inboundUpdateSuccess:
@@ -122,23 +131,11 @@
 <main class="flex flex-col gap-2">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="pb-4 font-bold">Inbound</h1>
-		<form
-			class="flex flex-col gap-4"
-			method="post"
-			use:enhance={() => {
-				isUpdatingInbound = true;
-
-				return async ({ update }) => {
-					await update();
-					await invalidate('inbound');
-					isUpdatingInbound = false;
-				};
-			}}
-		>
+		<form class="flex flex-col gap-4" method="post">
 			<select
 				disabled={isUpdatingInbound}
 				class="rounded-md border
-            border-gray-300 p-3 text-sm text-gray-800"
+            border-gray-300 bg-gray-200 p-3 text-sm text-gray-800"
 				name="clientName"
 			>
 				<option value="clientName">{inbound?.clientName}</option>

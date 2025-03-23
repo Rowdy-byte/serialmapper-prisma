@@ -27,6 +27,8 @@ export const load: PageServerLoad = async ({ params }) => {
 export const actions = {
     async updateInbound({ params, request }: { params: { id: string }, request: Request }) {
 
+        await new Promise((fulfil) => setTimeout(fulfil, 2000));
+
         const formData = await request.formData();
 
         const inboundId = Number(params.id);
@@ -65,7 +67,7 @@ export const actions = {
 
     },
 
-    async deleteInbound({ params }) {
+    async deleteInbound({ params }: { params: { id: string } }) {
         const inboundId = Number(params.id);
         await db.inbound.delete({
             where: { id: inboundId }
@@ -94,7 +96,7 @@ export const actions = {
 
     async addInboundProductToInbound({ request }: { params: { id: string }, request: Request }) {
 
-        await new Promise((fulfil) => setTimeout(fulfil, 3000));
+        await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
         const formData = await request.formData();
         const inboundId = Number(formData.get('inboundId'));
@@ -135,7 +137,7 @@ export const actions = {
 
     async addBatchInboundProductToInbound({ params, request }: { params: { id: string }, request: Request }) {
 
-        await new Promise((fulfil) => setTimeout(fulfil, 3000));
+        await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
         const inboundId = Number(params.id);
         const formData = await request.formData();
@@ -163,7 +165,6 @@ export const actions = {
             };
         }
 
-        // ✅ Step 3: Insert only unique serial numbers
         const inboundProducts = await db.inboundProduct.createMany({
             data: uniqueSerialNumbers.map(serialnumber => ({
                 product,

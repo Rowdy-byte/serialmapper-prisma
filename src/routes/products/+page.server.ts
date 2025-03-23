@@ -9,7 +9,10 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-    async createProduct({ request }) {
+    async createProduct({ request }: { request: Request }) {
+
+        await new Promise((fulfil) => setTimeout(fulfil, 2000));
+
         const formData = await request.formData();
         const name = formData.get('name');
         const description = formData.get('description');

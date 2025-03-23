@@ -1,13 +1,22 @@
 import type { Actions, PageServerLoad } from './$types';
 import db from '$lib/server/db';
 
+export const load: PageServerLoad = async () => {
+    const clients = await db.client.findMany();
+    return {
+        clients
+    }
+};
+
 export const actions: Actions = {
 
-    async default({ request }) {
+    async default({ request }: { request: Request }) {
+
+        await new Promise((fulfil) => setTimeout(fulfil, 2000));
+
         const formData = await request.formData();
         const name = formData.get('name');
 
-        // Check if the client already exists
         const existingClient = await db.client.findUnique({
             where: { name: name as string }
         });
@@ -34,9 +43,3 @@ export const actions: Actions = {
     }
 };
 
-export const load: PageServerLoad = async () => {
-    const clients = await db.client.findMany();
-    return {
-        clients
-    }
-};

@@ -20,7 +20,9 @@ export const load: PageServerLoad = async ({ url }) => {
 }
 
 export const actions: Actions = {
-    async deleteInboundProduct({ params, url }) {
+    async deleteInboundProduct({ params, url }: { params: { id: string }, url: URL }) {
+        await new Promise((fulfil) => setTimeout(fulfil, 2000));
+
         const { pathname } = url;
         const segments = pathname.split('/');
         const basePath = `/${segments[1]}/${segments[2]}`;
@@ -36,7 +38,10 @@ export const actions: Actions = {
         throw redirect(303, basePath);
     },
 
-    async updateInboundProduct({ request, params }) {
+    async updateInboundProduct({ request, params }: { request: Request, params: { id: string } }) {
+
+        await new Promise((fulfil) => setTimeout(fulfil, 3000));
+
         const formData = await request.formData();
 
         const product = formData.get('product') as string | null;

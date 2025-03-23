@@ -77,8 +77,6 @@ export const actions = {
 
     },
 
-
-
     async addInboundProductToInbound({ request }: { params: { id: string }, request: Request }) {
 
         await new Promise((fulfil) => setTimeout(fulfil, 2000));
@@ -95,9 +93,6 @@ export const actions = {
         }
 
         const { product, serialnumber, inboundId } = safeParse.data as { product: string; serialnumber: string; inboundId: string };
-
-
-
 
         const existingProduct = await db.inboundProduct.findFirst({
             where: { serialnumber: serialnumber as string },
@@ -188,7 +183,6 @@ export const actions = {
             where: { id: inboundId }
         });
 
-        // if the inbound was not deleted, return an error
         if (inbound) {
             return {
                 status: 500,
@@ -203,6 +197,4 @@ export const actions = {
             message: 'Inbound deleted successfully!'
         }
     }
-
-
 }

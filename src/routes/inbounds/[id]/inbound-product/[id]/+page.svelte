@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import { page, navigating, updated } from '$app/state';
-	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { CircleHelp, MoveRight } from '@lucide/svelte';
+	import toast from 'svelte-french-toast';
 
 	let deleteSectionOpen = $state(false);
 
@@ -12,9 +12,9 @@
 
 	const { pathname } = page.url;
 	const segments = pathname.split('/');
-	const basePath = `/${segments[1]}/${segments[2]}`;
+	// const basePath = `/${segments[1]}/${segments[2]}`;
 
-	const { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 	let { inboundProducts } = data;
 	let { inbound } = data;
 
@@ -24,7 +24,6 @@
 
 	function handleUpdateInboundProduct(event: Event) {
 		if (!confirm('Are you sure you want to update this inbound product?')) {
-			console.log('Update inbound product cancelled');
 			event.preventDefault();
 		}
 	}
@@ -34,6 +33,21 @@
 			event.preventDefault();
 		}
 	}
+
+	$effect(() => {
+		if (form?.success) {
+			toast.success(form.message, {
+				duration: 4000,
+				style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+		}
+		if (form?.success === false) {
+			toast.error(form.message, {
+				duration: 4000,
+				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+		}
+	});
 </script>
 
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">

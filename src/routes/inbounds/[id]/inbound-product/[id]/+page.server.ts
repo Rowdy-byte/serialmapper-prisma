@@ -34,12 +34,6 @@ export const actions: Actions = {
         })
 
         throw redirect(303, basePath);
-
-        return {
-            status: 200,
-            success: true
-
-        }
     },
 
     async updateInboundProduct({ request, params }) {
@@ -56,8 +50,11 @@ export const actions: Actions = {
                 serialnumber: serialnumber ?? undefined,
             }
         })
+
+        return {
+            status: 200,
+            success: true,
+            message: 'Inbound Product updated successfully'
+        }
     },
-
-
-
 }

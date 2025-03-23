@@ -2,7 +2,7 @@
 	import '../app.css';
 	import Footer from '$lib/components/Footer.svelte';
 	import HamburgerMenu from '$lib/components/HamburgerMenu.svelte';
-	import toast, { Toaster } from 'svelte-french-toast';
+	import { Toaster } from 'svelte-french-toast';
 	import { page } from '$app/state';
 
 	let { children } = $props();

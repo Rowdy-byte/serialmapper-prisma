@@ -8,9 +8,9 @@ importers:
 
   .:
     dependencies:
-      '@capacitor/cli':
+      '@capacitor/android':
         specifier: ^7.1.0
-        version: 7.1.0
+        version: 7.1.0(@capacitor/core@7.1.0)
       '@capacitor/core':
         specifier: ^7.1.0
         version: 7.1.0
@@ -36,6 +36,9 @@ importers:
         specifier: https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
         version: https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
     devDependencies:
+      '@capacitor/cli':
+        specifier: ^7.1.0
+        version: 7.1.0
       '@eslint/compat':
         specifier: ^1.2.5
         version: 1.2.7(eslint@9.21.0(jiti@2.4.2))
@@ -123,6 +126,11 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
+
+  '@capacitor/android@7.1.0':
+    resolution: {integrity: sha512-piPgQViWOjh18H7R8wDkh5uaZ5PwRbMxGZFu39ReP8Y0nZwjS8ESUvJuBm38T+HHJnHM6MnDHmCWnW3ixKqeZw==}
+    peerDependencies:
+      '@capacitor/core': ^7.1.0
 
   '@capacitor/cli@7.1.0':
     resolution: {integrity: sha512-oCjB9VB6KNTnBAlzt8tVIuBW+ZniIOCbrsp+nLoa2EfUIgoOGfMHldS4tG9KlTG3pTi5AzeHjSHJIMZwfiz6gg==}
@@ -2166,6 +2174,10 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
+
+  '@capacitor/android@7.1.0(@capacitor/core@7.1.0)':
+    dependencies:
+      '@capacitor/core': 7.1.0
 
   '@capacitor/cli@7.1.0':
     dependencies:

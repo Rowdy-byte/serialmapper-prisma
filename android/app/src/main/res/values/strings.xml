@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">serialmapper-prisma</string>
+    <string name="title_activity_main">serialmapper-prisma</string>
+    <string name="package_name">com.serialmapper.app</string>
+    <string name="custom_url_scheme">com.serialmapper.app</string>
+</resources>

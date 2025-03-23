@@ -1,5 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import db from '$lib/server/db';
+import { createClientSchema } from '$lib/zod/zod-schemas';
+import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
     const clients = await db.client.findMany();
@@ -14,12 +16,20 @@ export const actions: Actions = {
 
         await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
-        const formData = await request.formData();
-        const name = formData.get('name');
+        const formData = Object.fromEntries(await request.formData());
+
+        const safeParse = createClientSchema.safeParse(formData);
+
+        if (!safeParse.success) {
+            return fail(400, { issues: safeParse.error.issues });
+        }
+
+        const { name } = safeParse.data;
 
         const existingClient = await db.client.findUnique({
-            where: { name: name as string }
+            where: { name }
         });
+
         if (existingClient) {
             return {
                 status: 400,
@@ -30,16 +40,15 @@ export const actions: Actions = {
 
         const client = await db.client.create({
             data: {
-                name: name as string
+                name
             }
-        })
+        });
 
         return {
             status: 201,
             success: true,
             message: 'Client created successfully',
             client: client
-        }
-    }
-};
-
+        };
+    },
+}

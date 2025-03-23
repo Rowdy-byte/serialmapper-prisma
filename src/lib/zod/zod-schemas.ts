@@ -1,5 +1,13 @@
 import { z } from 'zod'
 
+export const createClientSchema = z.object({
+    name: z.string()
+        .min(2, { message: 'Client name must be at least 2 characters' })
+        .max(15, { message: 'Client name must be at most 15 characters' })
+        .regex(/^([A-Z][a-z]*)( [A-Z][a-z]*)*$/, { message: 'Client name must be in the format "First Last"' }),
+
+})
+
 export const CreateInboundSchema = z.object({
     clientName: z.string()
         .min(2, { message: 'Client name must be at least 2 characters' })

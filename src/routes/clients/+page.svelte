@@ -27,6 +27,15 @@
 			});
 		}
 	});
+
+	if (form?.issues) {
+		for (const issue of form.issues) {
+			toast.error(issue.message, {
+				duration: 3000,
+				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+		}
+	}
 </script>
 
 <h1 class="py-4 text-lg font-bold">Clients</h1>
@@ -75,5 +84,8 @@
 				{/each}
 			</tbody>
 		</table>
+		{#if clients.length === 0}
+			<p class="mt-2 border border-gray-400 p-2 text-sm">No inbounds found.</p>
+		{/if}
 	</section>
 </main>

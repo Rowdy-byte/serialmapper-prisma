@@ -24,9 +24,24 @@
 	const products = data.products;
 	const inboundProducts = data.inboundProducts;
 
-	const filteredInboundProducts = inboundProducts?.filter(
-		(product) => product.inboundId === inbound?.id
+	// Search state om producten binnen de Inbound te filteren
+	let searchQuery = $state('');
+
+	// Begin met de filtering op inboundId
+	let filteredInboundProducts = $state(
+		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
 	);
+
+	// Reactive effect: update de filteredInboundProducts wanneer searchQuery verandert
+	$effect(() => {
+		filteredInboundProducts = inboundProducts?.filter(
+			(product) =>
+				product.inboundId === inbound?.id &&
+				(searchQuery.trim() === '' ||
+					product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					product.product?.toLowerCase().includes(searchQuery.toLowerCase()))
+		);
+	});
 
 	function handleDeleteInbound(event: Event) {
 		if (!confirm('Are you sure you want to delete this inbound?')) {
@@ -59,6 +74,10 @@
 	function scanBarcodetoSingleTextarea() {}
 
 	function scanBarcodetoBatchTextarea() {}
+
+	function handleScanQr() {
+		alert('Buy Pro!');
+	}
 
 	function handleMapSerialToWorksheet(event: Event) {
 		if (!confirm('Are you sure you want to map the serialnumbers to a worksheet?')) {
@@ -127,10 +146,10 @@
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="text-gray-500">
 		<li class="font-bold">
-			<a href="/inbounds"
-				><span class="transition-all hover:text-blue-500">Inbound:</span>
-				{inbound?.inboundNumber}</a
-			>
+			<a href="/inbounds">
+				<span class="transition-all hover:text-blue-500">Inbound:</span>
+				{inbound?.inboundNumber}
+			</a>
 		</li>
 	</ul>
 </section>
@@ -144,7 +163,7 @@
 				size="14"
 			/>
 		</h1>
-		<ul class=" pb-4 pl-3 text-xs text-yellow-500" class:hidden={!inboundSectionOpen}>
+		<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!inboundSectionOpen}>
 			<li class="pb-1">
 				<p>1. Select the client.</p>
 			</li>
@@ -185,7 +204,7 @@
 				disabled={isUpdatingInbound}
 				formaction="?/updateInbound"
 				onclick={handleUpdateInbound}
-				class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-green-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit"
 			>
 				Update
@@ -201,7 +220,7 @@
 				size="14"
 			/>
 		</h1>
-		<ul class=" pb-4 pl-3 text-xs text-yellow-500" class:hidden={!singleSectionOpen}>
+		<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!singleSectionOpen}>
 			<li class="pb-1">
 				<p>1. Select the product you want to add.</p>
 			</li>
@@ -283,9 +302,12 @@
 						Add Batch
 					</button>
 					<button
+						type="button"
+						onclick={handleScanQr}
 						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						>Scan QR code</button
 					>
+						Scan QR code
+					</button>
 				</div>
 			</section>
 		</form>
@@ -293,6 +315,14 @@
 
 	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<h1 class="font-bold">Products in this Inbound</h1>
+
+		<!-- Search input voor filtering van producten -->
+		<input
+			type="text"
+			placeholder="Zoek product..."
+			bind:value={searchQuery}
+			class="mb-4 max-w-sm rounded-md border border-gray-500 bg-gray-950 p-2 text-sm text-gray-500 md:mx-auto"
+		/>
 
 		<table class="w-full text-left text-sm">
 			<thead>
@@ -325,12 +355,12 @@
 			</tbody>
 		</table>
 
-		{#if inboundProducts?.filter((product) => product.inboundId === inbound?.id).length === 0}
+		{#if filteredInboundProducts?.length === 0}
 			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
 		{/if}
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<h1 class=" font-bold">Map Serialnumbers to Worksheet</h1>
+		<h1 class="font-bold">Map Serialnumbers to Worksheet</h1>
 
 		<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
@@ -338,13 +368,16 @@
 			<button
 				class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				onclick={handleMapSerialToWorksheet}
-				type="button">Map</button
+				type="button"
 			>
+				Map
+			</button>
 		</form>
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<h1 class="flex w-full items-center justify-between font-bold">
-			Delete Inbound<CircleHelp
+			Delete Inbound
+			<CircleHelp
 				class="transition-all hover:cursor-pointer hover:text-yellow-500"
 				onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
 				size="14"
@@ -354,9 +387,11 @@
 			<button
 				formaction="?/deleteInbound"
 				onclick={handleDeleteInbound}
-				class=" rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				type="submit">Delete</button
+				class="rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				type="submit"
 			>
+				Delete
+			</button>
 			<div>
 				<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
 					<li class="pb-1">

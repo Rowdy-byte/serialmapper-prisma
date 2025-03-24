@@ -15,20 +15,27 @@
 		goto('/products');
 	}
 
-	$effect(() => {
-		if (form?.success) {
-			toast.success(form.message, {
-				duration: 3000,
-				style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-			});
-		}
-		if (form?.success === false) {
-			toast.error(form.message, {
+	if (form?.success) {
+		toast.success(form.message, {
+			duration: 3000,
+			style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+		});
+	}
+	if (form?.success === false) {
+		toast.error(form.message, {
+			duration: 3000,
+			style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+		});
+	}
+
+	if (form?.issues) {
+		for (const issue of form.issues) {
+			toast.error(issue.message, {
 				duration: 3000,
 				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
 			});
 		}
-	});
+	}
 </script>
 
 <h1 class="py-4 text-xl font-bold">Products</h1>
@@ -41,22 +48,19 @@
 				type="text"
 				name="name"
 				placeholder="Name"
-				class="rounded-md border
-            border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 			/>
 			<input
 				type="text"
 				name="description"
 				placeholder="Description"
-				class="rounded-md border
-            border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 			/>
 			<input
 				type="text"
 				name="number"
 				placeholder="Number"
-				class="rounded-md border
-            border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 			/>
 			<button
 				onclick={handleCreateProduct}

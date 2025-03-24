@@ -48,36 +48,31 @@
 				type="text"
 				name="name"
 				placeholder="Name"
-				class="rounded-md border
-            border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 			/>
 			<input
 				type="email"
 				name="email"
 				placeholder="Email"
-				class="rounded-md border
-			border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 			/>
 			<input
 				type="text"
 				name="phone"
 				placeholder="Phone"
-				class="rounded-md border
-			border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 			/>
 			<input
 				type="text"
 				name="address"
 				placeholder="Address"
-				class="rounded-md border
-			border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 			/>
 			<input
 				type="text"
 				name="city"
 				placeholder="City"
-				class="rounded-md border
-			border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 			/>
 			<button
 				onclick={handleCreateClient}

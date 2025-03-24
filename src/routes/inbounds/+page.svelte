@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import { Eye } from '@lucide/svelte';
+	import { Eye, Search } from '@lucide/svelte';
 	import { fly, slide } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
 	import { invalidate } from '$app/navigation';
@@ -54,7 +54,7 @@
 		<form class="flex flex-col gap-4" action="?/createInbound" method="post">
 			<select
 				disabled={form?.success}
-				class="rounded-md border border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				name="clientName"
 				required
 			>
@@ -69,7 +69,7 @@
 				type="text"
 				name="description"
 				placeholder="Description"
-				class="rounded-md border border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				required
 			/>
 			<button
@@ -85,17 +85,22 @@
 
 	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<section class="flex items-center justify-between">
-			<h1 class="text-center font-bold">Inbounds List</h1>
+			<h1 class="text-center font-bold">List</h1>
 
 			<!-- search filter  -->
-			<form class=" p-2" action="?/searchInbound" method="get">
+			<form class="relative py-1" action="?/searchInbound" method="get">
 				<input
 					bind:value={search}
 					type="text"
 					name="search"
 					placeholder="Search Inbound"
-					class="rounded-md border border-gray-300 p-3 text-sm text-gray-800"
+					class="w-full rounded border bg-gray-950 py-2 pr-4 pl-10 text-sm focus:outline-none"
 				/>
+				<div
+					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
+				>
+					<Search size="18" />
+				</div>
 			</form>
 		</section>
 

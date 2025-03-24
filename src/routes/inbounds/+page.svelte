@@ -12,14 +12,19 @@
 	const clients = data.clients;
 	const inbounds = data.inbounds;
 
-	const filterdInbounds = inbounds.filter((inbound) => {
-		if (search) {
-			return (
-				inbound.clientName.toLowerCase().includes(search.toLowerCase()) ||
-				inbound.description?.toLowerCase().includes(search.toLowerCase())
-			);
-		}
-		return true;
+	// Maak de lijst reactive zodat hij herberekend wordt bij wijziging van 'search'
+	let filterdInbounds = $state(inbounds);
+
+	$effect(() => {
+		filterdInbounds = inbounds.filter((inbound) => {
+			if (search.trim()) {
+				return (
+					inbound.clientName.toLowerCase().includes(search.toLowerCase()) ||
+					(inbound.description && inbound.description.toLowerCase().includes(search.toLowerCase()))
+				);
+			}
+			return true;
+		});
 	});
 
 	function handleCreateInbound(event: Event) {
@@ -76,25 +81,25 @@
 				disabled={form?.success}
 				onclick={handleCreateInbound}
 				type="submit"
-				class="rounded-md bg-blue-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-green-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 			>
 				Create Inbound
 			</button>
 		</form>
 	</section>
 
-	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
+	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<section class="flex items-center justify-between">
 			<h1 class="text-center font-bold">List</h1>
 
-			<!-- search filter  -->
-			<form class="relative py-1" action="?/searchInbound" method="get">
+			<!-- Search filter -->
+			<form class="relative py-1">
 				<input
 					bind:value={search}
 					type="text"
 					name="search"
-					placeholder="Search Inbound"
-					class="w-full rounded border bg-gray-950 py-2 pr-4 pl-10 text-sm focus:outline-none"
+					placeholder="Search Inbounds"
+					class="w-full rounded border bg-gray-950 py-2 pr-4 pl-10 text-sm"
 				/>
 				<div
 					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"

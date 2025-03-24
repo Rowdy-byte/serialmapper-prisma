@@ -85,16 +85,14 @@
 						name="product"
 						value={inboundProduct?.product}
 						placeholder="Product"
-						class="rounded-md border
-			border-gray-300 p-3 text-sm text-gray-800"
+						class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					/>
 					<input
 						type="text"
 						name="serialnumber"
 						value={inboundProduct?.serialnumber}
 						placeholder="Serialnumber"
-						class="rounded-md border
-			border-gray-300 p-3 text-sm text-gray-800"
+						class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					/>
 
 					<button

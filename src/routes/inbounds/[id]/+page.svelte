@@ -10,6 +10,7 @@
 
 	let { data, form }: PageProps = $props();
 
+	let inboundSectionOpen = $state(false);
 	let singleSectionOpen = $state(false);
 	let multiSectionOpen = $state(false);
 	let deleteSectionOpen = $state(false);
@@ -125,12 +126,39 @@
 
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="text-gray-500">
-		<li class="font-bold">Inbound: {inbound?.inboundNumber}</li>
+		<li class="font-bold">
+			<a href="/inbounds"
+				><span class="transition-all hover:text-blue-500">Inbound:</span>
+				{inbound?.inboundNumber}</a
+			>
+		</li>
 	</ul>
 </section>
 <main class="flex flex-col gap-2">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="pb-4 font-bold">Inbound</h1>
+		<h1 class="flex items-center justify-between pb-4 font-bold">
+			Inbound
+			<CircleHelp
+				class="transition-all hover:cursor-pointer hover:text-yellow-500"
+				onclick={() => (inboundSectionOpen = !inboundSectionOpen)}
+				size="14"
+			/>
+		</h1>
+		<ul class=" pb-4 pl-3 text-xs text-yellow-500" class:hidden={!inboundSectionOpen}>
+			<li class="pb-1">
+				<p>1. Select the client.</p>
+			</li>
+			<li class="pb-1">
+				<p>2. Enter inbound description.</p>
+			</li>
+			<li class="pb-1">
+				<p>3. Click on Add.</p>
+			</li>
+			<li class="pb-1">
+				<p>3. Inbound number is generated on the details page. Follow next step.</p>
+			</li>
+		</ul>
+
 		<form class="flex flex-col gap-4" method="post">
 			<select
 				disabled={isUpdatingInbound}
@@ -297,7 +325,7 @@
 		</table>
 
 		{#if inboundProducts.filter((product) => product.inboundId === inbound?.id).length === 0}
-			<p class="mt-2 border border-gray-300 p-2 text-sm">No products found.</p>
+			<p class="mt-2 rounded-lg bg-gray-500 p-2 text-sm">No products found.</p>
 		{/if}
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">

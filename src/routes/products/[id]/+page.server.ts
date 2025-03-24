@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
 import db from '$lib/server/db';
-import { redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
+import { createProductSchema } from '$lib/zod/zod-schemas';
 
 export const load: PageServerLoad = async ({ params }) => {
 
@@ -15,13 +16,16 @@ export const load: PageServerLoad = async ({ params }) => {
 
 export const actions = {
     async updateProduct({ params, request }) {
-        const formData = await request.formData();
 
+        const formData = Object.fromEntries(await request.formData());
+
+        const safeParse = createProductSchema.safeParse(formData);
+
+        if (!safeParse.success) {
+            return fail(400, { issues: safeParse.error.issues });
+        }
         const productId = Number(params.id);
 
-        const name = formData.get('name');
-        const description = formData.get('description');
-        const number = formData.get('number');
 
         const product = await db.product.update({
             where: {
@@ -29,9 +33,9 @@ export const actions = {
             },
 
             data: {
-                name: name as string,
-                number: number as string,
-                description: description as string
+                name: safeParse.data.name as string,
+                number: safeParse.data.number as string,
+                description: safeParse.data.description as string,
             }
         });
 

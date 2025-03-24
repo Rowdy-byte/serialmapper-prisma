@@ -1,10 +1,12 @@
 import type { PageServerLoad } from "./$types";
-import { fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 import db from "$lib/server/db";
 import { CreateInboundSchema } from "$lib/zod/zod-schemas";
-import { AddSingleProductSchema } from "$lib/zod/zod-schemas";
+import { AddSingleProductSchema, AddMultipleProductSchema } from "$lib/zod/zod-schemas";
 
 export const load: PageServerLoad = async ({ params }) => {
+
+
     const clients = await db.client.findMany();
 
     const client = await db.inbound.findUnique({
@@ -14,6 +16,10 @@ export const load: PageServerLoad = async ({ params }) => {
     const inbound = await db.inbound.findUnique(
         { where: { id: Number(params.id) } }
     );
+
+    if (!inbound) {
+        throw redirect(302, '/inbounds');
+    }
 
     const products = await db.product.findMany();
     const inboundProducts = await db.inboundProduct.findMany()
@@ -57,7 +63,7 @@ export const actions = {
             };
         }
 
-        const formattedNumber = `IN-${String(params.id).padStart(6, '0')}`;
+        const formattedNumber = `LC-IN-${String(params.id).padStart(6, '0')}`;
 
         await db.inbound.update({
             where: { id: inboundId },
@@ -131,13 +137,22 @@ export const actions = {
         await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
         const inboundId = Number(params.id);
+
         const formData = await request.formData();
+
         const batch = (formData.get('batch') as string)
             .split(/\s+/)
             .map(serialnumber => serialnumber.trim())
             .filter(serialnumber => serialnumber.length > 0);
 
-        const product = formData.get('product') as string;
+        const safeParse = AddMultipleProductSchema.safeParse({
+            ...Object.fromEntries(formData),
+            inboundId: formData.get('inboundId')
+        });
+
+        if (!safeParse.success) {
+            return fail(400, { issues: safeParse.error.issues });
+        }
 
         const existingSerialNumbers = new Set(
             (await db.inboundProduct.findMany({
@@ -158,9 +173,9 @@ export const actions = {
 
         const inboundProducts = await db.inboundProduct.createMany({
             data: uniqueSerialNumbers.map(serialnumber => ({
-                product,
+                product: safeParse.data.product as string,
                 serialnumber,
-                inboundId
+                inboundId: inboundId
             }))
         });
 

@@ -31,7 +31,23 @@
 				style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
 			});
 		}
+
+		if (form?.success === false) {
+			toast.error(form.message, {
+				duration: 3000,
+				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+		}
 	});
+
+	if (form?.issues) {
+		for (const issue of form.issues) {
+			toast.error(issue.message, {
+				duration: 3000,
+				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			});
+		}
+	}
 </script>
 
 <h1 class="py-4 text-lg font-bold">Client Details</h1>

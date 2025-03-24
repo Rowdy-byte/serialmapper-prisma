@@ -8,6 +8,22 @@ export const createClientSchema = z.object({
 
 })
 
+export const createProductSchema = z.object({
+    name: z.string()
+        .min(2, { message: 'Product name must be at least 2 characters' })
+        .max(50, { message: 'Product name must be at most 50 characters' })
+        .regex(/^([A-Z0-9][a-zA-Z0-9]*)( [A-Z0-9][a-zA-Z0-9]*)*$/
+            , { message: 'Product name must be in the format "First Last"' }),
+    description: z.string()
+        .min(2, { message: 'Description must be at least 2 characters' })
+        .max(50, { message: 'Description must be at most 200 characters' })
+        .regex(/^([A-Z][a-z]*)( [A-Z][a-z]*)*$/, { message: 'Description must be in the format "First Last"' }),
+    number: z.string()
+        .min(5, { message: 'Number must be at least 5 characters' })
+        .max(50, { message: 'Number must be at most 20 characters' })
+        .regex(/^\d{4,} \([^()]+\)$/, { message: 'Number must be one number' }),
+})
+
 export const CreateInboundSchema = z.object({
     clientName: z.string()
         .min(2, { message: 'Client name must be at least 2 characters' })
@@ -28,4 +44,15 @@ export const AddSingleProductSchema = z.object({
         .min(5, { message: 'Serial number must be at least 5 characters' })
         .max(200, { message: 'Serial number must be at most 200 characters' })
         .regex(/^\d{5,}$/, { message: 'Serial number must be one number' }),
+})
+
+export const AddMultipleProductSchema = z.object({
+    inboundId: z.string(),
+    product: z.string()
+        .min(2, { message: 'Product name must be at least 2 characters' })
+        .max(50, { message: 'Product name must be at most 15 characters' }),
+    batch: z.string()
+        .min(5, { message: 'Serialnumber Batch must be at least 5 numbers' })
+        .max(2000, { message: 'Serialnumbers Batch must be at most 2000 numbers' })
+        .regex(/^\d{5,}( \d{5,})+$/, { message: 'Serialnumber must be at least 2 serialnumbers' }),
 })

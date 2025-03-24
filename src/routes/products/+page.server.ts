@@ -1,5 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import db from '$lib/server/db';
+import { createProductSchema } from '$lib/zod/zod-schemas';
+import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
     const products = await db.product.findMany();
@@ -13,12 +15,15 @@ export const actions: Actions = {
 
         await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
-        const formData = await request.formData();
-        const name = formData.get('name');
-        const description = formData.get('description');
-        const number = formData.get('number');
+        const formData = Object.fromEntries(await request.formData());
 
-        // check if product already exists
+        const safeParse = createProductSchema.safeParse(formData);
+
+        if (!safeParse.success) {
+            return fail(400, { issues: safeParse.error.issues });
+        }
+        const { name, description, number } = safeParse.data;
+
         const existingProduct = await db.product.findFirst({
             where: {
                 name: name as string

@@ -1,6 +1,7 @@
 import type { PageServerLoad, Actions } from './$types';
 import db from '$lib/server/db';
-import { redirect } from '@sveltejs/kit';
+import { redirect, fail } from '@sveltejs/kit';
+import { createClientSchema } from '$lib/zod/zod-schemas';
 
 export const load: PageServerLoad = async ({ params }) => {
     const clientId = Number(params.id);
@@ -14,13 +15,33 @@ export const load: PageServerLoad = async ({ params }) => {
     }
 };
 
-// update client action
-
 export const actions: Actions = {
     async updateClient({ params, request }) {
+
+        const formData = Object.fromEntries(await request.formData());
+
+        const safeParse = createClientSchema.safeParse(formData);
+
+        if (!safeParse.success) {
+            return fail(400, { issues: safeParse.error.issues });
+        }
+        const { name } = safeParse.data;
+
         const clientId = Number(params.id);
-        const formData = await request.formData();
-        const name = formData.get('name');
+
+        const clientNameExists = await db.client.findUnique({
+            where: {
+                name: name as string
+            }
+        });
+
+        if (clientNameExists) {
+            return {
+                status: 400,
+                success: false,
+                message: 'Client name already exists'
+            }
+        }
 
         const client = await db.client.update({
             where: {
@@ -46,21 +67,6 @@ export const actions: Actions = {
                 id: clientId
             }
         });
-
-        // check if the client was deleted
-        const client = await db.client.findUnique({
-            where: {
-                id: clientId
-            }
-        });
-
-        if (client) {
-            return {
-                status: 500,
-                success: false,
-                message: 'Failed to delete client'
-            }
-        }
 
         throw redirect(301, '/clients');
     }

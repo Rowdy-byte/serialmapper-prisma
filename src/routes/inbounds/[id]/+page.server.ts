@@ -1,13 +1,10 @@
 import type { PageServerLoad } from "./$types";
-import { fail, redirect } from "@sveltejs/kit";
+import { fail } from "@sveltejs/kit";
 import db from "$lib/server/db";
 import { CreateInboundSchema } from "$lib/zod/zod-schemas";
 import { AddSingleProductSchema, AddMultipleProductSchema } from "$lib/zod/zod-schemas";
-
+import { error } from "@sveltejs/kit";
 export const load: PageServerLoad = async ({ params }) => {
-
-
-    const clients = await db.client.findMany();
 
     const client = await db.inbound.findUnique({
         where: { id: Number(params.id) }
@@ -18,11 +15,19 @@ export const load: PageServerLoad = async ({ params }) => {
     );
 
     if (!inbound) {
-        throw redirect(302, '/inbounds');
+        throw error(404, { message: "Inbound doesn't exist", code: 'NOT_FOUND' });
+    }
+
+    if (!client) {
+        return {
+            status: 404,
+            error: new Error('Inbound not found')
+        }
     }
 
     const products = await db.product.findMany();
     const inboundProducts = await db.inboundProduct.findMany()
+    const clients = await db.client.findMany();
 
     return {
         client,

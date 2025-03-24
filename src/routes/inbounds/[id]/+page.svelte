@@ -24,7 +24,7 @@
 	const products = data.products;
 	const inboundProducts = data.inboundProducts;
 
-	const filteredInboundProducts = inboundProducts.filter(
+	const filteredInboundProducts = inboundProducts?.filter(
 		(product) => product.inboundId === inbound?.id
 	);
 
@@ -68,7 +68,7 @@
 	}
 
 	function mapSerialToWorksheet() {
-		const worksheet = utils.json_to_sheet(inboundProducts);
+		const worksheet = utils.json_to_sheet(inboundProducts || []);
 		const workbook = utils.book_new();
 		utils.book_append_sheet(workbook, worksheet, 'Inbound Products');
 		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
@@ -168,9 +168,11 @@
 			>
 				<option value="clientName">{inbound?.clientName}</option>
 				<!-- fetch data from db with sveltekit loadfunction -->
-				{#each clients as client}
-					<option value={client.name}>{client.name}</option>
-				{/each}
+				{#if clients}
+					{#each clients as client}
+						<option value={client.name}>{client.name}</option>
+					{/each}
+				{/if}
 			</select>
 			<input
 				disabled={isUpdatingInbound}
@@ -221,9 +223,11 @@
 				name="product"
 			>
 				<option value="products">-- Select Product --</option>
-				{#each products as product}
-					<option value={product.name}>{product.number}</option>
-				{/each}
+				{#if products}
+					{#each products as product}
+						<option value={product.name}>{product.number}</option>
+					{/each}
+				{/if}
 			</select>
 			<textarea
 				disabled={isAddingInboundProduct}
@@ -305,27 +309,29 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each filteredInboundProducts as inboundProduct, i}
-					<tr class="text-sm hover:bg-slate-600">
-						<td class="border border-gray-500 p-2">{i + 1}</td>
-						<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
-						<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
-						<td class="border border-gray-500 p-2">
-							<a
-								class="text-blue-500 underline"
-								href={`/inbounds/${inbound?.id}/inbound-product/${inboundProduct.id}`}
-								title="View Product Details"
-							>
-								<Eye size="16" />
-							</a>
-						</td>
-					</tr>
-				{/each}
+				{#if filteredInboundProducts}
+					{#each filteredInboundProducts as inboundProduct, i}
+						<tr class="text-sm hover:bg-slate-600">
+							<td class="border border-gray-500 p-2">{i + 1}</td>
+							<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
+							<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
+							<td class="border border-gray-500 p-2">
+								<a
+									class="text-blue-500 underline"
+									href={`/inbounds/${inbound?.id}/inbound-product/${inboundProduct.id}`}
+									title="View Product Details"
+								>
+									<Eye size="16" />
+								</a>
+							</td>
+						</tr>
+					{/each}
+				{/if}
 			</tbody>
 		</table>
 
-		{#if inboundProducts.filter((product) => product.inboundId === inbound?.id).length === 0}
-			<p class="mt-2 rounded-lg bg-gray-500 p-2 text-sm">No products found.</p>
+		{#if inboundProducts?.filter((product) => product.inboundId === inbound?.id).length === 0}
+			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
 		{/if}
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">

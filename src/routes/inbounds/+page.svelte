@@ -106,7 +106,7 @@
 			</tbody>
 		</table>
 		{#if inbounds.length === 0}
-			<p class="mt-2 border border-gray-300 p-2 text-sm">No inbounds found.</p>
+			<p class="mt-2 max-w-sm rounded-md bg-gray-500 p-1 text-sm">No inbounds found.</p>
 		{/if}
 	</section>
 </main>

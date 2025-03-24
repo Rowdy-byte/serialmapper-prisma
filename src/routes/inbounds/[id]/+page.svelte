@@ -162,8 +162,7 @@
 		<form class="flex flex-col gap-4" method="post">
 			<select
 				disabled={isUpdatingInbound}
-				class="rounded-md border
-            border-gray-300 bg-gray-200 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				name="clientName"
 			>
 				<option value="clientName">{inbound?.clientName}</option>
@@ -179,8 +178,7 @@
 				type="text"
 				name="description"
 				value={inbound?.description}
-				class="rounded-md border
-            border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 			/>
 
 			<button
@@ -218,8 +216,7 @@
 			<input hidden type="text" name="inboundId" value={inbound?.id} />
 			<select
 				disabled={isAddingInboundProduct}
-				class="rounded-md border
-            border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				name="product"
 			>
 				<option value="products">-- Select Product --</option>
@@ -233,8 +230,7 @@
 				disabled={isAddingInboundProduct}
 				name="serialnumber"
 				placeholder="Serialnumber"
-				class="rounded-md border
-			border-gray-300 p-3 text-sm text-gray-800"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 			></textarea>
 
 			<button
@@ -274,8 +270,7 @@
 					disabled={isAddingBatchInboundProduct}
 					name="batch"
 					placeholder="Batch Serialnumbers "
-					class="rounded-md border
-	border-gray-300 p-3 text-sm text-gray-800"
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				></textarea>
 				<div class="flex gap-4">
 					<button

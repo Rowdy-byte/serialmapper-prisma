@@ -12,7 +12,6 @@
 
 	const { pathname } = page.url;
 	const segments = pathname.split('/');
-	// const basePath = `/${segments[1]}/${segments[2]}`;
 
 	let { data, form }: PageProps = $props();
 	let { inboundProducts } = data;

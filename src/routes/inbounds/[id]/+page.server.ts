@@ -146,7 +146,7 @@ export const actions = {
         const formData = await request.formData();
 
         const batch = (formData.get('batch') as string)
-            .split(/\s+/)
+            .split(/[\s\n]+/)
             .map(serialnumber => serialnumber.trim())
             .filter(serialnumber => serialnumber.length > 0);
 

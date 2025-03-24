@@ -3,7 +3,7 @@
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
 
-	import { CircleHelp, Eye } from '@lucide/svelte';
+	import { CircleHelp, Eye, Search } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 
 	import { utils, writeFileXLSX } from 'xlsx';
@@ -314,15 +314,25 @@
 	</section>
 
 	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<h1 class="font-bold">Products in this Inbound</h1>
+		<section class="flex items-center justify-between">
+			<h1 class="text-center font-bold">List</h1>
 
-		<!-- Search input voor filtering van producten -->
-		<input
-			type="text"
-			placeholder="Zoek product..."
-			bind:value={searchQuery}
-			class="mb-4 max-w-sm rounded-md border border-gray-500 bg-gray-950 p-2 text-sm text-gray-500 md:mx-auto"
-		/>
+			<!-- Search filter -->
+			<form class="relative py-1">
+				<input
+					bind:value={searchQuery}
+					type="text"
+					name="search"
+					placeholder="Search Products"
+					class="w-full rounded border bg-gray-950 py-2 pr-4 pl-10 text-sm"
+				/>
+				<div
+					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
+				>
+					<Search size="18" />
+				</div>
+			</form>
+		</section>
 
 		<table class="w-full text-left text-sm">
 			<thead>

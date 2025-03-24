@@ -88,7 +88,7 @@
 		</form>
 	</section>
 
-	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
+	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<section class="flex items-center justify-between">
 			<h1 class="text-center font-bold">List</h1>
 

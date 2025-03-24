@@ -7,7 +7,7 @@
 
 	let { data, form }: PageProps = $props();
 
-	let search = $state('');
+	let searchQuery = $state('');
 
 	const clients = data.clients;
 	const inbounds = data.inbounds;
@@ -17,10 +17,12 @@
 
 	$effect(() => {
 		filterdInbounds = inbounds.filter((inbound) => {
-			if (search.trim()) {
+			if (searchQuery.trim()) {
 				return (
-					inbound.clientName.toLowerCase().includes(search.toLowerCase()) ||
-					(inbound.description && inbound.description.toLowerCase().includes(search.toLowerCase()))
+					inbound.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					(inbound.description &&
+						inbound.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+					inbound.inboundNumber.toString().toLowerCase().includes(searchQuery.toLowerCase())
 				);
 			}
 			return true;
@@ -95,7 +97,7 @@
 			<!-- Search filter -->
 			<form class="relative py-1">
 				<input
-					bind:value={search}
+					bind:value={searchQuery}
 					type="text"
 					name="search"
 					placeholder="Search Inbounds"

@@ -1,6 +1,6 @@
 import type { PageServerLoad, Actions } from './$types';
 import db from '$lib/server/db';
-import { redirect, fail } from '@sveltejs/kit';
+import { redirect, fail, error } from '@sveltejs/kit';
 import { createClientSchema } from '$lib/zod/zod-schemas';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -10,6 +10,11 @@ export const load: PageServerLoad = async ({ params }) => {
             id: clientId
         }
     });
+
+    if (!client) {
+        throw error(404, { message: 'Client not found', code: 'CLIENT_NOT_FOUND' });
+    }
+
     return {
         client
     }

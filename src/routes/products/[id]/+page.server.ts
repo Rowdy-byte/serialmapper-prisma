@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types';
 import db from '$lib/server/db';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { createProductSchema } from '$lib/zod/zod-schemas';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -8,6 +8,11 @@ export const load: PageServerLoad = async ({ params }) => {
     const product = await db.product.findUnique(
         { where: { id: Number(params.id) } }
     );
+
+    if (!product) {
+        throw error(404, { message: 'Client not found', code: 'CLIENT_NOT_FOUND' });
+    }
+
     return {
         success: true,
         product

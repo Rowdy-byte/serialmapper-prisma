@@ -1,10 +1,16 @@
 import type { Actions, PageServerLoad } from './$types';
 import db from '$lib/server/db';
 import { createClientSchema } from '$lib/zod/zod-schemas';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
+
     const clients = await db.client.findMany();
+
+    if (!clients) {
+        throw error(404, { message: "Inbound doesn't exist", code: 'NOT_FOUND' });
+    }
+
     return {
         clients
     }

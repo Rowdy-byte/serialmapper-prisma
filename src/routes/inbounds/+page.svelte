@@ -3,12 +3,24 @@
 	import { Eye } from '@lucide/svelte';
 	import { fly, slide } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
-	import { goto, invalidate } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 
 	let { data, form }: PageProps = $props();
 
+	let search = $state('');
+
 	const clients = data.clients;
 	const inbounds = data.inbounds;
+
+	const filterdInbounds = inbounds.filter((inbound) => {
+		if (search) {
+			return (
+				inbound.clientName.toLowerCase().includes(search.toLowerCase()) ||
+				inbound.description?.toLowerCase().includes(search.toLowerCase())
+			);
+		}
+		return true;
+	});
 
 	function handleCreateInbound(event: Event) {
 		if (!confirm('Are you sure you want to create this inbound?')) {
@@ -72,7 +84,21 @@
 	</section>
 
 	<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="pb-4 font-bold">Inbounds List</h1>
+		<section class="flex items-center justify-between">
+			<h1 class="text-center font-bold">Inbounds List</h1>
+
+			<!-- search filter  -->
+			<form class=" p-2" action="?/searchInbound" method="get">
+				<input
+					bind:value={search}
+					type="text"
+					name="search"
+					placeholder="Search Inbound"
+					class="rounded-md border border-gray-300 p-3 text-sm text-gray-800"
+				/>
+			</form>
+		</section>
+
 		<table class="w-full text-left text-sm">
 			<thead>
 				<tr class="text-gray-500">
@@ -84,7 +110,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each inbounds as inbound}
+				{#each filterdInbounds as inbound}
 					<tr in:fly={{ y: 20 }} out:slide class="hover:bg-gray-800">
 						<td class="border border-gray-500 p-2">{inbound.inboundNumber}</td>
 						<td class="border border-gray-500 p-2">{inbound.clientName}</td>
@@ -106,7 +132,7 @@
 			</tbody>
 		</table>
 		{#if inbounds.length === 0}
-			<p class="mt-2 max-w-sm rounded-md bg-gray-500 p-1 text-sm">No inbounds found.</p>
+			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No inbounds found.</p>
 		{/if}
 	</section>
 </main>

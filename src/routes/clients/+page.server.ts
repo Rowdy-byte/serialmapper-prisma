@@ -30,7 +30,7 @@ export const actions: Actions = {
             return fail(400, { issues: safeParse.error.issues });
         }
 
-        const { name } = safeParse.data;
+        const { name, email, phone, address, city } = safeParse.data as { name: string; email: string; phone: string; address: string; city: string };
 
         const existingClient = await db.client.findUnique({
             where: { name }
@@ -46,7 +46,11 @@ export const actions: Actions = {
 
         const client = await db.client.create({
             data: {
-                name
+                name,
+                email,
+                phone,
+                address,
+                city
             }
         });
 

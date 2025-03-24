@@ -5,7 +5,22 @@ export const createClientSchema = z.object({
         .min(2, { message: 'Client name must be at least 2 characters' })
         .max(15, { message: 'Client name must be at most 15 characters' })
         .regex(/^([A-Z][a-z]*)( [A-Z][a-z]*)*$/, { message: 'Client name must be in the format "First Last"' }),
-
+    email: z.string()
+        .min(2, { message: 'Email must be at least 2 characters' })
+        .max(30, { message: 'Email must be at most 30 characters' })
+        .email({ message: 'Email must be a valid email' }),
+    phone: z.string()
+        .min(5, { message: 'Phone number must be at least 5 characters' })
+        .max(20, { message: 'Phone number must be at most 20 characters' })
+        .regex(/^\+?\d{5,}$/, { message: 'Phone number must be a valid phone number' }),
+    address: z.string()
+        .min(2, { message: 'Address must be at least 2 characters' })
+        .max(50, { message: 'Address must be at most 50 characters' })
+        .regex(/^([A-Z][a-z]*)( [A-Z][a-z]*)*$/, { message: 'Address must be in the format "First Last"' }),
+    city: z.string()
+        .min(2, { message: 'City must be at least 2 characters' })
+        .max(50, { message: 'City must be at most 50 characters' })
+        .regex(/^([A-Z][a-z]*)( [A-Z][a-z]*)*$/, { message: 'City must be in the format "First Last"' }),
 })
 
 export const createProductSchema = z.object({

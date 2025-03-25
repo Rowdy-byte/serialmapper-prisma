@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ProductStatus {
+  IN
+  OUT
+}
+
 model Client {
   id        Int       @id @default(autoincrement())
   name      String    @unique
@@ -31,18 +36,20 @@ model Inbound {
 }
 
 model InboundProduct {
-  id           Int      @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   product      String
   serialnumber String
-  createdAt    DateTime @default(now())
+  status       ProductStatus @default(IN)
+  createdAt    DateTime      @default(now())
   inboundId    Int
-  inbound      Inbound  @relation(fields: [inboundId], references: [id], onDelete: Cascade)
+  inbound      Inbound       @relation(fields: [inboundId], references: [id], onDelete: Cascade)
 }
 
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
   description String
+  value       String
   number      String
   createdAt   DateTime @default(now())
 }

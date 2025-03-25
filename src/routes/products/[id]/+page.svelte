@@ -90,8 +90,9 @@
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="flex w-full items-center justify-between font-bold">
-			Delete Product<CircleHelp
-				class="transition-all hover:cursor-pointer hover:text-yellow-500"
+			Delete Product
+			<CircleHelp
+				class="text-yellow-500 transition-all hover:cursor-pointer hover:text-yellow-500"
 				onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
 				size="14"
 			/>

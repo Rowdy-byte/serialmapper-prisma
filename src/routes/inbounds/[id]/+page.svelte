@@ -158,7 +158,7 @@
 		<h1 class="flex items-center justify-between pb-4 font-bold">
 			Inbound
 			<CircleHelp
-				class="transition-all hover:cursor-pointer hover:text-yellow-500"
+				class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
 				onclick={() => (inboundSectionOpen = !inboundSectionOpen)}
 				size="14"
 			/>
@@ -215,7 +215,7 @@
 		<h1 class="flex items-center justify-between pb-4 font-bold">
 			Add single Product to Inbound
 			<CircleHelp
-				class="transition-all hover:cursor-pointer hover:text-yellow-500"
+				class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
 				onclick={() => (singleSectionOpen = !singleSectionOpen)}
 				size="14"
 			/>
@@ -266,7 +266,7 @@
 					<h1 class="flex items-center justify-between font-bold">
 						Add multiple Products to Inbound
 						<CircleHelp
-							class="transition-all hover:cursor-pointer hover:text-yellow-500"
+							class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
 							onclick={() => (multiSectionOpen = !multiSectionOpen)}
 							size="14"
 						/>

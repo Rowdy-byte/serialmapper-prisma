@@ -40,6 +40,7 @@ model InboundProduct {
   id           Int           @id @default(autoincrement())
   product      String
   serialnumber String
+  value        String?
   status       ProductStatus @default(IN)
   createdAt    DateTime      @default(now())
   inboundId    Int

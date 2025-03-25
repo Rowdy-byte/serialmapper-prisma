@@ -340,6 +340,7 @@
 					<th class="border border-gray-500 p-2"></th>
 					<th class="border border-gray-500 p-2">Product</th>
 					<th class="border border-gray-500 p-2">Serialnumber</th>
+					<th class="border border-gray-500 p-2">Status</th>
 					<th class="border border-gray-500 p-2">Actions</th>
 				</tr>
 			</thead>
@@ -350,6 +351,7 @@
 							<td class="border border-gray-500 p-2">{i + 1}</td>
 							<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
 							<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
+							<td class="border border-gray-500 p-2">{inboundProduct.status}</td>
 							<td class="border border-gray-500 p-2">
 								<a
 									class="text-blue-500 underline"

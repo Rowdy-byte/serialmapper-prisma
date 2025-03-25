@@ -27,7 +27,7 @@
 
 	let searchQuery = $state('');
 
-	console.log(outboundProducts);
+	console.log('from inbouds', outboundProducts);
 
 	let filteredOutboundProducts = $state(
 		outboundProducts?.filter(

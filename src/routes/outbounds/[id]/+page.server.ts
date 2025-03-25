@@ -2,30 +2,27 @@ import type { PageServerLoad } from "./$types";
 import { fail, error } from "@sveltejs/kit";
 import db from "$lib/server/db";
 import { CreateOutboundSchema } from "$lib/zod/zod-schemas";
-import { AddSingleProductSchema, AddMultipleProductSchema } from "$lib/zod/zod-schemas";
+import { AddSingleProductSchema } from "$lib/zod/zod-schemas";
 
 export const load: PageServerLoad = async ({ params }) => {
-    const client = await db.outbound.findUnique({
-        where: { id: Number(params.id) }
-    });
-
+    // Haal het outbound record op en include de gekoppelde client
     const outbound = await db.outbound.findUnique({
-        where: { id: Number(params.id) }
+        where: { id: Number(params.id) },
+        include: { client: true }
     });
 
     if (!outbound) {
-        throw error(404, { message: "outbound doesn't exist", code: "NOT_FOUND" });
+        throw error(404, { message: "Outbound doesn't exist", code: "NOT_FOUND" });
     }
 
-    if (!client) {
-        return {
-            status: 404,
-            error: new Error("outbound not found")
-        };
-    }
+    // Gebruik de client uit het outbound record
+    const client = outbound.client;
 
     const products = await db.product.findMany();
-    const outboundProducts = await db.outboundProduct.findMany();
+    // Haal alleen de outboundProducts voor dit outbound record op
+    const outboundProducts = await db.outboundProduct.findMany({
+        where: { outboundId: Number(params.id) }
+    });
     const clients = await db.client.findMany();
 
     return {
@@ -76,7 +73,7 @@ export const actions = {
         return {
             status: 200,
             outboundUpdateSuccess: true,
-            message: "outbound updated successfully"
+            message: "Outbound updated successfully"
         };
     },
 
@@ -84,23 +81,18 @@ export const actions = {
         await new Promise((fulfil) => setTimeout(fulfil, 2000));
         const formData = Object.fromEntries(await request.formData());
 
-        const safeParse = AddSingleProductSchema.safeParse({
-            ...formData,
-            outboundId: formData.outboundId
-        });
+        // Neem aan dat het schema product, serialnumber en outboundId levert
+        const safeParse = AddSingleProductSchema.safeParse(formData);
 
         if (!safeParse.success) {
             return fail(400, { issues: safeParse.error.issues });
         }
 
-        // Hier wordt een veld uit safeParse overschreven; zorg dat je de juiste velden gebruikt.
-        const { product, serialnumber, outboundId } = {
-            ...safeParse.data,
-            outboundId: safeParse.data.inboundId
-        } as { product: string; serialnumber: string; outboundId: string };
+        const { product, serialnumber, inboundId } = safeParse.data as { product: string; serialnumber: string; inboundId: string };
+        const outboundId = inboundId; // Map inboundId to outboundId
 
         const existingProduct = await db.outboundProduct.findFirst({
-            where: { serialnumber: serialnumber as string }
+            where: { serialnumber }
         });
 
         if (existingProduct) {
@@ -114,16 +106,13 @@ export const actions = {
         const outboundProduct = await db.outboundProduct.create({
             data: {
                 serialnumber,
-                product: product as string,
+                product,
                 outbound: {
-                    connect: {
-                        id: Number(outboundId)
-                    }
+                    connect: { id: Number(outboundId) }
                 },
+                // Hier verwacht je dat het formulier een 'originInboundId' meestuurt die overeenkomt met Inbound.id
                 originInbound: {
-                    connect: {
-                        id: Number(formData.originInboundId) // Zorg dat dit veld aanwezig is in het formulier
-                    }
+                    connect: { id: Number(formData.originInboundId) }
                 }
             }
         });
@@ -136,127 +125,123 @@ export const actions = {
         };
     },
 
-    async addBatchoutboundProductTooutbound({ params, request }: { params: { id: string }, request: Request }) {
-        await new Promise((fulfil) => setTimeout(fulfil, 2000));
-        const outboundId = Number(params.id);
-        const formData = await request.formData();
-
-        const batch = (formData.get("batch") as string)
-            .split(/[\s\n]+/)
-            .map((serialnumber) => serialnumber.trim())
-            .filter((serialnumber) => serialnumber.length > 0);
-
-        const safeParse = AddMultipleProductSchema.safeParse({
-            ...Object.fromEntries(formData),
-            outboundId: formData.get("outboundId")
-        });
-
-        if (!safeParse.success) {
-            return fail(400, { issues: safeParse.error.issues });
-        }
-
-        const existingSerialNumbers = new Set(
-            (await db.outboundProduct.findMany({
-                where: { serialnumber: { in: batch } },
-                select: { serialnumber: true }
-            })).map(({ serialnumber }) => serialnumber)
-        );
-
-        const uniqueSerialNumbers = batch.filter((serialnumber) => !existingSerialNumbers.has(serialnumber));
-
-        if (uniqueSerialNumbers.length === 0) {
-            return {
-                status: 400,
-                addBatchTooutboundSuccess: false,
-                message: "Duplicate serialnumbers detected."
-            };
-        }
-
-        const outboundProducts = await db.outboundProduct.createMany({
-            data: uniqueSerialNumbers.map((serialnumber) => ({
-                product: safeParse.data.product as string,
-                serialnumber,
-                outboundId: outboundId,
-                originInboundId: Number(formData.get("originInboundId")) // Zorg dat dit veld aanwezig is
-            }))
-        });
-
-        return {
-            status: 200,
-            addBatchTooutboundSuccess: true,
-            message: "Batch added to outbound successfully.",
-            outboundProducts
-        };
-    },
-
-    async deleteoutbound({ params }: { params: { id: string } }) {
-        const outboundId = Number(params.id);
-        await db.outbound.delete({
-            where: { id: outboundId }
-        });
-
-        // Controleer of de outbound is verwijderd
-        const outbound = await db.outbound.findUnique({
-            where: { id: outboundId }
-        });
-
-        if (outbound) {
-            return {
-                status: 500,
-                outboundDeleteSuccess: false,
-                message: "outbound delete not successfully."
-            };
-        }
-
-        return {
-            status: 200,
-            outboundDeletesuccess: true,
-            message: "outbound deleted successfully!"
-        };
-    },
-
-    async moveInboundProductToOutbound({ request }: { request: Request }) {
+    async addInboundProductToOutbound({ request }: { request: Request }) {
         const formData = await request.formData();
         const serial = formData.get("serial") as string;
-        const outboundNumber = formData.get("outboundNumber") as string;
+        const outboundId = Number(formData.get("outboundId")); // Zorg dat dit veld in je formulier staat
 
         try {
-            const outboundRecord = await db.$transaction(async (tx) => {
+            const outboundProduct = await db.$transaction(async (tx) => {
+                // Controleer of de Outbound bestaat
+                const outboundExists = await tx.outbound.findUnique({
+                    where: { id: outboundId }
+                });
+                if (!outboundExists) {
+                    throw new Error(`Outbound met id ${outboundId} niet gevonden.`);
+                }
+
                 // Zoek het inbound product op basis van het serienummer
-                const inboundProduct = await tx.inboundProduct.findUnique({
-                    where: { id: (await tx.inboundProduct.findFirst({ where: { serialnumber: serial } }))?.id || 0 }
+                const inboundProduct = await tx.inboundProduct.findFirst({
+                    where: { serialnumber: serial }
                 });
                 if (!inboundProduct) {
                     throw new Error(`Inbound product met serial ${serial} niet gevonden.`);
                 }
+                // Controleer of het product nog niet is toegewezen
+                if (inboundProduct.status !== "IN") {
+                    throw new Error(`Inbound product met serial ${serial} is al toegewezen.`);
+                }
 
-                // Maak een outbound record aan en koppel het outbound product
-                const outboundRecord = await tx.outbound.create({
+                // Voeg het inbound product toe aan de bestaande outbound.
+                // Let op: de 'originInbound' relatie verbindt met het Inbound record, dus we gebruiken inboundProduct.inboundId.
+                const newOutboundProduct = await tx.outboundProduct.create({
                     data: {
-                        outboundNumber,
-                        description: "Verzending naar klant X",
-                        outboundProducts: {
-                            create: {
-                                product: inboundProduct.product,
-                                serialnumber: inboundProduct.serialnumber,
-                                originInboundId: inboundProduct.inboundId
-                            }
+                        product: inboundProduct.product,
+                        serialnumber: inboundProduct.serialnumber,
+                        outbound: {
+                            connect: { id: outboundId }
+                        },
+                        originInbound: {
+                            connect: { id: inboundProduct.inboundId }
                         }
                     }
                 });
 
-                // Verwijder het inbound product (of update de status, indien gewenst)
-                await tx.inboundProduct.delete({
-                    where: { id: inboundProduct.id }
+                // Update de status van het inbound product naar "OUT"
+                await tx.inboundProduct.update({
+                    where: { id: inboundProduct.id },
+                    data: { status: "OUT" }
                 });
 
-                return outboundRecord;
+                return newOutboundProduct;
             });
 
-            return { success: true, outbound: outboundRecord };
-        } catch (error) {
-            console.error("Fout opgetreden bij moveInboundProductToOutbound:", error);
-            return { success: false, error: "Er is een fout opgetreden bij het verwerken van het formulier." };
+            return { success: true, outboundProduct };
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return { success: false, error: error.message };
+            }
+            return { success: false, error: "An unknown error occurred" };
+        }
+    },
+
+    // Alternatieve action (dezelfde als addInboundProductToOutbound) – overweeg om slechts één versie te gebruiken
+    async moveInboundProductToOutbound({ request }: { request: Request }) {
+        const formData = await request.formData();
+        const serial = formData.get("serial") as string;
+        const outboundNumber = formData.get("outboundNumber") as string; // Gebruik outboundNumber uit het formulier
+
+        try {
+            const outboundProduct = await db.$transaction(async (tx) => {
+                // Zoek de Outbound op basis van het outboundNumber
+                const outboundRecord = await tx.outbound.findUnique({
+                    where: { outboundNumber }
+                });
+                if (!outboundRecord) {
+                    throw new Error(`Outbound with number ${outboundNumber} not found.`);
+                }
+
+                // Zoek het inbound product op basis van het serienummer
+                const inboundProduct = await tx.inboundProduct.findFirst({
+                    where: { serialnumber: serial }
+                });
+                if (!inboundProduct) {
+                    throw new Error(`Inbound product with serial ${serial} not found.`);
+                }
+                // Controleer of het product nog beschikbaar is (status "IN")
+                if (inboundProduct.status !== "IN") {
+                    throw new Error(`Inbound product with serial ${serial} is already assigned.`);
+                }
+
+                // Maak een nieuw OutboundProduct aan, waarbij de Outbound-relatie wordt gekoppeld via het gevonden record
+                const newOutboundProduct = await tx.outboundProduct.create({
+                    data: {
+                        product: inboundProduct.product,
+                        serialnumber: inboundProduct.serialnumber,
+                        outbound: {
+                            connect: { id: outboundRecord.id }
+                        },
+                        // Verbind de originInbound met het Inbound record via inboundProduct.inboundId
+                        originInbound: {
+                            connect: { id: inboundProduct.inboundId }
+                        }
+                    }
+                });
+
+                // Update de status van het inbound product naar "OUT"
+                await tx.inboundProduct.update({
+                    where: { id: inboundProduct.id },
+                    data: { status: "OUT" }
+                });
+
+                return newOutboundProduct;
+            });
+
+            return { success: true, outboundProduct };
+        } catch (error: any) {
+            console.error("Error in moveInboundProductToOutbound:", error);
+            return { success: false, error: error.message };
         }
     }
+
 };

@@ -4,6 +4,7 @@
 	import { fly, slide } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
 	import { invalidate } from '$app/navigation';
+	import BackToTop from '$lib/components/BackToTop.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -51,6 +52,8 @@
 		}
 	}
 </script>
+
+<BackToTop scrollTo="scroll to top" />
 
 <h1 class="py-4 text-lg font-bold">Inbounds</h1>
 

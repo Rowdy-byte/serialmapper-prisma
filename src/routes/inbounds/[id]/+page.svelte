@@ -7,6 +7,7 @@
 	import toast from 'svelte-french-toast';
 
 	import { utils, writeFileXLSX } from 'xlsx';
+	import BackToTop from '$lib/components/BackToTop.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -24,15 +25,12 @@
 	const products = data.products;
 	const inboundProducts = data.inboundProducts;
 
-	// Search state om producten binnen de Inbound te filteren
 	let searchQuery = $state('');
 
-	// Begin met de filtering op inboundId
 	let filteredInboundProducts = $state(
 		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
 	);
 
-	// Reactive effect: update de filteredInboundProducts wanneer searchQuery verandert
 	$effect(() => {
 		filteredInboundProducts = inboundProducts?.filter(
 			(product) =>
@@ -142,6 +140,8 @@
 		}
 	});
 </script>
+
+<BackToTop />
 
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="text-gray-500">

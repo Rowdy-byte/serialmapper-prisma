@@ -85,4 +85,6 @@ export const AddMultipleProductSchema = z.object({
         .min(5, { message: 'Serialnumber Batch must be at least 5 numbers' })
         .max(2000, { message: 'Serialnumbers Batch must be at most 2000 numbers' })
         .regex(/^\d{5,}( \d{5,})+$/, { message: 'Serialnumber must be at least 2 serialnumbers' }),
+
+
 })

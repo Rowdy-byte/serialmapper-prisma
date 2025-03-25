@@ -1,7 +1,7 @@
 <script lang="ts">
 	type StatsProps = {
 		statsName: string;
-		statsValue: number;
+		statsValue?: number;
 	};
 
 	let { statsName, statsValue }: StatsProps = $props();

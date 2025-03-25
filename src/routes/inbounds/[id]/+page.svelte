@@ -6,6 +6,7 @@
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
+	import Stats from '$lib/components/statics/Stats.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -214,14 +215,13 @@
 		</section>
 
 		<!-- Section 2: Secondary Content -->
-		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
-			<p>
-				Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor blanditiis minus minima
-				impedit, iste deleniti voluptatibus porro commodi consectetur! Omnis facilis dolores
-				quisquam! Accusamus reprehenderit voluptates quasi possimus dolores soluta dolore aut
-				provident rem, minus explicabo obcaecati fugit assumenda suscipit veritatis, cumque, animi
-				omnis exercitationem ad hic neque accusantium voluptate?
-			</p>
+		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
+			<div class="shadow-2xl">
+				<Stats statsName="Products" statsValue={inboundProducts?.length ?? 0} />
+			</div>
+			<div class="shadow-2xl">
+				<Stats statsName="Serialnumbers" statsValue={inboundProducts?.length ?? 0} />
+			</div>
 		</section>
 
 		<!-- Section 3: Add Single & Batch Product -->
@@ -259,6 +259,7 @@
 						{/each}
 					{/if}
 				</select>
+
 				<textarea
 					disabled={isAddingInboundProduct}
 					name="serialnumber"
@@ -324,11 +325,15 @@
 		</section>
 		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
 			<div>
-				<h1 class="pb-4 font-bold">Map Serialnumbers to Worksheet</h1>
-				<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
+				<h1 class="pb-4 font-bold">Map to Worksheet</h1>
+				<form
+					class="flex w-full flex-col gap-4"
+					action="?/mapSerialnumbersToWorksheet"
+					method="post"
+				>
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<button
-						class="rounded-md bg-blue-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
@@ -337,15 +342,8 @@
 				</form>
 			</div>
 			<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
-				<h1 class="flex items-center justify-between pb-4 font-bold">
-					Delete Inbound
-					<CircleHelp
-						class="transition-all hover:cursor-pointer hover:text-yellow-500"
-						onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
-						size="14"
-					/>
-				</h1>
-				<form use:enhance method="post" class="flex gap-2">
+				<h1 class=" pb-4 font-bold">Delete Inbound</h1>
+				<form use:enhance method="post" class="flex flex-col gap-2">
 					<button
 						formaction="?/deleteInbound"
 						onclick={handleDeleteInbound}
@@ -354,13 +352,6 @@
 					>
 						Delete
 					</button>
-					<div>
-						<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
-							<li class="pb-1">
-								<p class="text-sm">This will permanently delete this Inbound!</p>
-							</li>
-						</ul>
-					</div>
 				</form>
 			</div>
 		</section>

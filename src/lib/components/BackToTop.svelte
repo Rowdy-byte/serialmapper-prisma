@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SquareArrowUp } from '@lucide/svelte';
+	import { ArrowUpToLine } from '@lucide/svelte';
 
 	let showBackToTop = $state(false);
 
@@ -26,9 +26,10 @@
 	<button
 		title={scrollTo}
 		onclick={scrollToTop}
-		class="shad custom-gray fixed right-6 bottom-12 rounded-lg bg-gray-900 p-2 text-blue-500 shadow-lg"
+		class="custom-gray fixed right-6 bottom-12 rounded-full bg-gray-900 p-2 text-blue-500
+		shadow-lg hover:text-blue-800"
 		aria-label="Scroll to top"
 	>
-		<SquareArrowUp size="40 " stroke="1px" />
+		<ArrowUpToLine size="24" strokeWidth="1px" />
 	</button>
 {/if}

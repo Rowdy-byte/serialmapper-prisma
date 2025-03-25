@@ -141,7 +141,7 @@
 	});
 </script>
 
-<BackToTop />
+<BackToTop scrollTo="scroll to top" />
 
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="text-gray-500">

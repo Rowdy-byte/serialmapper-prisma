@@ -14,9 +14,10 @@
 	});
 
 	const links = [
+		{ linkName: 'Outbounds', linkPath: '/outbounds' },
 		{ linkName: 'Inbounds', linkPath: '/inbounds' },
-		{ linkName: 'Clients', linkPath: '/clients' },
-		{ linkName: 'Products', linkPath: '/products' }
+		{ linkName: 'Products', linkPath: '/products' },
+		{ linkName: 'Clients', linkPath: '/clients' }
 	];
 </script>
 

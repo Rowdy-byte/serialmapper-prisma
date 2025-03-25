@@ -54,6 +54,17 @@ export const CreateInboundSchema = z.object({
         .regex(/^([A-Z][a-z]*)( [A-Z][a-z]*)*$/, { message: 'Description must be in the format "First Last"' })
 })
 
+export const CreateOutboundSchema = z.object({
+    clientName: z.string()
+        .min(2, { message: 'Client name must be at least 2 characters' })
+        .max(15, { message: 'Client name must be at most 15 characters' })
+        .regex(/^([A-Z][a-z]*)( [A-Z][a-z]*)*$/, { message: 'Client name must be in the format "First Last"' }),
+    description: z.string()
+        .min(2, { message: 'Description must be at least 2 characters' })
+        .max(20, { message: 'Description must be at most 20 characters' })
+        .regex(/^([A-Z][a-z]*)( [A-Z][a-z]*)*$/, { message: 'Description must be in the format "First Last"' })
+})
+
 export const AddSingleProductSchema = z.object({
     inboundId: z.string(),
     product: z.string()

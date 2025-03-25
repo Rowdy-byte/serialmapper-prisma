@@ -2,10 +2,8 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-
 	import { CircleHelp, Eye, Search } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
-
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 
@@ -37,7 +35,8 @@
 				product.inboundId === inbound?.id &&
 				(searchQuery.trim() === '' ||
 					product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					product.product?.toLowerCase().includes(searchQuery.toLowerCase()))
+					product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					product.status?.toLowerCase().includes(searchQuery.toLowerCase()))
 		);
 	});
 
@@ -46,7 +45,6 @@
 			event.preventDefault();
 			return;
 		}
-
 		goto('/inbounds');
 	}
 
@@ -124,6 +122,7 @@
 				});
 				window.location.reload();
 				break;
+
 			case form?.addBatchToInboundSuccess:
 				toast.success(form?.message, {
 					duration: 4000,
@@ -131,6 +130,7 @@
 				});
 				window.location.reload();
 				break;
+
 			case form?.addBatchToInboundSuccess === false:
 				toast.error(form?.message, {
 					duration: 4000,
@@ -143,183 +143,232 @@
 
 <BackToTop scrollTo="scroll to top" />
 
-<section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
-	<ul class="text-gray-500">
-		<li class="font-bold">
-			<a href="/inbounds">
-				<span class="transition-all hover:text-blue-500">Inbound:</span>
-				{inbound?.inboundNumber}
-			</a>
-		</li>
-	</ul>
-</section>
-<main class="flex flex-col gap-2">
-	<!-- sectie 1 -->
-	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="flex items-center justify-between pb-4 font-bold">
-			Inbound
-			<CircleHelp
-				class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-				onclick={() => (inboundSectionOpen = !inboundSectionOpen)}
-				size="14"
-			/>
-		</h1>
-		<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!inboundSectionOpen}>
-			<li class="pb-1">
-				<p>1. Select the client.</p>
-			</li>
-			<li class="pb-1">
-				<p>2. Enter inbound description.</p>
-			</li>
-			<li class="pb-1">
-				<p>3. Click on Add.</p>
-			</li>
-			<li class="pb-1">
-				<p>3. Inbound number is generated on the details page. Follow next step.</p>
+<div class="container mx-auto px-4 py-4">
+	<!-- Breadcrumbs -->
+	<section class="breadcrums text-md mb-4 rounded-lg bg-gray-900 p-4 shadow-md">
+		<ul class="text-gray-500">
+			<li class="font-bold">
+				<a href="/inbounds" class="transition-all hover:text-blue-500">
+					Inbound: {inbound?.inboundNumber}
+				</a>
 			</li>
 		</ul>
-
-		<form class="flex flex-col gap-4" method="post">
-			<select
-				disabled={isUpdatingInbound}
-				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				name="clientName"
-			>
-				<option value="clientName">{inbound?.clientName}</option>
-				<!-- fetch data from db with sveltekit loadfunction -->
-				{#if clients}
-					{#each clients as client}
-						<option value={client.name}>{client.name}</option>
-					{/each}
-				{/if}
-			</select>
-			<input
-				disabled={isUpdatingInbound}
-				type="text"
-				name="description"
-				value={inbound?.description}
-				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-			/>
-
-			<button
-				disabled={isUpdatingInbound}
-				formaction="?/updateInbound"
-				onclick={handleUpdateInbound}
-				class="rounded-md bg-green-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				type="submit"
-			>
-				Update
-			</button>
-		</form>
 	</section>
-	<!-- sectie 2 -->
-	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
-		<h1 class="flex items-center justify-between pb-4 font-bold">
-			Add single Product to Inbound
-			<CircleHelp
-				class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-				onclick={() => (singleSectionOpen = !singleSectionOpen)}
-				size="14"
-			/>
-		</h1>
-		<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!singleSectionOpen}>
-			<li class="pb-1">
-				<p>1. Select the product you want to add.</p>
-			</li>
-			<li class="pb-1">
-				<p>2. Enter the serialnumber of the product.</p>
-			</li>
-			<li class="pb-1">
-				<p>3. Click on Add.</p>
-			</li>
-		</ul>
-		<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
-			<input hidden type="text" name="inboundId" value={inbound?.id} />
-			<select
-				disabled={isAddingInboundProduct}
-				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				name="product"
-			>
-				<option value="products">-- Select Product --</option>
-				{#if products}
-					{#each products as product}
-						<option value={product.name}>{product.number}</option>
-					{/each}
-				{/if}
-			</select>
-			<textarea
-				disabled={isAddingInboundProduct}
-				name="serialnumber"
-				placeholder="Serialnumber"
-				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-			></textarea>
 
-			<button
-				disabled={isAddingInboundProduct}
-				class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				onclick={handleAddSingle}
-				type="submit"
-			>
-				Add Single
-			</button>
+	<!-- Main Grid Layout -->
+	<main class="grid grid-cols-1 gap-4 md:grid-cols-2">
+		<!-- Section 1: Inbound Form -->
+		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+			<h1 class="flex items-center justify-between pb-4 font-bold">
+				Inbound
+				<CircleHelp
+					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
+					onclick={() => (inboundSectionOpen = !inboundSectionOpen)}
+					size="14"
+				/>
+			</h1>
+			<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!inboundSectionOpen}>
+				<li class="pb-1">
+					<p>1. Select the client.</p>
+				</li>
+				<li class="pb-1">
+					<p>2. Enter inbound description.</p>
+				</li>
+				<li class="pb-1">
+					<p>3. Click on Add.</p>
+				</li>
+				<li class="pb-1">
+					<p>4. Inbound number is generated on de details pagina. Volg de volgende stap.</p>
+				</li>
+			</ul>
+			<form class="flex flex-col gap-4" method="post">
+				<select
+					disabled={isUpdatingInbound}
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					name="clientName"
+				>
+					<option value="clientName">{inbound?.clientName}</option>
+					{#if clients}
+						{#each clients as client}
+							<option value={client.name}>{client.name}</option>
+						{/each}
+					{/if}
+				</select>
+				<input
+					disabled={isUpdatingInbound}
+					type="text"
+					name="description"
+					value={inbound?.description}
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+				/>
+				<button
+					disabled={isUpdatingInbound}
+					formaction="?/updateInbound"
+					onclick={handleUpdateInbound}
+					class="rounded-md bg-green-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					type="submit"
+				>
+					Update
+				</button>
+			</form>
+		</section>
 
-			<section class="flex max-w-sm flex-col gap-4 pt-8">
-				<div>
-					<h1 class="flex items-center justify-between font-bold">
-						Add multiple Products to Inbound
-						<CircleHelp
-							class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-							onclick={() => (multiSectionOpen = !multiSectionOpen)}
-							size="14"
-						/>
-					</h1>
+		<!-- Section 2: Secondary Content -->
+		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+			<p>
+				Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor blanditiis minus minima
+				impedit, iste deleniti voluptatibus porro commodi consectetur! Omnis facilis dolores
+				quisquam! Accusamus reprehenderit voluptates quasi possimus dolores soluta dolore aut
+				provident rem, minus explicabo obcaecati fugit assumenda suscipit veritatis, cumque, animi
+				omnis exercitationem ad hic neque accusantium voluptate?
+			</p>
+		</section>
 
-					<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!multiSectionOpen}>
-						<li class="pb-1">
-							<p>1. Select the product you want to add.</p>
-						</li>
-						<li class="pb-1">
-							<p>2. Enter the serialnumbers of the product, separated by a space.</p>
-						</li>
-						<li class="pb-1">
-							<p>3. Click on Add Batch.</p>
-						</li>
-					</ul>
-				</div>
-
+		<!-- Section 3: Add Single & Batch Product -->
+		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+			<h1 class="flex items-center justify-between pb-4 font-bold">
+				Add Single Product to Inbound
+				<CircleHelp
+					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
+					onclick={() => (singleSectionOpen = !singleSectionOpen)}
+					size="14"
+				/>
+			</h1>
+			<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!singleSectionOpen}>
+				<li class="pb-1">
+					<p>1. Select the product you want to add.</p>
+				</li>
+				<li class="pb-1">
+					<p>2. Enter the serialnumber of the product.</p>
+				</li>
+				<li class="pb-1">
+					<p>3. Click on Add.</p>
+				</li>
+			</ul>
+			<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
+				<input hidden type="text" name="inboundId" value={inbound?.id} />
+				<select
+					disabled={isAddingInboundProduct}
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					name="product"
+				>
+					<option value="products">-- Select Product --</option>
+					{#if products}
+						{#each products as product}
+							<option value={product.name}>{product.number}</option>
+						{/each}
+					{/if}
+				</select>
 				<textarea
-					disabled={isAddingBatchInboundProduct}
-					name="batch"
-					placeholder="Batch Serialnumbers "
+					disabled={isAddingInboundProduct}
+					name="serialnumber"
+					placeholder="Serialnumber"
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				></textarea>
-				<div class="flex gap-4">
-					<button
+				<button
+					disabled={isAddingInboundProduct}
+					class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					onclick={handleAddSingle}
+					type="submit"
+				>
+					Add Single
+				</button>
+				<section class="flex flex-col gap-4 pt-8">
+					<div>
+						<h1 class="flex items-center justify-between font-bold">
+							Add Multiple Products to Inbound
+							<CircleHelp
+								class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
+								onclick={() => (multiSectionOpen = !multiSectionOpen)}
+								size="14"
+							/>
+						</h1>
+						<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!multiSectionOpen}>
+							<li class="pb-1">
+								<p>1. Select the product you want to add.</p>
+							</li>
+							<li class="pb-1">
+								<p>2. Enter the serialnumbers of the product, separated by a space.</p>
+							</li>
+							<li class="pb-1">
+								<p>3. Click on Add Batch.</p>
+							</li>
+						</ul>
+					</div>
+					<textarea
 						disabled={isAddingBatchInboundProduct}
-						formaction="?/addBatchInboundProductToInbound"
-						onclick={handleAddBatch}
-						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						name="batch"
+						placeholder="Batch Serialnumbers"
+						class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					></textarea>
+					<div class="flex gap-4">
+						<button
+							disabled={isAddingBatchInboundProduct}
+							formaction="?/addBatchInboundProductToInbound"
+							onclick={handleAddBatch}
+							class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+							type="submit"
+						>
+							Add Batch
+						</button>
+						<button
+							type="button"
+							onclick={handleScanQr}
+							class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						>
+							Scan QR code
+						</button>
+					</div>
+				</section>
+			</form>
+		</section>
+		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
+			<div>
+				<h1 class="pb-4 font-bold">Map Serialnumbers to Worksheet</h1>
+				<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
+					<input hidden type="text" name="inboundId" value={inbound?.id} />
+					<button
+						class="rounded-md bg-blue-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						onclick={handleMapSerialToWorksheet}
+						type="button"
+					>
+						Map
+					</button>
+				</form>
+			</div>
+			<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
+				<h1 class="flex items-center justify-between pb-4 font-bold">
+					Delete Inbound
+					<CircleHelp
+						class="transition-all hover:cursor-pointer hover:text-yellow-500"
+						onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
+						size="14"
+					/>
+				</h1>
+				<form use:enhance method="post" class="flex gap-2">
+					<button
+						formaction="?/deleteInbound"
+						onclick={handleDeleteInbound}
+						class="rounded-md bg-red-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
-						Add Batch
+						Delete
 					</button>
-					<button
-						type="button"
-						onclick={handleScanQr}
-						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					>
-						Scan QR code
-					</button>
-				</div>
-			</section>
-		</form>
-	</section>
-	<!-- sectie 3 -->
-	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<section class="flex items-center justify-between">
-			<h1 class="text-center font-bold">List</h1>
+					<div>
+						<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
+							<li class="pb-1">
+								<p class="text-sm">This will permanently delete this Inbound!</p>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+		</section>
+	</main>
 
-			<!-- Search filter -->
+	<!-- Table Section with Search Filter -->
+	<section class="mt-4">
+		<section class="mb-4 flex items-center justify-between">
 			<form class="relative py-1">
 				<input
 					bind:value={searchQuery}
@@ -335,92 +384,44 @@
 				</div>
 			</form>
 		</section>
-
-		<table class="w-full text-left text-sm">
-			<thead>
-				<tr class="text-left text-sm text-gray-500">
-					<th class="border border-gray-500 p-2"></th>
-					<th class="border border-gray-500 p-2">Product</th>
-					<th class="border border-gray-500 p-2">Serialnumber</th>
-					<th class="border border-gray-500 p-2">Status</th>
-					<th class="border border-gray-500 p-2">Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#if filteredInboundProducts}
-					{#each filteredInboundProducts as inboundProduct, i}
-						<tr class="text-sm hover:bg-slate-600">
-							<td class="border border-gray-500 p-2">{i + 1}</td>
-							<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
-							<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
-							<td class="border border-gray-500 p-2">{inboundProduct.status}</td>
-							<td class="border border-gray-500 p-2">
-								<a
-									class="text-blue-500 underline"
-									href={`/inbounds/${inbound?.id}/inbound-product/${inboundProduct.id}`}
-									title="View Product Details"
-								>
-									<Eye size="16" />
-								</a>
-							</td>
-						</tr>
-					{/each}
-				{/if}
-			</tbody>
-		</table>
-
+		<div class="overflow-x-auto">
+			<table class="min-w-full text-left text-sm">
+				<thead>
+					<tr class="text-gray-500">
+						<th class="border border-gray-500 p-2"></th>
+						<th class="border border-gray-500 p-2">Product</th>
+						<th class="border border-gray-500 p-2">Serialnumber</th>
+						<th class="border border-gray-500 p-2">Status</th>
+						<th class="border border-gray-500 p-2">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#if filteredInboundProducts}
+						{#each filteredInboundProducts as inboundProduct, i}
+							<tr class="hover:bg-slate-600">
+								<td class="border border-gray-500 p-2">{i + 1}</td>
+								<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
+								<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
+								<td class="border border-gray-500 p-2">{inboundProduct.status}</td>
+								<td class="border border-gray-500 p-2">
+									<a
+										class="text-blue-500 underline"
+										href={`/inbounds/${inbound?.id}/inbound-product/${inboundProduct.id}`}
+										title="View Product Details"
+									>
+										<Eye size="16" />
+									</a>
+								</td>
+							</tr>
+						{/each}
+					{/if}
+				</tbody>
+			</table>
+		</div>
 		{#if filteredInboundProducts?.length === 0}
 			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
 		{/if}
 	</section>
-	<!-- sectie 4 -->
-	<section
-		class="grid w-full gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2 md:mx-auto md:max-w-2xl md:rounded-full md:p-10"
-	>
-		<div class="w-full">
-			<h1 class="pb-4 font-bold">Map Serialnumbers to Worksheet</h1>
 
-			<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
-				<input hidden type="text" name="inboundId" value={inbound?.id} />
-
-				<button
-					class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					onclick={handleMapSerialToWorksheet}
-					type="button"
-				>
-					Map
-				</button>
-			</form>
-		</div>
-
-		<!-- sectie 5 -->
-
-		<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
-			<h1 class="flex w-full items-center justify-between pb-4 font-bold">
-				Delete Inbound
-				<CircleHelp
-					class="transition-all hover:cursor-pointer hover:text-yellow-500"
-					onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
-					size="14"
-				/>
-			</h1>
-			<form use:enhance method="post" class="flex gap-2">
-				<button
-					formaction="?/deleteInbound"
-					onclick={handleDeleteInbound}
-					class="rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit"
-				>
-					Delete
-				</button>
-				<div>
-					<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
-						<li class="pb-1">
-							<p class="text-sm">This will permanently delete this Inbound!</p>
-						</li>
-					</ul>
-				</div>
-			</form>
-		</div>
-	</section>
-</main>
+	<!-- Map Serialnumbers & Delete Section -->
+</div>

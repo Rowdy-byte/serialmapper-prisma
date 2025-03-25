@@ -154,6 +154,7 @@
 	</ul>
 </section>
 <main class="flex flex-col gap-2">
+	<!-- sectie 1 -->
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="flex items-center justify-between pb-4 font-bold">
 			Inbound
@@ -211,6 +212,7 @@
 			</button>
 		</form>
 	</section>
+	<!-- sectie 2 -->
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="flex items-center justify-between pb-4 font-bold">
 			Add single Product to Inbound
@@ -312,7 +314,7 @@
 			</section>
 		</form>
 	</section>
-
+	<!-- sectie 3 -->
 	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<section class="flex items-center justify-between">
 			<h1 class="text-center font-bold">List</h1>
@@ -371,46 +373,54 @@
 			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
 		{/if}
 	</section>
-	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<h1 class="font-bold">Map Serialnumbers to Worksheet</h1>
+	<!-- sectie 4 -->
+	<section
+		class="grid w-full gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2 md:mx-auto md:max-w-2xl md:rounded-full md:p-10"
+	>
+		<div class="w-full">
+			<h1 class="pb-4 font-bold">Map Serialnumbers to Worksheet</h1>
 
-		<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
-			<input hidden type="text" name="inboundId" value={inbound?.id} />
+			<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
+				<input hidden type="text" name="inboundId" value={inbound?.id} />
 
-			<button
-				class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				onclick={handleMapSerialToWorksheet}
-				type="button"
-			>
-				Map
-			</button>
-		</form>
-	</section>
-	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<h1 class="flex w-full items-center justify-between font-bold">
-			Delete Inbound
-			<CircleHelp
-				class="transition-all hover:cursor-pointer hover:text-yellow-500"
-				onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
-				size="14"
-			/>
-		</h1>
-		<form use:enhance method="post" class="flex gap-2">
-			<button
-				formaction="?/deleteInbound"
-				onclick={handleDeleteInbound}
-				class="rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				type="submit"
-			>
-				Delete
-			</button>
-			<div>
-				<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
-					<li class="pb-1">
-						<p class="text-sm">This will permanently delete this Inbound!</p>
-					</li>
-				</ul>
-			</div>
-		</form>
+				<button
+					class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					onclick={handleMapSerialToWorksheet}
+					type="button"
+				>
+					Map
+				</button>
+			</form>
+		</div>
+
+		<!-- sectie 5 -->
+
+		<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
+			<h1 class="flex w-full items-center justify-between pb-4 font-bold">
+				Delete Inbound
+				<CircleHelp
+					class="transition-all hover:cursor-pointer hover:text-yellow-500"
+					onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
+					size="14"
+				/>
+			</h1>
+			<form use:enhance method="post" class="flex gap-2">
+				<button
+					formaction="?/deleteInbound"
+					onclick={handleDeleteInbound}
+					class="rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					type="submit"
+				>
+					Delete
+				</button>
+				<div>
+					<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
+						<li class="pb-1">
+							<p class="text-sm">This will permanently delete this Inbound!</p>
+						</li>
+					</ul>
+				</div>
+			</form>
+		</div>
 	</section>
 </main>

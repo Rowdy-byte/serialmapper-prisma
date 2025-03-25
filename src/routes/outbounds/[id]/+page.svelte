@@ -128,14 +128,14 @@
 				});
 				window.location.reload();
 				break;
-			case form?.addBatchTooutboundSuccess:
+			case form?.addBatchToOutboundSuccess:
 				toast.success(form?.message, {
 					duration: 4000,
 					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
 				});
 				window.location.reload();
 				break;
-			case form?.addBatchTooutboundSuccess === false:
+			case form?.addBatchToOutboundSuccess === false:
 				toast.error(form?.message, {
 					duration: 4000,
 					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
@@ -151,7 +151,7 @@
 	<ul class="text-gray-500">
 		<li class="font-bold">
 			<a href="/outbounds">
-				<span class="transition-all hover:text-blue-500">outbound:</span>
+				<span class="transition-all hover:text-blue-500">Outbound:</span>
 				{outbound?.outboundNumber}
 			</a>
 		</li>
@@ -160,7 +160,7 @@
 <main class="flex flex-col gap-2">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="flex items-center justify-between pb-4 font-bold">
-			outbound
+			Outbound
 			<CircleHelp
 				class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
 				onclick={() => (outboundSectionOpen = !outboundSectionOpen)}
@@ -215,8 +215,6 @@
 			</button>
 		</form>
 	</section>
-
-	<!-- Nieuwe sectie: Move Inbound Product to Outbound -->
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="flex items-center justify-between pb-4 font-bold">
 			Move Inbound Product to Outbound
@@ -231,28 +229,24 @@
 			method="post"
 			use:enhance
 		>
-			<div>
-				<label for="serial" class="text-sm">Inbound Product Serial:</label>
-				<input
-					id="serial"
-					type="text"
-					name="serial"
-					placeholder="Enter serial"
-					required
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				/>
-			</div>
-			<div>
-				<label for="outboundNumber" class="text-sm">Outbound Number:</label>
-				<input
-					id="outboundNumber"
-					type="text"
-					name="outboundNumber"
-					placeholder="Enter outbound number"
-					required
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				/>
-			</div>
+			<input
+				id="serial"
+				type="text"
+				name="serial"
+				placeholder="Enter Serialnumber"
+				required
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+			/>
+
+			<input
+				id="outboundNumber"
+				type="text"
+				name="outboundNumber"
+				placeholder="Enter Outbound Number"
+				required
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+			/>
+
 			<button
 				type="submit"
 				class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
@@ -261,8 +255,7 @@
 			</button>
 		</form>
 	</section>
-
-	<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
+	<!-- <section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
 		<h1 class="flex items-center justify-between pb-4 font-bold">
 			Add single Product to outbound
 			<CircleHelp
@@ -358,7 +351,7 @@
 				</div>
 			</section>
 		</form>
-	</section>
+	</section> -->
 
 	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<section class="flex items-center justify-between">
@@ -428,7 +421,7 @@
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<h1 class="flex w-full items-center justify-between font-bold">
-			Delete outbound
+			Delete Outbound
 			<CircleHelp
 				class="transition-all hover:cursor-pointer hover:text-yellow-500"
 				onclick={() => (deleteSectionOpen = !deleteSectionOpen)}

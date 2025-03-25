@@ -238,9 +238,13 @@ export const actions = {
             });
 
             return { success: true, outboundProduct };
-        } catch (error: any) {
-            console.error("Error in moveInboundProductToOutbound:", error);
-            return { success: false, error: error.message };
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("Error in moveInboundProductToOutbound:", error);
+                return { success: false, error: error.message };
+            }
+            console.error("Unknown error in moveInboundProductToOutbound:", error);
+            return { success: false, error: "An unknown error occurred" };
         }
     }
 

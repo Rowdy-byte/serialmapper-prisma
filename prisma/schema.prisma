@@ -7,42 +7,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ProductStatus {
+  IN
+  OUT
+}
+
 model Client {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  email     String    @unique
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  email     String     @unique
   phone     String
   address   String
   city      String
-  createdAt DateTime  @default(now())
+  createdAt DateTime   @default(now())
   inbound   Inbound[]
+  outbound  Outbound[]
 }
 
 model Inbound {
-  id            Int      @id @default(autoincrement())
-  description   String?
-  clientName    String
-  inboundNumber String   @unique
-  createdAt     DateTime @default(now())
-  clientId      Int?
-  client        Client   @relation(fields: [clientName], references: [name], onDelete: Cascade)
-
-  inboundProducts InboundProduct[]
+  id               Int               @id @default(autoincrement())
+  description      String?
+  clientName       String
+  inboundNumber    String            @unique
+  createdAt        DateTime          @default(now())
+  clientId         Int?
+  client           Client            @relation(fields: [clientName], references: [name], onDelete: Cascade)
+  inboundProducts  InboundProduct[]
+  outboundProducts OutboundProduct[] @relation("InboundToOutboundProduct")
 }
 
 model InboundProduct {
-  id           Int      @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   product      String
   serialnumber String
-  createdAt    DateTime @default(now())
+  status       ProductStatus @default(IN)
+  createdAt    DateTime      @default(now())
   inboundId    Int
-  inbound      Inbound  @relation(fields: [inboundId], references: [id], onDelete: Cascade)
+  inbound      Inbound       @relation(fields: [inboundId], references: [id], onDelete: Cascade)
 }
 
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
   description String
+  value       String
   number      String
   createdAt   DateTime @default(now())
+}
+
+model Outbound {
+  id               Int               @id @default(autoincrement())
+  outboundNumber   String            @unique
+  description      String?
+  createdAt        DateTime          @default(now())
+  clientName       String?
+  client           Client?           @relation(fields: [clientName], references: [name], onDelete: Cascade)
+  outboundProducts OutboundProduct[]
+}
+
+model OutboundProduct {
+  id              Int      @id @default(autoincrement())
+  product         String
+  serialnumber    String
+  createdAt       DateTime @default(now())
+  outboundId      Int
+  outbound        Outbound @relation(fields: [outboundId], references: [id], onDelete: Cascade)
+  originInboundId Int
+  originInbound   Inbound  @relation("InboundToOutboundProduct", fields: [originInboundId], references: [id])
 }

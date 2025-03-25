@@ -62,6 +62,12 @@
 				placeholder="Number"
 				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 			/>
+			<input
+				type="text"
+				name="value"
+				placeholder="Value (€)"
+				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+			/>
 			<button
 				onclick={handleCreateProduct}
 				class="rounded-md
@@ -76,8 +82,9 @@
 			<thead>
 				<tr class="text-left text-sm font-bold text-gray-400">
 					<th class="border border-gray-500 p-2">Name</th>
-					<th class="border border-gray-500 p-2">Description</th>
+					<th class="hidden border border-gray-500 p-2 md:table-cell">Description</th>
 					<th class="border border-gray-500 p-2">Number</th>
+					<th class="border border-gray-500 p-2">Value (€)</th>
 					<th class="border border-gray-500 p-2">Actions</th>
 				</tr>
 			</thead>
@@ -85,8 +92,9 @@
 				{#each products as product}
 					<tr class="hover:bg-slate-800">
 						<td class="border border-gray-500 p-2">{product.name}</td>
-						<td class="border border-gray-500 p-2">{product.description}</td>
+						<td class="hidden border border-gray-500 p-2 md:table-cell">{product.description}</td>
 						<td class="border border-gray-500 p-2">{product.number}</td>
+						<td class="border border-gray-500 p-2">{product.value}</td>
 						<td class="border border-gray-500 p-2">
 							<a class="text-blue-500 underline" href={`products/${product.id}`}>
 								<Eye size="16" />

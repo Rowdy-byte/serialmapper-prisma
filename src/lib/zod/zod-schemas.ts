@@ -37,9 +37,24 @@ export const createProductSchema = z.object({
         .min(5, { message: 'Number must be at least 5 characters' })
         .max(50, { message: 'Number must be at most 20 characters' })
         .regex(/^\d{4,} \([^()]+\)$/, { message: 'Number must be one number' }),
+    value: z.string()
+        .min(1, { message: 'Value must be at least 1 characters' })
+        .max(7, { message: 'Value must be at most 50 characters' })
+        .regex(/^\d{1,}$/, { message: 'Value must be one number' }),
 })
 
 export const CreateInboundSchema = z.object({
+    clientName: z.string()
+        .min(2, { message: 'Client name must be at least 2 characters' })
+        .max(15, { message: 'Client name must be at most 15 characters' })
+        .regex(/^([A-Z][a-z]*)( [A-Z][a-z]*)*$/, { message: 'Client name must be in the format "First Last"' }),
+    description: z.string()
+        .min(2, { message: 'Description must be at least 2 characters' })
+        .max(20, { message: 'Description must be at most 20 characters' })
+        .regex(/^([A-Z][a-z]*)( [A-Z][a-z]*)*$/, { message: 'Description must be in the format "First Last"' })
+})
+
+export const CreateOutboundSchema = z.object({
     clientName: z.string()
         .min(2, { message: 'Client name must be at least 2 characters' })
         .max(15, { message: 'Client name must be at most 15 characters' })

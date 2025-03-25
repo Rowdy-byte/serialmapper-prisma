@@ -22,7 +22,7 @@ export const actions: Actions = {
         if (!safeParse.success) {
             return fail(400, { issues: safeParse.error.issues });
         }
-        const { name, description, number } = safeParse.data;
+        const { name, description, number, value } = safeParse.data;
 
         const existingProduct = await db.product.findFirst({
             where: {
@@ -43,6 +43,7 @@ export const actions: Actions = {
                 name: name as string,
                 number: number as string,
                 description: description as string,
+                value: value
             }
         });
         return {

@@ -9,60 +9,61 @@
 
 	let { data, form }: PageProps = $props();
 
-	let inboundSectionOpen = $state(false);
+	let outboundSectionOpen = $state(false);
 	let singleSectionOpen = $state(false);
 	let multiSectionOpen = $state(false);
 	let deleteSectionOpen = $state(false);
 
-	let isUpdatingInbound = $state(false);
-	let isAddingInboundProduct = $state(false);
-	let isAddingBatchInboundProduct = $state(false);
+	let isUpdatingOutbound = $state(false);
+	let isAddingOutboundProduct = $state(false);
+	let isAddingBatchOutboundProduct = $state(false);
 
 	const clients = data.clients;
-	const inbound = data.inbound;
+	const outbound = data.outbound;
 	const products = data.products;
-	const inboundProducts = data.inboundProducts;
+	const outboundProducts = data.outboundProducts;
 
 	let searchQuery = $state('');
 
-	let filteredInboundProducts = $state(
-		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
+	let filteredOutboundProducts = $state(
+		outboundProducts?.filter(
+			(product: { outboundId: number }) => product.outboundId === Number(outbound?.id)
+		)
 	);
 
 	$effect(() => {
-		filteredInboundProducts = inboundProducts?.filter(
-			(product) =>
-				product.inboundId === inbound?.id &&
+		filteredOutboundProducts = outboundProducts?.filter(
+			(product: { outboundId: number; serialnumber?: string; product?: string }) =>
+				product.outboundId === Number(outbound?.id) &&
 				(searchQuery.trim() === '' ||
 					product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					product.status?.toLowerCase().includes(searchQuery.toLowerCase()))
+					product.product?.toLowerCase().includes(searchQuery.toLowerCase()))
 		);
 	});
 
-	function handleDeleteInbound(event: Event) {
-		if (!confirm('Are you sure you want to delete this inbound?')) {
+	function handleDeleteOutbound(event: Event) {
+		if (!confirm('Are you sure you want to delete this outbound?')) {
 			event.preventDefault();
 			return;
 		}
-		goto('/inbounds');
+		goto('/outbounds');
 	}
 
-	function handleUpdateInbound(event: Event) {
-		if (!confirm('Are you sure you want to update this inbound?')) {
+	function handleUpdateOutbound(event: Event) {
+		if (!confirm('Are you sure you want to update this outbound?')) {
 			event.preventDefault();
 			return;
 		}
 	}
 
 	function handleAddSingle(event: Event) {
-		if (!confirm('Are you sure you want to add this product to this inbound?')) {
+		if (!confirm('Are you sure you want to add this product to this outbound?')) {
 			event.preventDefault();
 		}
 	}
 
 	function handleAddBatch(event: Event) {
-		if (!confirm('Are you sure you want to add this batch to this inbound?')) {
+		if (!confirm('Are you sure you want to add this batch to this outbound?')) {
 			event.preventDefault();
 		}
 	}
@@ -83,10 +84,10 @@
 	}
 
 	function mapSerialToWorksheet() {
-		const worksheet = utils.json_to_sheet(inboundProducts || []);
+		const worksheet = utils.json_to_sheet(outboundProducts || []);
 		const workbook = utils.book_new();
-		utils.book_append_sheet(workbook, worksheet, 'Inbound Products');
-		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
+		utils.book_append_sheet(workbook, worksheet, 'Outbound Products');
+		writeFileXLSX(workbook, `${outbound?.outboundNumber}-products.xlsx`);
 	}
 
 	if (form?.issues) {
@@ -100,7 +101,7 @@
 
 	$effect(() => {
 		switch (true) {
-			case form?.inboundUpdateSuccess:
+			case form?.outboundUpdateSuccess:
 				toast.success(form?.message, {
 					duration: 4000,
 					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
@@ -115,7 +116,7 @@
 				});
 				break;
 
-			case form?.addProductToInboundSuccess:
+			case form?.addProductTooutboundSuccess:
 				toast.success(form?.message, {
 					duration: 4000,
 					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
@@ -123,7 +124,7 @@
 				window.location.reload();
 				break;
 
-			case form?.addBatchToInboundSuccess:
+			case form?.addBatchToOutboundSuccess:
 				toast.success(form?.message, {
 					duration: 4000,
 					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
@@ -131,7 +132,7 @@
 				window.location.reload();
 				break;
 
-			case form?.addBatchToInboundSuccess === false:
+			case form?.addBatchToOutboundSuccess === false:
 				toast.error(form?.message, {
 					duration: 4000,
 					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
@@ -148,8 +149,8 @@
 	<section class="breadcrums text-md mb-4 rounded-lg bg-gray-900 p-4 shadow-md">
 		<ul class="text-gray-500">
 			<li class="font-bold">
-				<a href="/inbounds" class="transition-all hover:text-blue-500">
-					Inbound: {inbound?.inboundNumber}
+				<a href="/outbounds" class="transition-all hover:text-blue-500">
+					Outbound: {outbound?.outboundNumber}
 				</a>
 			</li>
 		</ul>
@@ -157,37 +158,37 @@
 
 	<!-- Main Grid Layout -->
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2">
-		<!-- Section 1: Inbound Form -->
+		<!-- Section 1: Outbound Form -->
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="flex items-center justify-between pb-4 font-bold">
-				Inbound
+				Outbound
 				<CircleHelp
 					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-					onclick={() => (inboundSectionOpen = !inboundSectionOpen)}
+					onclick={() => (outboundSectionOpen = !outboundSectionOpen)}
 					size="14"
 				/>
 			</h1>
-			<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!inboundSectionOpen}>
+			<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!outboundSectionOpen}>
 				<li class="pb-1">
 					<p>1. Select the client.</p>
 				</li>
 				<li class="pb-1">
-					<p>2. Enter inbound description.</p>
+					<p>2. Enter outbound description.</p>
 				</li>
 				<li class="pb-1">
 					<p>3. Click on Add.</p>
 				</li>
 				<li class="pb-1">
-					<p>4. Inbound number is generated on de details pagina. Volg de volgende stap.</p>
+					<p>4. Outbound number is generated on the details page. Follow next step.</p>
 				</li>
 			</ul>
 			<form class="flex flex-col gap-4" method="post">
 				<select
-					disabled={isUpdatingInbound}
+					disabled={isUpdatingOutbound}
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					name="clientName"
 				>
-					<option value="clientName">{inbound?.clientName}</option>
+					<option value="clientName">{outbound?.clientName}</option>
 					{#if clients}
 						{#each clients as client}
 							<option value={client.name}>{client.name}</option>
@@ -195,16 +196,16 @@
 					{/if}
 				</select>
 				<input
-					disabled={isUpdatingInbound}
+					disabled={isUpdatingOutbound}
 					type="text"
 					name="description"
-					value={inbound?.description}
+					value={outbound?.description}
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				/>
 				<button
-					disabled={isUpdatingInbound}
-					formaction="?/updateInbound"
-					onclick={handleUpdateInbound}
+					disabled={isUpdatingOutbound}
+					formaction="?/updateOutbound"
+					onclick={handleUpdateOutbound}
 					class="rounded-md bg-green-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit"
 				>
@@ -213,7 +214,47 @@
 			</form>
 		</section>
 
-		<!-- Section 2: Secondary Content -->
+		<!-- Section 2: Move Inbound Product to Outbound -->
+		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+			<h1 class="flex items-center justify-between pb-4 font-bold">
+				Move Inbound Product to Outbound
+				<CircleHelp
+					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
+					size="14"
+				/>
+			</h1>
+			<form
+				class="flex flex-col gap-4"
+				action="?/moveInboundProductToOutbound"
+				method="post"
+				use:enhance
+			>
+				<input
+					id="serial"
+					type="text"
+					name="serial"
+					placeholder="Enter Serialnumber"
+					required
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+				/>
+
+				<input
+					id="outboundNumber"
+					type="text"
+					name="outboundNumber"
+					placeholder="Enter Outbound Number"
+					required
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+				/>
+
+				<button
+					type="submit"
+					class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				>
+					Move Product
+				</button>
+			</form>
+		</section>
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 			<p>
 				Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor blanditiis minus minima
@@ -223,112 +264,13 @@
 				omnis exercitationem ad hic neque accusantium voluptate?
 			</p>
 		</section>
-
-		<!-- Section 3: Add Single & Batch Product -->
-		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
-			<h1 class="flex items-center justify-between pb-4 font-bold">
-				Add Single Product to Inbound
-				<CircleHelp
-					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-					onclick={() => (singleSectionOpen = !singleSectionOpen)}
-					size="14"
-				/>
-			</h1>
-			<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!singleSectionOpen}>
-				<li class="pb-1">
-					<p>1. Select the product you want to add.</p>
-				</li>
-				<li class="pb-1">
-					<p>2. Enter the serialnumber of the product.</p>
-				</li>
-				<li class="pb-1">
-					<p>3. Click on Add.</p>
-				</li>
-			</ul>
-			<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
-				<input hidden type="text" name="inboundId" value={inbound?.id} />
-				<select
-					disabled={isAddingInboundProduct}
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-					name="product"
-				>
-					<option value="products">-- Select Product --</option>
-					{#if products}
-						{#each products as product}
-							<option value={product.name}>{product.number}</option>
-						{/each}
-					{/if}
-				</select>
-				<textarea
-					disabled={isAddingInboundProduct}
-					name="serialnumber"
-					placeholder="Serialnumber"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				></textarea>
-				<button
-					disabled={isAddingInboundProduct}
-					class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					onclick={handleAddSingle}
-					type="submit"
-				>
-					Add Single
-				</button>
-				<section class="flex flex-col gap-4 pt-8">
-					<div>
-						<h1 class="flex items-center justify-between font-bold">
-							Add Multiple Products to Inbound
-							<CircleHelp
-								class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-								onclick={() => (multiSectionOpen = !multiSectionOpen)}
-								size="14"
-							/>
-						</h1>
-						<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!multiSectionOpen}>
-							<li class="pb-1">
-								<p>1. Select the product you want to add.</p>
-							</li>
-							<li class="pb-1">
-								<p>2. Enter the serialnumbers of the product, separated by a space.</p>
-							</li>
-							<li class="pb-1">
-								<p>3. Click on Add Batch.</p>
-							</li>
-						</ul>
-					</div>
-					<textarea
-						disabled={isAddingBatchInboundProduct}
-						name="batch"
-						placeholder="Batch Serialnumbers"
-						class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-					></textarea>
-					<div class="flex gap-4">
-						<button
-							disabled={isAddingBatchInboundProduct}
-							formaction="?/addBatchInboundProductToInbound"
-							onclick={handleAddBatch}
-							class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-							type="submit"
-						>
-							Add Batch
-						</button>
-						<button
-							type="button"
-							onclick={handleScanQr}
-							class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						>
-							Scan QR code
-						</button>
-					</div>
-				</section>
-			</form>
-		</section>
 		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
 			<div>
 				<h1 class="pb-4 font-bold">Map Serialnumbers to Worksheet</h1>
 				<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
-					<input hidden type="text" name="inboundId" value={inbound?.id} />
+					<input hidden type="text" name="outboundId" value={outbound?.id} />
 					<button
-						class="rounded-md bg-blue-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
@@ -338,7 +280,7 @@
 			</div>
 			<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
 				<h1 class="flex items-center justify-between pb-4 font-bold">
-					Delete Inbound
+					Delete Outbound
 					<CircleHelp
 						class="transition-all hover:cursor-pointer hover:text-yellow-500"
 						onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
@@ -347,9 +289,9 @@
 				</h1>
 				<form use:enhance method="post" class="flex gap-2">
 					<button
-						formaction="?/deleteInbound"
-						onclick={handleDeleteInbound}
-						class="rounded-md bg-red-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						formaction="?/deleteoutbound"
+						onclick={handleDeleteOutbound}
+						class="rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
 						Delete
@@ -357,7 +299,7 @@
 					<div>
 						<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
 							<li class="pb-1">
-								<p class="text-sm">This will permanently delete this Inbound!</p>
+								<p class="text-sm">This will permanently delete this outbound!</p>
 							</li>
 						</ul>
 					</div>
@@ -366,7 +308,7 @@
 		</section>
 	</main>
 
-	<!-- Table Section with Search Filter -->
+	<!-- List Section with Search Filter -->
 	<section class="mt-4">
 		<section class="mb-4 flex items-center justify-between">
 			<form class="relative py-1">
@@ -391,22 +333,20 @@
 						<th class="border border-gray-500 p-2"></th>
 						<th class="border border-gray-500 p-2">Product</th>
 						<th class="border border-gray-500 p-2">Serialnumber</th>
-						<th class="border border-gray-500 p-2">Status</th>
 						<th class="border border-gray-500 p-2">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#if filteredInboundProducts}
-						{#each filteredInboundProducts as inboundProduct, i}
+					{#if filteredOutboundProducts}
+						{#each filteredOutboundProducts as outboundProduct, i}
 							<tr class="hover:bg-slate-600">
 								<td class="border border-gray-500 p-2">{i + 1}</td>
-								<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
-								<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
-								<td class="border border-gray-500 p-2">{inboundProduct.status}</td>
+								<td class="border border-gray-500 p-2">{outboundProduct.product}</td>
+								<td class="border border-gray-500 p-2">{outboundProduct.serialnumber}</td>
 								<td class="border border-gray-500 p-2">
 									<a
 										class="text-blue-500 underline"
-										href={`/inbounds/${inbound?.id}/inbound-product/${inboundProduct.id}`}
+										href={`/outbounds/${outbound?.id}/outbound-product/${outboundProduct.id}`}
 										title="View Product Details"
 									>
 										<Eye size="16" />
@@ -418,7 +358,7 @@
 				</tbody>
 			</table>
 		</div>
-		{#if filteredInboundProducts?.length === 0}
+		{#if filteredOutboundProducts?.length === 0}
 			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
 		{/if}
 	</section>

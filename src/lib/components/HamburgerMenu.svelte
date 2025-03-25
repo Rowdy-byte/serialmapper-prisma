@@ -9,8 +9,9 @@
 
 	const links = [
 		{ linkName: 'Inbounds', linkPath: '/inbounds' },
-		{ linkName: 'Clients', linkPath: '/clients' },
-		{ linkName: 'Products', linkPath: '/products' }
+		{ linkName: 'Outbounds', linkPath: '/outbounds' },
+		{ linkName: 'Products', linkPath: '/products' },
+		{ linkName: 'Clients', linkPath: '/clients' }
 	];
 
 	function toggle() {

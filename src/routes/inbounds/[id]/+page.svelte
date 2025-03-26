@@ -26,20 +26,19 @@
 
 	let searchQuery = $state('');
 
+	let productValue = $state(0);
+	let productRevenue = $state(0);
+	let productStatusIn = $state();
+	let productStatusOut = $state();
+
+	let productsCount = $state<number>(0);
+	let serialnumbersCount = $state<number>(0);
+
 	let filteredInboundProducts = $state(
 		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
 	);
 
-	$effect(() => {
-		filteredInboundProducts = inboundProducts?.filter(
-			(product) =>
-				product.inboundId === inbound?.id &&
-				(searchQuery.trim() === '' ||
-					product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					product.status?.toLowerCase().includes(searchQuery.toLowerCase()))
-		);
-	});
+	$effect(() => {});
 
 	function handleDeleteInbound(event: Event) {
 		if (!confirm('Are you sure you want to delete this inbound?')) {
@@ -139,20 +138,56 @@
 				});
 				break;
 		}
-	});
 
-	console.log(inboundProducts);
+		filteredInboundProducts = inboundProducts?.filter(
+			(product) =>
+				product.inboundId === inbound?.id &&
+				(searchQuery.trim() === '' ||
+					product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					product.status?.toLowerCase().includes(searchQuery.toLowerCase()))
+		);
 
-	let productValue = $state(0);
+		// Define inboundProductId outside the effect scope
+		let inboundProductId = $state();
 
-	$effect(() => {
-		if (inboundProducts) {
-			productValue = inboundProducts.reduce((acc, product) => {
-				return acc + (product.value ? parseFloat(product.value.toString()) : 0);
-			}, 0);
-		} else {
-			productValue = 0;
-		}
+		// Update inboundProductId in its own effect
+		$effect(() => {
+			inboundProductId = inboundProducts?.map((product) => product.inboundId);
+		});
+
+		// Use a separate effect for calculations that depend on inboundProductId
+		// Total value: sum of all product values (converted to a float)
+		$effect(() => {
+			// productCount
+			productsCount =
+				inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+			serialnumbersCount =
+				inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+
+			productValue = (
+				inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []
+			).reduce((sum, product) => sum + (parseFloat(product.value ?? '0') || 0), 0);
+
+			// Revenue: for example, we calculate revenue as a fixed factor (0.1) times the number of products
+			productRevenue = parseFloat(
+				(
+					(inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []).length *
+					0.1
+				).toFixed(2)
+			);
+
+			// Status counts: number of products with status 'IN' and 'OUT'
+			productStatusIn =
+				inboundProducts?.filter(
+					(product) => product.inboundId === inbound?.id && product.status === 'IN'
+				).length || 0;
+
+			productStatusOut =
+				inboundProducts?.filter(
+					(product) => product.inboundId === inbound?.id && product.status === 'OUT'
+				).length || 0;
+		});
 	});
 </script>
 
@@ -229,12 +264,14 @@
 		</section>
 
 		<!-- Section 2: Secondary Content -->
-		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
-			<Stats statsName="Products" statsValue={inboundProducts?.length ?? 0} />
+		<section class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
+			<Stats statsName="Products" statsValue={productsCount} />
 
-			<Stats statsName="Serialnumbers" statsValue={inboundProducts?.length ?? 0} />
+			<Stats statsName="Serialnumbers" statsValue={serialnumbersCount} />
 
-			<Stats statsName="Value" statsValue={productValue} />
+			<Stats statsName="Value" statsValue={`€ ${productValue}`} />
+			<Stats statsName="Revenue" statsValue={`€ ${productRevenue}`} />
+			<Stats statsName="In/Out" statsValue={`${productStatusIn}/${productStatusOut} `} />
 		</section>
 
 		<!-- Section 3: Add Single & Batch Product -->

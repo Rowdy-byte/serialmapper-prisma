@@ -269,8 +269,8 @@
 
 			<Stats statsName="Serialnumbers" statsValue={serialnumbersCount} />
 
-			<Stats statsName="Value" statsValue={`€ ${productValue}`} />
-			<Stats statsName="Revenue" statsValue={`€ ${productRevenue}`} />
+			<Stats statsName="Value" statsValue={productValue} prefix="€" />
+			<Stats statsName="Revenue" statsValue={productRevenue} prefix="€ " />
 			<Stats statsName="In/Out" statsValue={`${productStatusIn}/${productStatusOut} `} />
 		</section>
 

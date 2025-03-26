@@ -10,6 +10,8 @@
 
 	let { data, form }: PageProps = $props();
 
+	let inboundsProducts = data.outboundProducts;
+
 	let outboundSectionOpen = $state(false);
 	let singleSectionOpen = $state(false);
 	let multiSectionOpen = $state(false);
@@ -25,6 +27,13 @@
 	const outboundProducts = data.outboundProducts;
 
 	let searchQuery = $state('');
+
+	let productValue = $state(0);
+	let productRevenue = $state(0);
+	let productStatusIn = $state();
+	let productStatusOut = $state();
+	let productsCount = $state<number>(0);
+	let serialnumbersCount = $state<number>(0);
 
 	let filteredOutboundProducts = $state(
 		outboundProducts?.filter(
@@ -140,6 +149,19 @@
 			// 	});
 			// 	break;
 		}
+
+		productValue = (
+			outboundProducts?.filter((product) => product.outboundId === outbound?.id) || []
+		).reduce((sum, product) => sum + (parseFloat((product as any).value ?? '0') || 0), 0);
+
+		productRevenue = parseFloat(
+			(
+				(outboundProducts?.filter((product) => product.outboundId === outbound?.id) || []).length *
+				0.1
+			).toFixed(2)
+		);
+
+		// Status counts: number of products with status 'IN' and 'OUT'
 	});
 </script>
 
@@ -258,8 +280,9 @@
 		</section>
 		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
 			<Stats statsName="Products" statsValue={outboundProducts?.length ?? 0} />
-
 			<Stats statsName="Serialnumbers" statsValue={outboundProducts?.length ?? 0} />
+			<Stats statsName="Value" statsValue={productValue} prefix="€" />
+			<Stats statsName="Revenue" statsValue={productRevenue} prefix="€ " />
 
 			<!-- <Stats statsName="Value" statsValue={outboundValue} /> -->
 		</section>

@@ -5,7 +5,6 @@ import { CreateOutboundSchema } from "$lib/zod/zod-schemas";
 import { AddSingleProductSchema } from "$lib/zod/zod-schemas";
 
 export const load: PageServerLoad = async ({ params }) => {
-    // Haal het outbound record op en include de gekoppelde client
     const outbound = await db.outbound.findUnique({
         where: { id: Number(params.id) },
         include: { client: true }
@@ -15,11 +14,10 @@ export const load: PageServerLoad = async ({ params }) => {
         throw error(404, { message: "Outbound doesn't exist", code: "NOT_FOUND" });
     }
 
-    // Gebruik de client uit het outbound record
     const client = outbound.client;
 
     const products = await db.product.findMany();
-    // Haal alleen de outboundProducts voor dit outbound record op
+
     const outboundProducts = await db.outboundProduct.findMany({
         where: { outboundId: Number(params.id) }
     });
@@ -81,7 +79,6 @@ export const actions = {
         await new Promise((fulfil) => setTimeout(fulfil, 2000));
         const formData = Object.fromEntries(await request.formData());
 
-        // Neem aan dat het schema product, serialnumber en outboundId levert
         const safeParse = AddSingleProductSchema.safeParse(formData);
 
         if (!safeParse.success) {
@@ -110,7 +107,7 @@ export const actions = {
                 outbound: {
                     connect: { id: Number(outboundId) }
                 },
-                // Hier verwacht je dat het formulier een 'originInboundId' meestuurt die overeenkomt met Inbound.id
+
                 originInbound: {
                     connect: { id: Number(formData.originInboundId) }
                 }
@@ -132,7 +129,7 @@ export const actions = {
 
         try {
             const outboundProduct = await db.$transaction(async (tx) => {
-                // Controleer of de Outbound bestaat
+
                 const outboundExists = await tx.outbound.findUnique({
                     where: { id: outboundId }
                 });
@@ -140,20 +137,17 @@ export const actions = {
                     throw new Error(`Outbound met id ${outboundId} niet gevonden.`);
                 }
 
-                // Zoek het inbound product op basis van het serienummer
                 const inboundProduct = await tx.inboundProduct.findFirst({
                     where: { serialnumber: serial }
                 });
                 if (!inboundProduct) {
                     throw new Error(`Inbound product met serial ${serial} niet gevonden.`);
                 }
-                // Controleer of het product nog niet is toegewezen
+
                 if (inboundProduct.status !== "IN") {
                     throw new Error(`Inbound product met serial ${serial} is al toegewezen.`);
                 }
 
-                // Voeg het inbound product toe aan de bestaande outbound.
-                // Let op: de 'originInbound' relatie verbindt met het Inbound record, dus we gebruiken inboundProduct.inboundId.
                 const newOutboundProduct = await tx.outboundProduct.create({
                     data: {
                         product: inboundProduct.product,
@@ -167,7 +161,6 @@ export const actions = {
                     }
                 });
 
-                // Update de status van het inbound product naar "OUT"
                 await tx.inboundProduct.update({
                     where: { id: inboundProduct.id },
                     data: { status: "OUT" }
@@ -211,7 +204,6 @@ export const actions = {
         };
     },
 
-    // Alternatieve action (dezelfde als addInboundProductToOutbound) – overweeg om slechts één versie te gebruiken
     async moveInboundProductToOutbound({ request }: { request: Request }) {
         const formData = await request.formData();
         const serial = formData.get("serial") as string;
@@ -223,23 +215,32 @@ export const actions = {
                 const outboundRecord = await tx.outbound.findUnique({
                     where: { outboundNumber }
                 });
+
                 if (!outboundRecord) {
-                    throw new Error(`Outbound with number ${outboundNumber} not found.`);
+                    return {
+                        status: 400,
+                        message: "Outbound not found."
+                    }
                 }
 
-                // Zoek het inbound product op basis van het serienummer
                 const inboundProduct = await tx.inboundProduct.findFirst({
                     where: { serialnumber: serial }
                 });
+
                 if (!inboundProduct) {
-                    throw new Error(`Inbound product with serial ${serial} not found.`);
-                }
-                // Controleer of het product nog beschikbaar is (status "IN")
-                if (inboundProduct.status !== "IN") {
-                    throw new Error(`Inbound product with serial ${serial} is already assigned.`);
+                    return {
+                        status: 400,
+                        message: "Inbound product not found."
+                    }
                 }
 
-                // Maak een nieuw OutboundProduct aan, waarbij de Outbound-relatie wordt gekoppeld via het gevonden record
+                if (inboundProduct.status !== "IN") {
+                    return {
+                        status: 400,
+                        message: "Inbound product is already assigned."
+                    }
+                }
+
                 const newOutboundProduct = await tx.outboundProduct.create({
                     data: {
                         product: inboundProduct.product,
@@ -264,6 +265,7 @@ export const actions = {
             });
 
             return { success: true, outboundProduct };
+
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error("Error in moveInboundProductToOutbound:", error);

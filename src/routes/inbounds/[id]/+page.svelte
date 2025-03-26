@@ -7,11 +7,11 @@
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
-	import InboundSectionOpen from '$lib/components/InboundSectionOpen.svelte';
+	import InboundSectionOpen from '$lib/components/SectionIsOpen.svelte';
 
 	let { data, form }: PageProps = $props();
 
-	let inboundSectionOpen = $state(false);
+	let SectionOpen = $state(false);
 	let singleSectionOpen = $state(false);
 	let multiSectionOpen = $state(false);
 
@@ -199,7 +199,7 @@
 		>
 			<Stats statsName="PRODUCTS" statsValue={productsCount} />
 			<Stats statsName="SERIALS" statsValue={serialnumbersCount} />
-			<Stats statsName="VALUE" statsValue={productValue} prefix="€" />
+			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
 			<Stats statsName="IN/OUT" statsValue={`${productStatusIn}/${productStatusOut} `} />
 		</section>
@@ -236,15 +236,7 @@
 			</div>
 		</section>
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
-			<h1 class="flex items-center justify-between pb-4 font-bold">
-				Inbound
-				<CircleHelp
-					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-					onclick={() => (inboundSectionOpen = !inboundSectionOpen)}
-					size="14"
-				/>
-			</h1>
-			<InboundSectionOpen {inboundSectionOpen} />
+			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
 			<form class="flex flex-col gap-4" method="post">
 				<select
 					disabled={isUpdatingInbound}
@@ -265,10 +257,10 @@
 					value={inbound?.description}
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				/>
-				<label for=""></label>
+
 				<fieldset class="rounded-lg border border-gray-500 p-3">
 					<legend class="text-sm text-gray-500">Customs</legend>
-					<input type="checkbox" name="isSubscribed" value="on" />
+					<input type="checkbox" name="isSubscribed" checked={inbound?.isSubscribed} value="on" />
 				</fieldset>
 				<button
 					disabled={isUpdatingInbound}
@@ -284,11 +276,6 @@
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="flex items-center justify-between pb-4 font-bold">
 				Add Single Product to Inbound
-				<CircleHelp
-					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-					onclick={() => (singleSectionOpen = !singleSectionOpen)}
-					size="14"
-				/>
 			</h1>
 			<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!singleSectionOpen}>
 				<li class="pb-1">
@@ -340,11 +327,6 @@
 					<div>
 						<h1 class="flex items-center justify-between font-bold">
 							Add Multiple Products to Inbound
-							<CircleHelp
-								class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-								onclick={() => (multiSectionOpen = !multiSectionOpen)}
-								size="14"
-							/>
 						</h1>
 						<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!multiSectionOpen}>
 							<li class="pb-1">

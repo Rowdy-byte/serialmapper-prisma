@@ -31,7 +31,7 @@
 		});
 	});
 
-	function handleCreateInbound(event: Event) {
+	function handleCreateOutbound(event: Event) {
 		if (!confirm('Are you sure you want to create this inbound?')) {
 			event.preventDefault();
 		}
@@ -85,9 +85,9 @@
 			/>
 			<button
 				disabled={form?.success}
-				onclick={handleCreateInbound}
+				onclick={handleCreateOutbound}
 				type="submit"
-				class="rounded-md bg-green-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-gray-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 			>
 				Create Outbound
 			</button>
@@ -127,7 +127,7 @@
 			</thead>
 			<tbody>
 				{#each filterdoutbounds as outbound}
-					<tr in:fly={{ y: 20 }} out:slide class="hover:bg-gray-800">
+					<tr in:fly={{ y: 20 }} out:slide class="hover:bg-orange-800/20">
 						<td class="border border-gray-500 p-2">{outbound.outboundNumber}</td>
 						<td class="border border-gray-500 p-2">{outbound.clientName}</td>
 						<td class="hidden border border-gray-500 p-2 md:table-cell">{outbound.description}</td>

@@ -11,7 +11,6 @@
 	const inboundId = urlArray[2];
 
 	const { pathname } = page.url;
-	const segments = pathname.split('/');
 
 	let { data, form }: PageProps = $props();
 	let { inboundProducts } = data;
@@ -52,15 +51,15 @@
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="flex items-center gap-2">
 		<li>
-			<a href={`/inbounds/${inboundId}`} class="text-gray-500 hover:text-blue-500">
-				<span class="hidden md:inline">Inbound: </span> {inbound?.inboundNumber}</a
+			<a href={`/inbounds/${inboundId}`} class="font-bold text-gray-500 hover:text-blue-500">
+				<span class="hidden font-bold md:inline">Inbound: </span> {inbound?.inboundNumber}</a
 			>
 		</li>
 		<li>
 			<MoveRight size="24" class="px-1" />
 		</li>
 		<li>
-			<p class="text-gray-500">
+			<p class="font-bold text-gray-500">
 				{#each filteredInboundProducts as inboundProduct, i}
 					{#if inboundProduct.id === Number(params.id)}
 						<span class="text-gray-500">
@@ -104,7 +103,7 @@
 					<button
 						formaction="?/updateInboundProduct"
 						onclick={handleUpdateInboundProduct}
-						class="rounded-md bg-green-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-md bg-gray-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit">Update</button
 					>
 				</form>
@@ -124,7 +123,7 @@
 			<button
 				formaction="?/deleteInboundProduct"
 				onclick={handleDeleteInboundProduct}
-				class=" rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class=" rounded-md bg-gray-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Delete</button
 			>
 			<div>

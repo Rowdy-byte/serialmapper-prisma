@@ -230,15 +230,11 @@
 
 		<!-- Section 2: Secondary Content -->
 		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
-			<div class="shadow-2xl">
-				<Stats statsName="Products" statsValue={inboundProducts?.length ?? 0} />
-			</div>
-			<div class="shadow-2xl">
-				<Stats statsName="Serialnumbers" statsValue={inboundProducts?.length ?? 0} />
-			</div>
-			<div class="shadow-2xl">
-				<Stats statsName="Value" statsValue={productValue} />
-			</div>
+			<Stats statsName="Products" statsValue={inboundProducts?.length ?? 0} />
+
+			<Stats statsName="Serialnumbers" statsValue={inboundProducts?.length ?? 0} />
+
+			<Stats statsName="Value" statsValue={productValue} />
 		</section>
 
 		<!-- Section 3: Add Single & Batch Product -->
@@ -279,7 +275,7 @@
 				<input
 					type="text"
 					name="value"
-					value={productValue}
+					placeholder="Value €"
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				/>
 
@@ -438,6 +434,4 @@
 			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
 		{/if}
 	</section>
-
-	<!-- Map Serialnumbers & Delete Section -->
 </div>

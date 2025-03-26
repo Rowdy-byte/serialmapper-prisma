@@ -208,6 +208,47 @@
 	<!-- Main Grid Layout -->
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2">
 		<!-- Section 1: Inbound Form -->
+		<section class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
+			<Stats statsName="Products" statsValue={productsCount} />
+
+			<Stats statsName="Serialnumbers" statsValue={serialnumbersCount} />
+
+			<Stats statsName="Value" statsValue={productValue} prefix="€" />
+			<Stats statsName="Revenue" statsValue={productRevenue} prefix="€ " />
+			<Stats statsName="In/Out" statsValue={`${productStatusIn}/${productStatusOut} `} />
+		</section>
+		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
+			<div>
+				<h1 class="pb-4 font-bold">Map to Worksheet</h1>
+				<form
+					class="flex w-full flex-col gap-4"
+					action="?/mapSerialnumbersToWorksheet"
+					method="post"
+				>
+					<input hidden type="text" name="inboundId" value={inbound?.id} />
+					<button
+						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						onclick={handleMapSerialToWorksheet}
+						type="button"
+					>
+						Map
+					</button>
+				</form>
+			</div>
+			<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
+				<h1 class=" pb-4 font-bold">Delete Inbound</h1>
+				<form use:enhance method="post" class="flex flex-col gap-2">
+					<button
+						formaction="?/deleteInbound"
+						onclick={handleDeleteInbound}
+						class="rounded-md bg-red-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						type="submit"
+					>
+						Delete
+					</button>
+				</form>
+			</div>
+		</section>
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="flex items-center justify-between pb-4 font-bold">
 				Inbound
@@ -264,15 +305,6 @@
 		</section>
 
 		<!-- Section 2: Secondary Content -->
-		<section class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
-			<Stats statsName="Products" statsValue={productsCount} />
-
-			<Stats statsName="Serialnumbers" statsValue={serialnumbersCount} />
-
-			<Stats statsName="Value" statsValue={productValue} prefix="€" />
-			<Stats statsName="Revenue" statsValue={productRevenue} prefix="€ " />
-			<Stats statsName="In/Out" statsValue={`${productStatusIn}/${productStatusOut} `} />
-		</section>
 
 		<!-- Section 3: Add Single & Batch Product -->
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
@@ -378,38 +410,6 @@
 					</div>
 				</section>
 			</form>
-		</section>
-		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
-			<div>
-				<h1 class="pb-4 font-bold">Map to Worksheet</h1>
-				<form
-					class="flex w-full flex-col gap-4"
-					action="?/mapSerialnumbersToWorksheet"
-					method="post"
-				>
-					<input hidden type="text" name="inboundId" value={inbound?.id} />
-					<button
-						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						onclick={handleMapSerialToWorksheet}
-						type="button"
-					>
-						Map
-					</button>
-				</form>
-			</div>
-			<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
-				<h1 class=" pb-4 font-bold">Delete Inbound</h1>
-				<form use:enhance method="post" class="flex flex-col gap-2">
-					<button
-						formaction="?/deleteInbound"
-						onclick={handleDeleteInbound}
-						class="rounded-md bg-red-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						type="submit"
-					>
-						Delete
-					</button>
-				</form>
-			</div>
 		</section>
 	</main>
 

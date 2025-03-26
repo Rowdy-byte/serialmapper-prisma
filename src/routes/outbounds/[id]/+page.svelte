@@ -236,6 +236,14 @@
 				</button>
 			</form>
 		</section>
+		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
+			<Stats statsName="Products" statsValue={outboundProducts?.length ?? 0} />
+			<Stats statsName="Serialnumbers" statsValue={outboundProducts?.length ?? 0} />
+			<Stats statsName="Value" statsValue={productValue} prefix="€" />
+			<Stats statsName="Revenue" statsValue={productRevenue} prefix="€ " />
+
+			<!-- <Stats statsName="Value" statsValue={outboundValue} /> -->
+		</section>
 
 		<!-- Section 2: Move Inbound Product to Outbound -->
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
@@ -278,17 +286,10 @@
 				</button>
 			</form>
 		</section>
-		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
-			<Stats statsName="Products" statsValue={outboundProducts?.length ?? 0} />
-			<Stats statsName="Serialnumbers" statsValue={outboundProducts?.length ?? 0} />
-			<Stats statsName="Value" statsValue={productValue} prefix="€" />
-			<Stats statsName="Revenue" statsValue={productRevenue} prefix="€ " />
 
-			<!-- <Stats statsName="Value" statsValue={outboundValue} /> -->
-		</section>
 		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
 			<div>
-				<h1 class="pb-4 font-bold">Map Serialnumbers to Worksheet</h1>
+				<h1 class="pb-4 font-bold">Map to Worksheet</h1>
 				<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
 					<input hidden type="text" name="outboundId" value={outbound?.id} />
 					<button
@@ -300,16 +301,11 @@
 					</button>
 				</form>
 			</div>
-			<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
-				<h1 class="flex items-center justify-between pb-4 font-bold">
-					Delete Outbound
-					<CircleHelp
-						class="transition-all hover:cursor-pointer hover:text-yellow-500"
-						onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
-						size="14"
-					/>
-				</h1>
-				<form use:enhance method="post" class="flex gap-2">
+			<div
+				class="max-h-48 border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4"
+			>
+				<h1 class="flex items-center justify-between pb-4 font-bold">Delete Outbound</h1>
+				<form use:enhance method="post" class="flex flex-col gap-4">
 					<button
 						formaction="?/deleteOutbound"
 						onclick={handleDeleteOutbound}
@@ -318,13 +314,6 @@
 					>
 						Delete
 					</button>
-					<div>
-						<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
-							<li class="pb-1">
-								<p class="text-sm">This will permanently delete this outbound!</p>
-							</li>
-						</ul>
-					</div>
 				</form>
 			</div>
 		</section>

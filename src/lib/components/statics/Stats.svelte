@@ -3,10 +3,10 @@
 		statsName: string;
 		statsValue?: number | string;
 		prefix?: string;
-		emptyString?: string;
+		suffix?: string;
 	};
 
-	let { statsName, statsValue, prefix, emptyString }: StatsProps = $props();
+	let { statsName, statsValue, prefix, suffix }: StatsProps = $props();
 </script>
 
 <section
@@ -15,6 +15,6 @@
 	<h1 class="sm:text-md text-xs font-bold">{statsName}</h1>
 
 	<p class="text-lg font-bold text-blue-500 md:text-xl xl:text-2xl">
-		<span class="text-sm">{prefix}{emptyString}</span>{statsValue}
+		<span class="text-sm">{prefix}</span>{statsValue}<span class="text-xs">{suffix}</span>
 	</p>
 </section>

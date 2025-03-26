@@ -26,8 +26,11 @@
 	let productStatusIn = $state();
 	let productStatusOut = $state();
 
-	let productsCount = $state<number>(0);
-	let serialnumbersCount = $state<number>(0);
+	let productsCount = $state(0);
+	let serialnumbersCount = $state(0);
+	let timeSaved = $state(0);
+	let euroPerMinute = $state(0);
+	let timeSavedPerSerial = $state(0);
 
 	let inboundProductId = $state();
 
@@ -91,9 +94,6 @@
 		return (oldMinutes * 60) / serials - (newMinutes * 60) / serials;
 	}
 
-	// Voorbeeld van het gebruik van de functie
-	const timeSaved = calculateTimeSavedPerSerial(30, 3, 144); // geeft 11.25
-
 	if (form?.issues) {
 		for (const issue of form.issues) {
 			toast.error(issue.message, {
@@ -153,34 +153,50 @@
 					product.status?.toLowerCase().includes(searchQuery.toLowerCase()))
 		);
 
-		$effect(() => {
-			inboundProductId = inboundProducts?.map((product) => product.inboundId);
-			productsCount =
-				inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
-			serialnumbersCount =
-				inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+		inboundProductId = inboundProducts?.map((product) => product.inboundId);
+		productsCount =
+			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+		serialnumbersCount =
+			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
 
-			productValue = (
-				inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []
-			).reduce((sum, product) => sum + (parseFloat(product.value ?? '0') || 0), 0);
+		productValue = (
+			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []
+		).reduce((sum, product) => sum + (parseFloat(product.value ?? '0') || 0), 0);
 
-			productRevenue = parseFloat(
-				(
-					(inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []).length *
-					0.1
-				).toFixed(2)
+		productRevenue = parseFloat(
+			(
+				(inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []).length * 0.1
+			).toFixed(2)
+		);
+
+		productStatusIn =
+			inboundProducts?.filter(
+				(product) => product.inboundId === inbound?.id && product.status === 'IN'
+			).length || 0;
+
+		productStatusOut =
+			inboundProducts?.filter(
+				(product) => product.inboundId === inbound?.id && product.status === 'OUT'
+			).length || 0;
+
+		const currentSerials =
+			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+
+		if (currentSerials > 0) {
+			timeSaved = parseFloat(
+				((((30 * 60) / currentSerials - (3 * 60) / currentSerials) * currentSerials) / 60).toFixed(
+					2
+				)
 			);
+		}
 
-			productStatusIn =
-				inboundProducts?.filter(
-					(product) => product.inboundId === inbound?.id && product.status === 'IN'
-				).length || 0;
+		timeSavedPerSerial = parseFloat(
+			((30 * 60) / currentSerials - (3 * 60) / currentSerials).toFixed(2)
+		); // in seconds
 
-			productStatusOut =
-				inboundProducts?.filter(
-					(product) => product.inboundId === inbound?.id && product.status === 'OUT'
-				).length || 0;
-		});
+		if (timeSaved > 0) {
+			euroPerMinute = parseFloat((productRevenue / (30 - timeSaved)).toFixed(2));
+		}
 	});
 </script>
 
@@ -202,10 +218,12 @@
 		>
 			<Stats statsName="PRODUCTS" statsValue={productsCount} />
 			<Stats statsName="SERIALS" statsValue={serialnumbersCount} />
+			<Stats statsName="IN / OUT" statsValue={`${productStatusIn}/${productStatusOut} `} />
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
-			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
-			<Stats statsName="IN/OUT" statsValue={`${productStatusIn}/${productStatusOut} `} />
-			<Stats statsName="TIME SAVED" statsValue={timeSaved} />
+			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
+			<Stats statsName="T-SAVED" statsValue={timeSaved} suffix=" min" />
+			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
+			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
 		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
 			<div>

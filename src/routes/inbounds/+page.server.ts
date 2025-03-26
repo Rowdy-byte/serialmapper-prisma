@@ -26,13 +26,14 @@ export const actions: Actions = {
             return fail(400, { issues: safeParse.error.issues });
         }
 
-        const { description, clientName } = safeParse.data;
+        const { description, clientName, isSubscribed } = safeParse.data;
 
         await db.inbound.create({
             data: {
                 description: description as string,
                 clientName: clientName as string,
                 inboundNumber: '',
+                isSubscribed
             }
         });
 

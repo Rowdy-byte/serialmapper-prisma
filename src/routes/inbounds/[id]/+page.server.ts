@@ -51,7 +51,7 @@ export const actions = {
             return fail(400, { issues: safeParse.error.issues });
         }
 
-        const { description, clientName } = safeParse.data;
+        const { description, clientName, isSubscribed } = safeParse.data;
 
         const inboundId = Number(params.id);
 
@@ -75,7 +75,9 @@ export const actions = {
             data: {
                 description: description as string,
                 clientName: client.name,
-                inboundNumber: formattedNumber
+                inboundNumber: formattedNumber,
+                isSubscribed
+
             }
         });
 

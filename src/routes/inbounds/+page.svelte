@@ -82,11 +82,16 @@
 				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				required
 			/>
+			<fieldset class="rounded-lg border border-gray-500 p-3">
+				<legend class="text-sm text-gray-500">Customs</legend>
+				<input type="checkbox" name="isSubscribed" value="on" />
+			</fieldset>
+
 			<button
 				disabled={form?.success}
 				onclick={handleCreateInbound}
 				type="submit"
-				class="rounded-md bg-green-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-gray-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 			>
 				Create Inbound
 			</button>
@@ -120,16 +125,22 @@
 					<th class="border border-gray-500 p-2">No</th>
 					<th class="border border-gray-500 p-2">Client</th>
 					<th class="hidden border border-gray-500 p-2 md:table-cell">Description</th>
+					<th class="hidden border border-gray-500 p-2 md:table-cell">Customs</th>
+
 					<th class="hidden border border-gray-500 p-2 md:table-cell">Created</th>
 					<th class="border border-gray-500 p-2">Actions</th>
 				</tr>
 			</thead>
 			<tbody>
 				{#each filterdInbounds as inbound}
-					<tr in:fly={{ y: 20 }} out:slide class="hover:bg-gray-800">
+					<tr in:fly={{ y: 20 }} out:slide class="hover:bg-orange-800/20">
 						<td class="border border-gray-500 p-2">{inbound.inboundNumber}</td>
 						<td class="border border-gray-500 p-2">{inbound.clientName}</td>
 						<td class="hidden border border-gray-500 p-2 md:table-cell">{inbound.description}</td>
+						<td class="hidden border border-gray-500 p-2 md:table-cell"
+							>{inbound.isSubscribed ? 'T1' : 'exa'}</td
+						>
+
 						<td class="hidden border border-gray-500 p-2 md:table-cell">
 							{new Date(inbound.createdAt).toLocaleDateString()}
 						</td>

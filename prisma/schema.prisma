@@ -29,6 +29,7 @@ model Inbound {
   description      String?
   clientName       String
   inboundNumber    String            @unique
+  isSubscribed     Boolean           @default(false)
   createdAt        DateTime          @default(now())
   clientId         Int?
   client           Client            @relation(fields: [clientName], references: [name], onDelete: Cascade)
@@ -67,12 +68,14 @@ model Outbound {
 }
 
 model OutboundProduct {
-  id              Int      @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   product         String
   serialnumber    String
-  createdAt       DateTime @default(now())
+  value           String
+  status          ProductStatus @default(OUT)
+  createdAt       DateTime      @default(now())
   outboundId      Int
-  outbound        Outbound @relation(fields: [outboundId], references: [id], onDelete: Cascade)
+  outbound        Outbound      @relation(fields: [outboundId], references: [id], onDelete: Cascade)
   originInboundId Int
-  originInbound   Inbound  @relation("InboundToOutboundProduct", fields: [originInboundId], references: [id])
+  originInbound   Inbound       @relation("InboundToOutboundProduct", fields: [originInboundId], references: [id])
 }

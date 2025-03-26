@@ -1,19 +1,14 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { CircleHelp, Eye, Search } from '@lucide/svelte';
+	import { Eye, Search } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
 
 	let { data, form }: PageProps = $props();
-
-	let inboundSectionOpen = $state(false);
-	let singleSectionOpen = $state(false);
-	let multiSectionOpen = $state(false);
-	let deleteSectionOpen = $state(false);
 
 	let isUpdatingInbound = $state(false);
 	let isAddingInboundProduct = $state(false);
@@ -31,8 +26,13 @@
 	let productStatusIn = $state();
 	let productStatusOut = $state();
 
-	let productsCount = $state<number>(0);
-	let serialnumbersCount = $state<number>(0);
+	let productsCount = $state(0);
+	let serialnumbersCount = $state(0);
+	let timeSaved = $state(0);
+	let euroPerMinute = $state(0);
+	let timeSavedPerSerial = $state(0);
+
+	let inboundProductId = $state();
 
 	let filteredInboundProducts = $state(
 		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
@@ -87,6 +87,11 @@
 		const workbook = utils.book_new();
 		utils.book_append_sheet(workbook, worksheet, 'Inbound Products');
 		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
+	}
+
+	// Calculate time saved per serial, for showing in the Stats component
+	function calculateTimeSavedPerSerial(oldMinutes: number, newMinutes: number, serials: number) {
+		return (oldMinutes * 60) / serials - (newMinutes * 60) / serials;
 	}
 
 	if (form?.issues) {
@@ -148,74 +153,77 @@
 					product.status?.toLowerCase().includes(searchQuery.toLowerCase()))
 		);
 
-		// Define inboundProductId outside the effect scope
-		let inboundProductId = $state();
+		inboundProductId = inboundProducts?.map((product) => product.inboundId);
+		productsCount =
+			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+		serialnumbersCount =
+			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
 
-		// Update inboundProductId in its own effect
-		$effect(() => {
-			inboundProductId = inboundProducts?.map((product) => product.inboundId);
-		});
+		productValue = (
+			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []
+		).reduce((sum, product) => sum + (parseFloat(product.value ?? '0') || 0), 0);
 
-		// Use a separate effect for calculations that depend on inboundProductId
-		// Total value: sum of all product values (converted to a float)
-		$effect(() => {
-			// productCount
-			productsCount =
-				inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
-			serialnumbersCount =
-				inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+		productRevenue = parseFloat(
+			(
+				(inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []).length * 0.1
+			).toFixed(2)
+		);
 
-			productValue = (
-				inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []
-			).reduce((sum, product) => sum + (parseFloat(product.value ?? '0') || 0), 0);
+		productStatusIn =
+			inboundProducts?.filter(
+				(product) => product.inboundId === inbound?.id && product.status === 'IN'
+			).length || 0;
 
-			// Revenue: for example, we calculate revenue as a fixed factor (0.1) times the number of products
-			productRevenue = parseFloat(
-				(
-					(inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []).length *
-					0.1
-				).toFixed(2)
+		productStatusOut =
+			inboundProducts?.filter(
+				(product) => product.inboundId === inbound?.id && product.status === 'OUT'
+			).length || 0;
+
+		const currentSerials =
+			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+
+		if (currentSerials > 0) {
+			timeSaved = parseFloat(
+				((((30 * 60) / currentSerials - (3 * 60) / currentSerials) * currentSerials) / 60).toFixed(
+					2
+				)
 			);
+		}
 
-			// Status counts: number of products with status 'IN' and 'OUT'
-			productStatusIn =
-				inboundProducts?.filter(
-					(product) => product.inboundId === inbound?.id && product.status === 'IN'
-				).length || 0;
+		timeSavedPerSerial = parseFloat(
+			((30 * 60) / currentSerials - (3 * 60) / currentSerials).toFixed(2)
+		); // in seconds
 
-			productStatusOut =
-				inboundProducts?.filter(
-					(product) => product.inboundId === inbound?.id && product.status === 'OUT'
-				).length || 0;
-		});
+		if (timeSaved > 0) {
+			euroPerMinute = parseFloat((productRevenue / (30 - timeSaved)).toFixed(2));
+		}
 	});
 </script>
 
 <BackToTop scrollTo="scroll to top" />
 
-<div class="container mx-auto px-4 py-4">
-	<!-- Breadcrumbs -->
+<div class="container mx-auto py-4">
 	<section class="breadcrums text-md mb-4 rounded-lg bg-gray-900 p-4 shadow-md">
 		<ul class="text-gray-500">
 			<li class="font-bold">
-				<a href="/inbounds" class="transition-all hover:text-blue-500">
-					Inbound: {inbound?.inboundNumber}
+				<a href="/inbounds" class="transition-all">
+					<span class="hover:text-blue-500"> Inbound </span>: {inbound?.inboundNumber}
 				</a>
 			</li>
 		</ul>
 	</section>
-
-	<!-- Main Grid Layout -->
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2">
-		<!-- Section 1: Inbound Form -->
-		<section class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
-			<Stats statsName="Products" statsValue={productsCount} />
-
-			<Stats statsName="Serialnumbers" statsValue={serialnumbersCount} />
-
-			<Stats statsName="Value" statsValue={productValue} prefix="€" />
-			<Stats statsName="Revenue" statsValue={productRevenue} prefix="€ " />
-			<Stats statsName="In/Out" statsValue={`${productStatusIn}/${productStatusOut} `} />
+		<section
+			class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md md:grid-cols-4 lg:grid-cols-5"
+		>
+			<Stats statsName="PRODUCTS" statsValue={productsCount} />
+			<Stats statsName="SERIALS" statsValue={serialnumbersCount} />
+			<Stats statsName="IN / OUT" statsValue={`${productStatusIn}/${productStatusOut} `} />
+			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
+			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
+			<Stats statsName="T-SAVED" statsValue={timeSaved} suffix=" min" />
+			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
+			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
 		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
 			<div>
@@ -227,7 +235,7 @@
 				>
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<button
-						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
@@ -241,7 +249,7 @@
 					<button
 						formaction="?/deleteInbound"
 						onclick={handleDeleteInbound}
-						class="rounded-md bg-red-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
 						Delete
@@ -250,32 +258,11 @@
 			</div>
 		</section>
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
-			<h1 class="flex items-center justify-between pb-4 font-bold">
-				Inbound
-				<CircleHelp
-					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-					onclick={() => (inboundSectionOpen = !inboundSectionOpen)}
-					size="14"
-				/>
-			</h1>
-			<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!inboundSectionOpen}>
-				<li class="pb-1">
-					<p>1. Select the client.</p>
-				</li>
-				<li class="pb-1">
-					<p>2. Enter inbound description.</p>
-				</li>
-				<li class="pb-1">
-					<p>3. Click on Add.</p>
-				</li>
-				<li class="pb-1">
-					<p>4. Inbound number is generated on de details pagina. Volg de volgende stap.</p>
-				</li>
-			</ul>
+			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
 			<form class="flex flex-col gap-4" method="post">
 				<select
 					disabled={isUpdatingInbound}
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class=" rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					name="clientName"
 				>
 					<option value="clientName">{inbound?.clientName}</option>
@@ -290,43 +277,29 @@
 					type="text"
 					name="description"
 					value={inbound?.description}
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class=" rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				/>
+
+				<fieldset class="rounded-lg border border-gray-500 p-3">
+					<legend class="text-sm text-gray-500">Customs</legend>
+					<input type="checkbox" name="isSubscribed" checked={inbound?.isSubscribed} value="on" />
+				</fieldset>
 				<button
 					disabled={isUpdatingInbound}
 					formaction="?/updateInbound"
 					onclick={handleUpdateInbound}
-					class="rounded-md bg-green-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit"
 				>
 					Update
 				</button>
 			</form>
 		</section>
-
-		<!-- Section 2: Secondary Content -->
-
-		<!-- Section 3: Add Single & Batch Product -->
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="flex items-center justify-between pb-4 font-bold">
 				Add Single Product to Inbound
-				<CircleHelp
-					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-					onclick={() => (singleSectionOpen = !singleSectionOpen)}
-					size="14"
-				/>
 			</h1>
-			<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!singleSectionOpen}>
-				<li class="pb-1">
-					<p>1. Select the product you want to add.</p>
-				</li>
-				<li class="pb-1">
-					<p>2. Enter the serialnumber of the product.</p>
-				</li>
-				<li class="pb-1">
-					<p>3. Click on Add.</p>
-				</li>
-			</ul>
+
 			<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
 				<input hidden type="text" name="inboundId" value={inbound?.id} />
 				<select
@@ -356,46 +329,25 @@
 				></textarea>
 				<button
 					disabled={isAddingInboundProduct}
-					class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					onclick={handleAddSingle}
 					type="submit"
 				>
 					Add Single
 				</button>
 				<section class="flex flex-col gap-4 pt-8">
-					<div>
-						<h1 class="flex items-center justify-between font-bold">
-							Add Multiple Products to Inbound
-							<CircleHelp
-								class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-								onclick={() => (multiSectionOpen = !multiSectionOpen)}
-								size="14"
-							/>
-						</h1>
-						<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!multiSectionOpen}>
-							<li class="pb-1">
-								<p>1. Select the product you want to add.</p>
-							</li>
-							<li class="pb-1">
-								<p>2. Enter the serialnumbers of the product, separated by a space.</p>
-							</li>
-							<li class="pb-1">
-								<p>3. Click on Add Batch.</p>
-							</li>
-						</ul>
-					</div>
 					<textarea
 						disabled={isAddingBatchInboundProduct}
 						name="batch"
 						placeholder="Batch Serialnumbers"
-						class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+						class="rounded-lg border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					></textarea>
-					<div class="flex gap-4">
+					<div class="flex justify-center gap-4">
 						<button
 							disabled={isAddingBatchInboundProduct}
 							formaction="?/addBatchInboundProductToInbound"
 							onclick={handleAddBatch}
-							class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+							class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 							type="submit"
 						>
 							Add Batch
@@ -403,7 +355,7 @@
 						<button
 							type="button"
 							onclick={handleScanQr}
-							class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+							class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						>
 							Scan QR code
 						</button>
@@ -412,8 +364,6 @@
 			</form>
 		</section>
 	</main>
-
-	<!-- Table Section with Search Filter -->
 	<section class="mt-4">
 		<section class="mb-4 flex items-center justify-between">
 			<form class="relative py-1">
@@ -446,7 +396,7 @@
 				<tbody>
 					{#if filteredInboundProducts}
 						{#each filteredInboundProducts as inboundProduct, i}
-							<tr class="hover:bg-slate-600">
+							<tr class="hover:bg-orange-500/20">
 								<td class="border border-gray-500 p-2">{i + 1}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>

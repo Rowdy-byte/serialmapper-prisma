@@ -7,6 +7,7 @@
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
+	import SectionIsOpen from '$lib/components/SectionIsOpen.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -64,23 +65,31 @@
 			event.preventDefault();
 			return;
 		}
+		invalidate('outbound');
 	}
 
-	function handleAddSingle(event: Event) {
-		if (!confirm('Are you sure you want to add this product to this outbound?')) {
+	function handleMoveToOutbound(event: Event) {
+		if (!confirm('Are you sure you want to move this product to this outbound?')) {
 			event.preventDefault();
+			return;
 		}
 	}
 
-	function handleAddBatch(event: Event) {
-		if (!confirm('Are you sure you want to add this batch to this outbound?')) {
-			event.preventDefault();
-		}
-	}
+	// function handleAddSingle(event: Event) {
+	// 	if (!confirm('Are you sure you want to add this product to this outbound?')) {
+	// 		event.preventDefault();
+	// 	}
+	// }
 
-	function scanBarcodetoSingleTextarea() {}
+	// function handleAddBatch(event: Event) {
+	// 	if (!confirm('Are you sure you want to add this batch to this outbound?')) {
+	// 		event.preventDefault();
+	// 	}
+	// }
 
-	function scanBarcodetoBatchTextarea() {}
+	// function scanBarcodetoSingleTextarea() {}
+
+	// function scanBarcodetoBatchTextarea() {}
 
 	function handleScanQr() {
 		alert('Buy Pro!');
@@ -119,20 +128,20 @@
 				window.location.reload();
 				break;
 
-			case form?.duplicateSuccess === false:
-				toast.error(form?.message, {
-					duration: 4000,
-					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				break;
+			// case form?.duplicateSuccess === false:
+			// 	toast.error(form?.message, {
+			// 		duration: 4000,
+			// 		style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			// 	});
+			// 	break;
 
-			case form?.addProductTooutboundSuccess:
-				toast.success(form?.message, {
-					duration: 4000,
-					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				window.location.reload();
-				break;
+			// case form?.addProductTooutboundSuccess:
+			// 	toast.success(form?.message, {
+			// 		duration: 4000,
+			// 		style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+			// 	});
+			// 	window.location.reload();
+			// 	break;
 
 			// case form?.addBatchToOutboundSuccess:
 			// 	toast.success(form?.message, {
@@ -168,7 +177,6 @@
 <BackToTop scrollTo="scroll to top" />
 
 <div class="container mx-auto px-4 py-4">
-	<!-- Breadcrumbs -->
 	<section class="breadcrums text-md mb-4 rounded-lg bg-gray-900 p-4 shadow-md">
 		<ul class="text-gray-500">
 			<li class="font-bold">
@@ -178,33 +186,55 @@
 			</li>
 		</ul>
 	</section>
-
-	<!-- Main Grid Layout -->
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2">
-		<!-- Section 1: Outbound Form -->
+		<section
+			class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-5 md:grid-cols-5 lg:grid-cols-6"
+		>
+			<Stats statsName="PRODUCTS" statsValue={outboundProducts?.length ?? 0} />
+			<Stats statsName="SERIALS" statsValue={outboundProducts?.length ?? 0} />
+			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
+			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
+			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
+			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
+		</section>
+		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
+			<div>
+				<h1 class="pb-4 font-bold">Map to Worksheet</h1>
+				<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
+					<input hidden type="text" name="outboundId" value={outbound?.id} />
+					<button
+						class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						onclick={handleMapSerialToWorksheet}
+						type="button"
+					>
+						Map
+					</button>
+				</form>
+			</div>
+			<div
+				class="max-h-48 border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4"
+			>
+				<h1 class="flex items-center justify-between pb-4 font-bold">Delete Outbound</h1>
+				<form use:enhance method="post" class="flex flex-col gap-4">
+					<button
+						formaction="?/deleteOutbound"
+						onclick={handleDeleteOutbound}
+						class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						type="submit"
+					>
+						Delete
+					</button>
+				</form>
+			</div>
+		</section>
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
-			<h1 class="flex items-center justify-between pb-4 font-bold">
-				Outbound
-				<CircleHelp
-					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-					onclick={() => (outboundSectionOpen = !outboundSectionOpen)}
-					size="14"
-				/>
-			</h1>
-			<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!outboundSectionOpen}>
-				<li class="pb-1">
-					<p>1. Select the client.</p>
-				</li>
-				<li class="pb-1">
-					<p>2. Enter outbound description.</p>
-				</li>
-				<li class="pb-1">
-					<p>3. Click on Add.</p>
-				</li>
-				<li class="pb-1">
-					<p>4. Outbound number is generated on the details page. Follow next step.</p>
-				</li>
-			</ul>
+			<h1 class="flex items-center justify-between pb-4 font-bold">Outbound</h1>
+			<SectionIsOpen
+				SectionOpen={outboundSectionOpen}
+				lineOne="Always select client again when updating."
+				lineTwo="Choose fields to update."
+				lineThree="Click Update"
+			/>
 			<form class="flex flex-col gap-4" method="post">
 				<select
 					disabled={isUpdatingOutbound}
@@ -229,30 +259,16 @@
 					disabled={isUpdatingOutbound}
 					formaction="?/updateOutbound"
 					onclick={handleUpdateOutbound}
-					class="rounded-md bg-green-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit"
 				>
 					Update
 				</button>
 			</form>
 		</section>
-		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
-			<Stats statsName="Products" statsValue={outboundProducts?.length ?? 0} />
-			<Stats statsName="Serialnumbers" statsValue={outboundProducts?.length ?? 0} />
-			<Stats statsName="Value" statsValue={productValue} prefix="€" />
-			<Stats statsName="Revenue" statsValue={productRevenue} prefix="€ " />
-
-			<!-- <Stats statsName="Value" statsValue={outboundValue} /> -->
-		</section>
-
-		<!-- Section 2: Move Inbound Product to Outbound -->
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="flex items-center justify-between pb-4 font-bold">
 				Move Inbound Product to Outbound
-				<CircleHelp
-					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-					size="14"
-				/>
 			</h1>
 			<form
 				class="flex flex-col gap-4"
@@ -280,42 +296,12 @@
 
 				<button
 					type="submit"
-					class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					onclick={handleMoveToOutbound}
+					class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				>
 					Move Product
 				</button>
 			</form>
-		</section>
-
-		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
-			<div>
-				<h1 class="pb-4 font-bold">Map to Worksheet</h1>
-				<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
-					<input hidden type="text" name="outboundId" value={outbound?.id} />
-					<button
-						class="rounded-md bg-blue-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						onclick={handleMapSerialToWorksheet}
-						type="button"
-					>
-						Map
-					</button>
-				</form>
-			</div>
-			<div
-				class="max-h-48 border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4"
-			>
-				<h1 class="flex items-center justify-between pb-4 font-bold">Delete Outbound</h1>
-				<form use:enhance method="post" class="flex flex-col gap-4">
-					<button
-						formaction="?/deleteOutbound"
-						onclick={handleDeleteOutbound}
-						class="rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						type="submit"
-					>
-						Delete
-					</button>
-				</form>
-			</div>
 		</section>
 	</main>
 
@@ -341,20 +327,32 @@
 			<table class="min-w-full text-left text-sm">
 				<thead>
 					<tr class="text-gray-500">
-						<th class="border border-gray-500 p-2"></th>
+						<th class="rounded-tl-lg border border-gray-500 p-2"></th>
 						<th class="border border-gray-500 p-2">Product</th>
 						<th class="border border-gray-500 p-2">Serialnumber</th>
-						<th class="border border-gray-500 p-2">Actions</th>
+						<th class="border border-gray-500 p-2">Value</th>
+						<th class="rounded-tr-lg border border-gray-500 p-2">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#if filteredOutboundProducts}
-						{#each filteredOutboundProducts as outboundProduct, i}
+						{#each filteredOutboundProducts as outboundProduct, i (outboundProduct.id)}
 							<tr class="hover:bg-slate-600">
-								<td class="border border-gray-500 p-2">{i + 1}</td>
+								<td
+									class="border border-gray-500 p-2 {i === filteredOutboundProducts.length - 1
+										? 'rounded-bl-lg'
+										: ''}"
+								>
+									{i + 1}
+								</td>
 								<td class="border border-gray-500 p-2">{outboundProduct.product}</td>
 								<td class="border border-gray-500 p-2">{outboundProduct.serialnumber}</td>
-								<td class="border border-gray-500 p-2">
+								<td class="border border-gray-500 p-2">{outboundProduct.value}</td>
+								<td
+									class="border border-gray-500 p-2 {i === filteredOutboundProducts.length - 1
+										? 'rounded-br-lg'
+										: ''}"
+								>
 									<a
 										class="text-blue-500 underline"
 										href={`/outbounds/${outbound?.id}/outbound-product/${outboundProduct.id}`}

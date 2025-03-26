@@ -1,19 +1,14 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { CircleHelp, Eye, Search } from '@lucide/svelte';
+	import { Eye, Search } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
-	import InboundSectionOpen from '$lib/components/SectionIsOpen.svelte';
 
 	let { data, form }: PageProps = $props();
-
-	let SectionOpen = $state(false);
-	let singleSectionOpen = $state(false);
-	let multiSectionOpen = $state(false);
 
 	let isUpdatingInbound = $state(false);
 	let isAddingInboundProduct = $state(false);
@@ -213,7 +208,7 @@
 				>
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<button
-						class="w-full rounded-md bg-gray-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="w-full rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
@@ -227,7 +222,7 @@
 					<button
 						formaction="?/deleteInbound"
 						onclick={handleDeleteInbound}
-						class="rounded-md bg-gray-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
 						Delete
@@ -240,7 +235,7 @@
 			<form class="flex flex-col gap-4" method="post">
 				<select
 					disabled={isUpdatingInbound}
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class=" rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					name="clientName"
 				>
 					<option value="clientName">{inbound?.clientName}</option>
@@ -255,7 +250,7 @@
 					type="text"
 					name="description"
 					value={inbound?.description}
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class=" rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				/>
 
 				<fieldset class="rounded-lg border border-gray-500 p-3">
@@ -266,7 +261,7 @@
 					disabled={isUpdatingInbound}
 					formaction="?/updateInbound"
 					onclick={handleUpdateInbound}
-					class="rounded-md bg-gray-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit"
 				>
 					Update
@@ -277,17 +272,7 @@
 			<h1 class="flex items-center justify-between pb-4 font-bold">
 				Add Single Product to Inbound
 			</h1>
-			<ul class="pb-4 pl-3 text-xs text-yellow-500" class:hidden={!singleSectionOpen}>
-				<li class="pb-1">
-					<p>1. Select the product you want to add.</p>
-				</li>
-				<li class="pb-1">
-					<p>2. Enter the serialnumber of the product.</p>
-				</li>
-				<li class="pb-1">
-					<p>3. Click on Add.</p>
-				</li>
-			</ul>
+
 			<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
 				<input hidden type="text" name="inboundId" value={inbound?.id} />
 				<select
@@ -317,41 +302,25 @@
 				></textarea>
 				<button
 					disabled={isAddingInboundProduct}
-					class="w-full rounded-md bg-gray-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="w-full rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					onclick={handleAddSingle}
 					type="submit"
 				>
 					Add Single
 				</button>
 				<section class="flex flex-col gap-4 pt-8">
-					<div>
-						<h1 class="flex items-center justify-between font-bold">
-							Add Multiple Products to Inbound
-						</h1>
-						<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!multiSectionOpen}>
-							<li class="pb-1">
-								<p>1. Select the product you want to add.</p>
-							</li>
-							<li class="pb-1">
-								<p>2. Enter the serialnumbers of the product, separated by a space.</p>
-							</li>
-							<li class="pb-1">
-								<p>3. Click on Add Batch.</p>
-							</li>
-						</ul>
-					</div>
 					<textarea
 						disabled={isAddingBatchInboundProduct}
 						name="batch"
 						placeholder="Batch Serialnumbers"
 						class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					></textarea>
-					<div class="flex gap-4">
+					<div class="flex justify-center gap-4">
 						<button
 							disabled={isAddingBatchInboundProduct}
 							formaction="?/addBatchInboundProductToInbound"
 							onclick={handleAddBatch}
-							class="w-full rounded-md bg-gray-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+							class="w-full rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 							type="submit"
 						>
 							Add Batch
@@ -359,7 +328,7 @@
 						<button
 							type="button"
 							onclick={handleScanQr}
-							class="w-full rounded-md bg-gray-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+							class="w-full rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						>
 							Scan QR code
 						</button>

@@ -9,11 +9,9 @@
 	let { data, form }: PageProps = $props();
 
 	let searchQuery = $state('');
-
 	const clients = data.clients;
 	const inbounds = data.inbounds;
 
-	// Maak de lijst reactive zodat hij herberekend wordt bij wijziging van 'search'
 	let filterdInbounds = $state(inbounds);
 
 	$effect(() => {
@@ -91,7 +89,7 @@
 				disabled={form?.success}
 				onclick={handleCreateInbound}
 				type="submit"
-				class="rounded-md bg-gray-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-orange-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 			>
 				Create Inbound
 			</button>

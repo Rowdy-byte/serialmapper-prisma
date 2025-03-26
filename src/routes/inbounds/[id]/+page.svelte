@@ -140,6 +140,20 @@
 				break;
 		}
 	});
+
+	console.log(inboundProducts);
+
+	let productValue = $state(0);
+
+	$effect(() => {
+		if (inboundProducts) {
+			productValue = inboundProducts.reduce((acc, product) => {
+				return acc + (product.value ? parseFloat(product.value.toString()) : 0);
+			}, 0);
+		} else {
+			productValue = 0;
+		}
+	});
 </script>
 
 <BackToTop scrollTo="scroll to top" />
@@ -216,12 +230,11 @@
 
 		<!-- Section 2: Secondary Content -->
 		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
-			<div class="shadow-2xl">
-				<Stats statsName="Products" statsValue={inboundProducts?.length ?? 0} />
-			</div>
-			<div class="shadow-2xl">
-				<Stats statsName="Serialnumbers" statsValue={inboundProducts?.length ?? 0} />
-			</div>
+			<Stats statsName="Products" statsValue={inboundProducts?.length ?? 0} />
+
+			<Stats statsName="Serialnumbers" statsValue={inboundProducts?.length ?? 0} />
+
+			<Stats statsName="Value" statsValue={productValue} />
 		</section>
 
 		<!-- Section 3: Add Single & Batch Product -->
@@ -259,6 +272,12 @@
 						{/each}
 					{/if}
 				</select>
+				<input
+					type="text"
+					name="value"
+					placeholder="Value €"
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+				/>
 
 				<textarea
 					disabled={isAddingInboundProduct}
@@ -382,6 +401,7 @@
 						<th class="border border-gray-500 p-2"></th>
 						<th class="border border-gray-500 p-2">Product</th>
 						<th class="border border-gray-500 p-2">Serialnumber</th>
+						<th class="border border-gray-500 p-2">Value €</th>
 						<th class="border border-gray-500 p-2">Status</th>
 						<th class="border border-gray-500 p-2">Actions</th>
 					</tr>
@@ -393,6 +413,7 @@
 								<td class="border border-gray-500 p-2">{i + 1}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
+								<td class="border border-gray-500 p-2">{inboundProduct.value}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.status}</td>
 								<td class="border border-gray-500 p-2">
 									<a
@@ -413,6 +434,4 @@
 			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
 		{/if}
 	</section>
-
-	<!-- Map Serialnumbers & Delete Section -->
 </div>

@@ -6,6 +6,7 @@
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
+	import Stats from '$lib/components/statics/Stats.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -124,20 +125,20 @@
 				window.location.reload();
 				break;
 
-			case form?.addBatchToOutboundSuccess:
-				toast.success(form?.message, {
-					duration: 4000,
-					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				window.location.reload();
-				break;
+			// case form?.addBatchToOutboundSuccess:
+			// 	toast.success(form?.message, {
+			// 		duration: 4000,
+			// 		style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+			// 	});
+			// 	window.location.reload();
+			// 	break;
 
-			case form?.addBatchToOutboundSuccess === false:
-				toast.error(form?.message, {
-					duration: 4000,
-					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				break;
+			// case form?.addBatchToOutboundSuccess === false:
+			// 	toast.error(form?.message, {
+			// 		duration: 4000,
+			// 		style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			// 	});
+			// 	break;
 		}
 	});
 </script>
@@ -255,14 +256,12 @@
 				</button>
 			</form>
 		</section>
-		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
-			<p>
-				Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor blanditiis minus minima
-				impedit, iste deleniti voluptatibus porro commodi consectetur! Omnis facilis dolores
-				quisquam! Accusamus reprehenderit voluptates quasi possimus dolores soluta dolore aut
-				provident rem, minus explicabo obcaecati fugit assumenda suscipit veritatis, cumque, animi
-				omnis exercitationem ad hic neque accusantium voluptate?
-			</p>
+		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
+			<Stats statsName="Products" statsValue={outboundProducts?.length ?? 0} />
+
+			<Stats statsName="Serialnumbers" statsValue={outboundProducts?.length ?? 0} />
+
+			<!-- <Stats statsName="Value" statsValue={outboundValue} /> -->
 		</section>
 		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
 			<div>
@@ -289,7 +288,7 @@
 				</h1>
 				<form use:enhance method="post" class="flex gap-2">
 					<button
-						formaction="?/deleteoutbound"
+						formaction="?/deleteOutbound"
 						onclick={handleDeleteOutbound}
 						class="rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"

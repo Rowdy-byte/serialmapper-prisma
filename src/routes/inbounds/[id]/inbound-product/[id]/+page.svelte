@@ -93,6 +93,13 @@
 						placeholder="Serialnumber"
 						class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					/>
+					<input
+						type="text"
+						name="value"
+						value={inboundProduct?.value}
+						placeholder="Value"
+						class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					/>
 
 					<button
 						formaction="?/updateInboundProduct"

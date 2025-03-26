@@ -74,6 +74,10 @@ export const AddSingleProductSchema = z.object({
         .min(5, { message: 'Serial number must be at least 5 characters' })
         .max(200, { message: 'Serial number must be at most 200 characters' })
         .regex(/^\d{5,}$/, { message: 'Serial number must be one number' }),
+    value: z.string()
+        .min(1, { message: 'Value must be at least 1 characters' })
+        .max(7, { message: 'Value must be at most 50 characters' })
+        .regex(/^\d{1,}$/, { message: 'Value must be one number' }),
 })
 
 export const AddMultipleProductSchema = z.object({
@@ -85,6 +89,10 @@ export const AddMultipleProductSchema = z.object({
         .min(5, { message: 'Serialnumber Batch must be at least 5 numbers' })
         .max(2000, { message: 'Serialnumbers Batch must be at most 2000 numbers' })
         .regex(/^\d{5,}( \d{5,})+$/, { message: 'Serialnumber must be at least 2 serialnumbers' }),
+    value: z.string()
+        .min(1, { message: 'Value must be at least 1 characters' })
+        .max(7, { message: 'Value must be at most 50 characters' })
+        .regex(/^\d{1,}$/, { message: 'Value must be one number' }),
 
 
 })

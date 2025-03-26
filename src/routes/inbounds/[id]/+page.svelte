@@ -26,20 +26,19 @@
 
 	let searchQuery = $state('');
 
+	let productValue = $state(0);
+	let productRevenue = $state(0);
+	let productStatusIn = $state();
+	let productStatusOut = $state();
+
+	let productsCount = $state<number>(0);
+	let serialnumbersCount = $state<number>(0);
+
 	let filteredInboundProducts = $state(
 		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
 	);
 
-	$effect(() => {
-		filteredInboundProducts = inboundProducts?.filter(
-			(product) =>
-				product.inboundId === inbound?.id &&
-				(searchQuery.trim() === '' ||
-					product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					product.status?.toLowerCase().includes(searchQuery.toLowerCase()))
-		);
-	});
+	$effect(() => {});
 
 	function handleDeleteInbound(event: Event) {
 		if (!confirm('Are you sure you want to delete this inbound?')) {
@@ -139,20 +138,56 @@
 				});
 				break;
 		}
-	});
 
-	console.log(inboundProducts);
+		filteredInboundProducts = inboundProducts?.filter(
+			(product) =>
+				product.inboundId === inbound?.id &&
+				(searchQuery.trim() === '' ||
+					product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+					product.status?.toLowerCase().includes(searchQuery.toLowerCase()))
+		);
 
-	let productValue = $state(0);
+		// Define inboundProductId outside the effect scope
+		let inboundProductId = $state();
 
-	$effect(() => {
-		if (inboundProducts) {
-			productValue = inboundProducts.reduce((acc, product) => {
-				return acc + (product.value ? parseFloat(product.value.toString()) : 0);
-			}, 0);
-		} else {
-			productValue = 0;
-		}
+		// Update inboundProductId in its own effect
+		$effect(() => {
+			inboundProductId = inboundProducts?.map((product) => product.inboundId);
+		});
+
+		// Use a separate effect for calculations that depend on inboundProductId
+		// Total value: sum of all product values (converted to a float)
+		$effect(() => {
+			// productCount
+			productsCount =
+				inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+			serialnumbersCount =
+				inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+
+			productValue = (
+				inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []
+			).reduce((sum, product) => sum + (parseFloat(product.value ?? '0') || 0), 0);
+
+			// Revenue: for example, we calculate revenue as a fixed factor (0.1) times the number of products
+			productRevenue = parseFloat(
+				(
+					(inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []).length *
+					0.1
+				).toFixed(2)
+			);
+
+			// Status counts: number of products with status 'IN' and 'OUT'
+			productStatusIn =
+				inboundProducts?.filter(
+					(product) => product.inboundId === inbound?.id && product.status === 'IN'
+				).length || 0;
+
+			productStatusOut =
+				inboundProducts?.filter(
+					(product) => product.inboundId === inbound?.id && product.status === 'OUT'
+				).length || 0;
+		});
 	});
 </script>
 
@@ -173,6 +208,47 @@
 	<!-- Main Grid Layout -->
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2">
 		<!-- Section 1: Inbound Form -->
+		<section class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
+			<Stats statsName="Products" statsValue={productsCount} />
+
+			<Stats statsName="Serialnumbers" statsValue={serialnumbersCount} />
+
+			<Stats statsName="Value" statsValue={productValue} prefix="€" />
+			<Stats statsName="Revenue" statsValue={productRevenue} prefix="€ " />
+			<Stats statsName="In/Out" statsValue={`${productStatusIn}/${productStatusOut} `} />
+		</section>
+		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
+			<div>
+				<h1 class="pb-4 font-bold">Map to Worksheet</h1>
+				<form
+					class="flex w-full flex-col gap-4"
+					action="?/mapSerialnumbersToWorksheet"
+					method="post"
+				>
+					<input hidden type="text" name="inboundId" value={inbound?.id} />
+					<button
+						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						onclick={handleMapSerialToWorksheet}
+						type="button"
+					>
+						Map
+					</button>
+				</form>
+			</div>
+			<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
+				<h1 class=" pb-4 font-bold">Delete Inbound</h1>
+				<form use:enhance method="post" class="flex flex-col gap-2">
+					<button
+						formaction="?/deleteInbound"
+						onclick={handleDeleteInbound}
+						class="rounded-md bg-red-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						type="submit"
+					>
+						Delete
+					</button>
+				</form>
+			</div>
+		</section>
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="flex items-center justify-between pb-4 font-bold">
 				Inbound
@@ -229,13 +305,6 @@
 		</section>
 
 		<!-- Section 2: Secondary Content -->
-		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
-			<Stats statsName="Products" statsValue={inboundProducts?.length ?? 0} />
-
-			<Stats statsName="Serialnumbers" statsValue={inboundProducts?.length ?? 0} />
-
-			<Stats statsName="Value" statsValue={productValue} />
-		</section>
 
 		<!-- Section 3: Add Single & Batch Product -->
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
@@ -341,38 +410,6 @@
 					</div>
 				</section>
 			</form>
-		</section>
-		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
-			<div>
-				<h1 class="pb-4 font-bold">Map to Worksheet</h1>
-				<form
-					class="flex w-full flex-col gap-4"
-					action="?/mapSerialnumbersToWorksheet"
-					method="post"
-				>
-					<input hidden type="text" name="inboundId" value={inbound?.id} />
-					<button
-						class="w-full rounded-md bg-blue-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-blue-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						onclick={handleMapSerialToWorksheet}
-						type="button"
-					>
-						Map
-					</button>
-				</form>
-			</div>
-			<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
-				<h1 class=" pb-4 font-bold">Delete Inbound</h1>
-				<form use:enhance method="post" class="flex flex-col gap-2">
-					<button
-						formaction="?/deleteInbound"
-						onclick={handleDeleteInbound}
-						class="rounded-md bg-red-500 p-3 text-sm text-white hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						type="submit"
-					>
-						Delete
-					</button>
-				</form>
-			</div>
 		</section>
 	</main>
 

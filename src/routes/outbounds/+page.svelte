@@ -87,7 +87,7 @@
 				disabled={form?.success}
 				onclick={handleCreateOutbound}
 				type="submit"
-				class="rounded-md bg-gray-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-md bg-orange-500 p-3 text-sm hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 			>
 				Create Outbound
 			</button>

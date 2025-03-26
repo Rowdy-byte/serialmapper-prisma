@@ -86,6 +86,14 @@
 		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
 	}
 
+	// Calculate time saved per serial, for showing in the Stats component
+	function calculateTimeSavedPerSerial(oldMinutes: number, newMinutes: number, serials: number) {
+		return (oldMinutes * 60) / serials - (newMinutes * 60) / serials;
+	}
+
+	// Voorbeeld van het gebruik van de functie
+	const timeSaved = calculateTimeSavedPerSerial(30, 3, 144); // geeft 11.25
+
 	if (form?.issues) {
 		for (const issue of form.issues) {
 			toast.error(issue.message, {
@@ -178,7 +186,7 @@
 
 <BackToTop scrollTo="scroll to top" />
 
-<div class="container mx-auto px-4 py-4">
+<div class="container mx-auto py-4">
 	<section class="breadcrums text-md mb-4 rounded-lg bg-gray-900 p-4 shadow-md">
 		<ul class="text-gray-500">
 			<li class="font-bold">
@@ -197,6 +205,7 @@
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
 			<Stats statsName="IN/OUT" statsValue={`${productStatusIn}/${productStatusOut} `} />
+			<Stats statsName="TIME SAVED" statsValue={timeSaved} />
 		</section>
 		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
 			<div>

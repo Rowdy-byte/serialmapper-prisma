@@ -65,23 +65,31 @@
 			event.preventDefault();
 			return;
 		}
+		invalidate('outbound');
 	}
 
-	function handleAddSingle(event: Event) {
-		if (!confirm('Are you sure you want to add this product to this outbound?')) {
+	function handleMoveToOutbound(event: Event) {
+		if (!confirm('Are you sure you want to move this product to this outbound?')) {
 			event.preventDefault();
+			return;
 		}
 	}
 
-	function handleAddBatch(event: Event) {
-		if (!confirm('Are you sure you want to add this batch to this outbound?')) {
-			event.preventDefault();
-		}
-	}
+	// function handleAddSingle(event: Event) {
+	// 	if (!confirm('Are you sure you want to add this product to this outbound?')) {
+	// 		event.preventDefault();
+	// 	}
+	// }
 
-	function scanBarcodetoSingleTextarea() {}
+	// function handleAddBatch(event: Event) {
+	// 	if (!confirm('Are you sure you want to add this batch to this outbound?')) {
+	// 		event.preventDefault();
+	// 	}
+	// }
 
-	function scanBarcodetoBatchTextarea() {}
+	// function scanBarcodetoSingleTextarea() {}
+
+	// function scanBarcodetoBatchTextarea() {}
 
 	function handleScanQr() {
 		alert('Buy Pro!');
@@ -120,20 +128,20 @@
 				window.location.reload();
 				break;
 
-			case form?.duplicateSuccess === false:
-				toast.error(form?.message, {
-					duration: 4000,
-					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				break;
+			// case form?.duplicateSuccess === false:
+			// 	toast.error(form?.message, {
+			// 		duration: 4000,
+			// 		style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			// 	});
+			// 	break;
 
-			case form?.addProductTooutboundSuccess:
-				toast.success(form?.message, {
-					duration: 4000,
-					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				window.location.reload();
-				break;
+			// case form?.addProductTooutboundSuccess:
+			// 	toast.success(form?.message, {
+			// 		duration: 4000,
+			// 		style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+			// 	});
+			// 	window.location.reload();
+			// 	break;
 
 			// case form?.addBatchToOutboundSuccess:
 			// 	toast.success(form?.message, {
@@ -179,10 +187,14 @@
 		</ul>
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2">
-		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
+		<section
+			class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-5 md:grid-cols-5 lg:grid-cols-6"
+		>
 			<Stats statsName="PRODUCTS" statsValue={outboundProducts?.length ?? 0} />
 			<Stats statsName="SERIALS" statsValue={outboundProducts?.length ?? 0} />
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
+			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
+			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
 			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
 		</section>
 		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
@@ -191,7 +203,7 @@
 				<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
 					<input hidden type="text" name="outboundId" value={outbound?.id} />
 					<button
-						class="rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
@@ -207,7 +219,7 @@
 					<button
 						formaction="?/deleteOutbound"
 						onclick={handleDeleteOutbound}
-						class="rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
 						Delete
@@ -216,14 +228,7 @@
 			</div>
 		</section>
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
-			<h1 class="flex items-center justify-between pb-4 font-bold">
-				Outbound
-				<CircleHelp
-					class="text-gray-500 transition-all hover:cursor-pointer hover:text-orange-500"
-					onclick={() => (outboundSectionOpen = !outboundSectionOpen)}
-					size="14"
-				/>
-			</h1>
+			<h1 class="flex items-center justify-between pb-4 font-bold">Outbound</h1>
 			<SectionIsOpen
 				SectionOpen={outboundSectionOpen}
 				lineOne="Always select client again when updating."
@@ -254,22 +259,16 @@
 					disabled={isUpdatingOutbound}
 					formaction="?/updateOutbound"
 					onclick={handleUpdateOutbound}
-					class="rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit"
 				>
 					Update
 				</button>
 			</form>
 		</section>
-
-		<!-- Section 2: Move Inbound Product to Outbound -->
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="flex items-center justify-between pb-4 font-bold">
 				Move Inbound Product to Outbound
-				<CircleHelp
-					class="text-gray-500 transition-all hover:cursor-pointer hover:text-yellow-500"
-					size="14"
-				/>
 			</h1>
 			<form
 				class="flex flex-col gap-4"
@@ -297,7 +296,8 @@
 
 				<button
 					type="submit"
-					class="rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					onclick={handleMoveToOutbound}
+					class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				>
 					Move Product
 				</button>
@@ -327,20 +327,32 @@
 			<table class="min-w-full text-left text-sm">
 				<thead>
 					<tr class="text-gray-500">
-						<th class="border border-gray-500 p-2"></th>
+						<th class="rounded-tl-lg border border-gray-500 p-2"></th>
 						<th class="border border-gray-500 p-2">Product</th>
 						<th class="border border-gray-500 p-2">Serialnumber</th>
-						<th class="border border-gray-500 p-2">Actions</th>
+						<th class="border border-gray-500 p-2">Value</th>
+						<th class="rounded-tr-lg border border-gray-500 p-2">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#if filteredOutboundProducts}
-						{#each filteredOutboundProducts as outboundProduct, i}
+						{#each filteredOutboundProducts as outboundProduct, i (outboundProduct.id)}
 							<tr class="hover:bg-slate-600">
-								<td class="border border-gray-500 p-2">{i + 1}</td>
+								<td
+									class="border border-gray-500 p-2 {i === filteredOutboundProducts.length - 1
+										? 'rounded-bl-lg'
+										: ''}"
+								>
+									{i + 1}
+								</td>
 								<td class="border border-gray-500 p-2">{outboundProduct.product}</td>
 								<td class="border border-gray-500 p-2">{outboundProduct.serialnumber}</td>
-								<td class="border border-gray-500 p-2">
+								<td class="border border-gray-500 p-2">{outboundProduct.value}</td>
+								<td
+									class="border border-gray-500 p-2 {i === filteredOutboundProducts.length - 1
+										? 'rounded-br-lg'
+										: ''}"
+								>
 									<a
 										class="text-blue-500 underline"
 										href={`/outbounds/${outbound?.id}/outbound-product/${outboundProduct.id}`}

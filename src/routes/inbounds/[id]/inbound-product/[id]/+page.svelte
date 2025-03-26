@@ -103,7 +103,7 @@
 					<button
 						formaction="?/updateInboundProduct"
 						onclick={handleUpdateInboundProduct}
-						class="rounded-md bg-gray-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit">Update</button
 					>
 				</form>
@@ -112,27 +112,14 @@
 	</section>
 
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
-		<h1 class="flex w-full items-center justify-between font-bold">
-			Delete product from Inbound<CircleHelp
-				class="transition-all hover:cursor-pointer hover:text-yellow-500"
-				onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
-				size="14"
-			/>
-		</h1>
+		<h1 class="flex w-full items-center justify-between font-bold">Delete product from Inbound</h1>
 		<form method="post" class="flex gap-2">
 			<button
 				formaction="?/deleteInboundProduct"
 				onclick={handleDeleteInboundProduct}
-				class=" rounded-md bg-gray-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class=" rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Delete</button
 			>
-			<div>
-				<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
-					<li class="pb-1">
-						<p class="text-sm">This will permanently delete this Product from inbound!</p>
-					</li>
-				</ul>
-			</div>
 		</form>
 	</section>
 </main>

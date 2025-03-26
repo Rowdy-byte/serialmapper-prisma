@@ -185,6 +185,32 @@ export const actions = {
         }
     },
 
+    async deleteOutbound({ params }: { params: { id: string } }) {
+        const outboundId = Number(params.id);
+        const outbound = await db.outbound.findUnique({
+            where: { id: outboundId }
+        });
+        if (!outbound) {
+            return {
+                status: 400,
+                message: "Outbound does not exist"
+            };
+        }
+        // Verwijder de Outbound en de bijbehorende OutboundProducts
+        await db.$transaction(async (tx) => {
+            await tx.outboundProduct.deleteMany({
+                where: { outboundId }
+            });
+            await tx.outbound.delete({
+                where: { id: outboundId }
+            });
+        });
+        return {
+            status: 200,
+            message: "Outbound deleted successfully"
+        };
+    },
+
     // Alternatieve action (dezelfde als addInboundProductToOutbound) – overweeg om slechts één versie te gebruiken
     async moveInboundProductToOutbound({ request }: { request: Request }) {
         const formData = await request.formData();

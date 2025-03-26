@@ -103,7 +103,7 @@ export const actions = {
             return fail(400, { issues: safeParse.error.issues });
         }
 
-        const { product, serialnumber, inboundId } = safeParse.data as { product: string; serialnumber: string; inboundId: string };
+        const { product, serialnumber, inboundId, value } = safeParse.data as { product: string; serialnumber: string; value: string; inboundId: string };
 
         const existingProduct = await db.inboundProduct.findFirst({
             where: { serialnumber: serialnumber as string },
@@ -121,6 +121,7 @@ export const actions = {
             data: {
                 serialnumber,
                 product: product as string,
+                value: value,  // value is already a string from the form data
                 inbound: {
                     connect: {
                         id: Number(inboundId)
@@ -180,6 +181,7 @@ export const actions = {
             data: uniqueSerialNumbers.map(serialnumber => ({
                 product: safeParse.data.product as string,
                 serialnumber,
+                value: safeParse.data.value as string,
                 inboundId: inboundId
             }))
         });

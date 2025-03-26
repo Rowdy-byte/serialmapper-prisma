@@ -124,20 +124,20 @@
 				window.location.reload();
 				break;
 
-			case form?.addBatchToOutboundSuccess:
-				toast.success(form?.message, {
-					duration: 4000,
-					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				window.location.reload();
-				break;
+			// case form?.addBatchToOutboundSuccess:
+			// 	toast.success(form?.message, {
+			// 		duration: 4000,
+			// 		style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+			// 	});
+			// 	window.location.reload();
+			// 	break;
 
-			case form?.addBatchToOutboundSuccess === false:
-				toast.error(form?.message, {
-					duration: 4000,
-					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				break;
+			// case form?.addBatchToOutboundSuccess === false:
+			// 	toast.error(form?.message, {
+			// 		duration: 4000,
+			// 		style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+			// 	});
+			// 	break;
 		}
 	});
 </script>
@@ -289,7 +289,7 @@
 				</h1>
 				<form use:enhance method="post" class="flex gap-2">
 					<button
-						formaction="?/deleteoutbound"
+						formaction="?/deleteOutbound"
 						onclick={handleDeleteOutbound}
 						class="rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"

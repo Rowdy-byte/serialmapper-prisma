@@ -46,6 +46,7 @@ export const actions: Actions = {
 
         const product = formData.get('product') as string | null;
         const serialnumber = formData.get('serialnumber') as string | null;
+        const value = formData.get('value') as string | null;
         await db.inboundProduct.update({
             where: {
                 id: Number(params.id)
@@ -53,6 +54,7 @@ export const actions: Actions = {
             data: {
                 product: product ?? undefined,
                 serialnumber: serialnumber ?? undefined,
+                value: value ? String(Number(value)) : undefined,
             }
         })
 

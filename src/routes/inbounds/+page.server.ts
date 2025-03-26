@@ -1,6 +1,6 @@
 import type { PageServerLoad, Actions } from "./$types";
 import db from "$lib/server/db";
-import { fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 import { CreateInboundSchema } from "$lib/zod/zod-schemas";
 
 export const load: PageServerLoad = async () => {
@@ -40,7 +40,6 @@ export const actions: Actions = {
         return {
             success: true,
             message: 'Inbound created successfully',
-
         };
     }
 }

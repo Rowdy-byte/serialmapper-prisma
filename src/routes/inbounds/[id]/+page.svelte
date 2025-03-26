@@ -235,7 +235,7 @@
 				>
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<button
-						class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
@@ -245,11 +245,10 @@
 			</div>
 			<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
 				<h1 class=" pb-4 font-bold">Delete Inbound</h1>
-				<form use:enhance method="post" class="flex flex-col gap-2">
+				<form use:enhance method="post" action="?/deleteInbound" class="flex flex-col gap-2">
 					<button
-						formaction="?/deleteInbound"
 						onclick={handleDeleteInbound}
-						class="rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
 						Delete
@@ -288,7 +287,7 @@
 					disabled={isUpdatingInbound}
 					formaction="?/updateInbound"
 					onclick={handleUpdateInbound}
-					class="rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit"
 				>
 					Update
@@ -329,7 +328,7 @@
 				></textarea>
 				<button
 					disabled={isAddingInboundProduct}
-					class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					onclick={handleAddSingle}
 					type="submit"
 				>
@@ -347,7 +346,7 @@
 							disabled={isAddingBatchInboundProduct}
 							formaction="?/addBatchInboundProductToInbound"
 							onclick={handleAddBatch}
-							class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+							class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 							type="submit"
 						>
 							Add Batch
@@ -355,7 +354,7 @@
 						<button
 							type="button"
 							onclick={handleScanQr}
-							class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+							class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						>
 							Scan QR code
 						</button>

@@ -235,7 +235,7 @@
 				>
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<button
-						class="w-full rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
@@ -249,7 +249,7 @@
 					<button
 						formaction="?/deleteInbound"
 						onclick={handleDeleteInbound}
-						class="rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
 						Delete
@@ -288,7 +288,7 @@
 					disabled={isUpdatingInbound}
 					formaction="?/updateInbound"
 					onclick={handleUpdateInbound}
-					class="rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit"
 				>
 					Update
@@ -329,7 +329,7 @@
 				></textarea>
 				<button
 					disabled={isAddingInboundProduct}
-					class="w-full rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					onclick={handleAddSingle}
 					type="submit"
 				>
@@ -340,14 +340,14 @@
 						disabled={isAddingBatchInboundProduct}
 						name="batch"
 						placeholder="Batch Serialnumbers"
-						class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+						class="rounded-lg border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					></textarea>
 					<div class="flex justify-center gap-4">
 						<button
 							disabled={isAddingBatchInboundProduct}
 							formaction="?/addBatchInboundProductToInbound"
 							onclick={handleAddBatch}
-							class="w-full rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+							class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 							type="submit"
 						>
 							Add Batch
@@ -355,7 +355,7 @@
 						<button
 							type="button"
 							onclick={handleScanQr}
-							class="w-full rounded-md bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+							class="w-full rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						>
 							Scan QR code
 						</button>

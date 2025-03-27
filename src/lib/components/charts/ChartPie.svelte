@@ -66,10 +66,7 @@
 		});
 	}
 
-	$effect(() => {
-		if (chart) {
-			chart.destroy();
-		}
+	$effect.pre(() => {
 		initChart();
 	});
 </script>

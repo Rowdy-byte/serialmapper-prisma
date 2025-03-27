@@ -43,10 +43,7 @@
 		});
 	}
 
-	$effect(() => {
-		if (chartStatus) {
-			chartStatus.destroy();
-		}
+	$effect.pre(() => {
 		initStatusChart();
 	});
 </script>

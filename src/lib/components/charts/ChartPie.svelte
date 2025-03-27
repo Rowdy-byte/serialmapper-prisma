@@ -30,12 +30,12 @@
 				labels: labels,
 				datasets: [
 					{
-						label: 'Productverdeling',
+						label: 'Products',
 						data: dataValues,
 						backgroundColor: [
-							'rgba(255, 105, 0, 1)',
-							'rgba(43, 127, 255, 1)',
-							'rgba(34, 197, 94, 1)',
+							'rgba(234, 179, 8, 1)',
+							'rgba(99, 102, 241, 1)',
+							'rgba(217, 70, 239, 1)',
 							'rgba(75, 192, 192, 0.2)',
 							'rgba(153, 102, 255, 0.2)',
 							'rgba(255, 159, 64, 0.2)'

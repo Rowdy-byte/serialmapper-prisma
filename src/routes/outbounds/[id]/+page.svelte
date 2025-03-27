@@ -222,12 +222,7 @@
 		</ul>
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-		<section
-			class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md md:grid-cols-4 lg:grid-cols-5"
-		>
-			<Stats statsName="PRODUCTS" statsValue={productsCount} />
-			<Stats statsName="SERIALS" statsValue={serialnumbersCount} />
-			<Stats statsName="IN / OUT" statsValue={`${productStatusIn}/${productStatusOut} `} />
+		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />

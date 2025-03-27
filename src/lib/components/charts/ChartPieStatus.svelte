@@ -23,7 +23,7 @@
 					{
 						label: 'Product Status Distribution',
 						data: [inStatus, outStatus],
-						backgroundColor: ['rgba(255, 105, 0, 1)', 'rgba(43, 127, 255, 1)'],
+						backgroundColor: ['rgba(244, 63, 94, 1)', 'rgba(147, 51, 234, 1)'],
 						borderColor: [],
 						borderWidth: 1
 					}

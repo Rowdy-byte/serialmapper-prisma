@@ -3,9 +3,8 @@
 	import { Eye, Search } from '@lucide/svelte';
 	import { fly, slide } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
-	import { goto, invalidate } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import BackToTop from '$lib/components/BackToTop.svelte';
-	import { enhance } from '$app/forms';
 
 	let { data, form }: PageProps = $props();
 
@@ -33,7 +32,7 @@
 		if (!confirm('Are you sure you want to create this inbound?')) {
 			event.preventDefault();
 		}
-		invalidate('/inbounds');
+		invalidate('inbounds');
 	}
 
 	if (form?.success) {
@@ -92,39 +91,7 @@
 			</form>
 		</section>
 
-<<<<<<< HEAD
-			<input
-				disabled={form?.success}
-				type="text"
-				name="description"
-				placeholder="Description"
-				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				required
-			/>
-			<fieldset class="rounded-lg border border-gray-500 p-3">
-				<legend class="text-sm text-gray-500">Customs</legend>
-				<input type="checkbox" name="isSubscribed" value="on" />
-			</fieldset>
-
-			<button
-				disabled={form?.success}
-				onclick={handleCreateInbound}
-				type="submit"
-				class="rounded-md bg-orange-500 p-3 text-sm font-bold hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-			>
-				Create Inbound
-			</button>
-		</form>
-	</section>
-
-	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<section class="flex items-center justify-between">
-			<h1 class="text-center font-bold">List</h1>
-
-			<!-- Search filter -->
-=======
 		<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
->>>>>>> development
 			<form class="relative py-1">
 				<input
 					bind:value={searchQuery}

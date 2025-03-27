@@ -80,16 +80,16 @@
 				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				required
 			/>
-			<fieldset class="rounded-lg border border-gray-500 p-3">
+			<!-- <fieldset class="rounded-lg border border-gray-500 p-3">
 				<legend class="text-sm text-gray-500">Customs</legend>
 				<input type="checkbox" name="isSubscribed" value="on" />
-			</fieldset>
+			</fieldset> -->
 
 			<button
 				disabled={form?.success}
 				onclick={handleCreateInbound}
 				type="submit"
-				class="rounded-md bg-orange-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-full bg-orange-500 p-3 text-sm font-bold hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 			>
 				Create Inbound
 			</button>
@@ -99,8 +99,6 @@
 	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 		<section class="flex items-center justify-between">
 			<h1 class="text-center font-bold">List</h1>
-
-			<!-- Search filter -->
 			<form class="relative py-1">
 				<input
 					bind:value={searchQuery}
@@ -116,7 +114,6 @@
 				</div>
 			</form>
 		</section>
-
 		<table class="w-full text-left text-sm">
 			<thead>
 				<tr class="text-gray-500">
@@ -138,7 +135,6 @@
 						<td class="hidden border border-gray-500 p-2 md:table-cell"
 							>{inbound.isSubscribed ? 'T1' : 'exa'}</td
 						>
-
 						<td class="hidden border border-gray-500 p-2 md:table-cell">
 							{new Date(inbound.createdAt).toLocaleDateString()}
 						</td>
@@ -156,7 +152,7 @@
 			</tbody>
 		</table>
 		{#if inbounds.length === 0}
-			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No inbounds found.</p>
+			<p class="mt-2 rounded-full bg-gray-500 p-1 px-2 text-sm">No inbounds found.</p>
 		{/if}
 	</section>
 </main>

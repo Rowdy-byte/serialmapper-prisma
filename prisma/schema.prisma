@@ -29,7 +29,7 @@ model Inbound {
   description      String?
   clientName       String
   inboundNumber    String            @unique
-  isSubscribed     Boolean           @default(false)
+  isSubscribed     Boolean?          @default(false)
   createdAt        DateTime          @default(now())
   clientId         Int?
   client           Client            @relation(fields: [clientName], references: [name], onDelete: Cascade)

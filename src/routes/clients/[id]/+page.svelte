@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { CircleHelp } from '@lucide/svelte';
+	import { CircleHelp, Trash2 } from '@lucide/svelte';
 	import type { PageProps } from './$types';
 	import toast from 'svelte-french-toast';
 	let { data, form }: PageProps = $props();
@@ -61,41 +61,28 @@
 				name="name"
 				placeholder="Name"
 				class="rounded-md border
-            border-gray-300 p-3 text-sm text-gray-800"
+            bg-gray-950 p-3 text-sm text-gray-500"
 				value={client?.name}
 			/>
 			<button
 				formaction="?/updateClient"
 				onclick={handleUpdateClient}
-				class="rounded-md bg-green-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Update</button
 			>
 		</form>
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
-		<h1 class="flex w-full items-center justify-between font-bold">
-			Delete Client<CircleHelp
-				class="transition-all hover:cursor-pointer hover:text-yellow-500"
-				onclick={() => (deleteSectionOpen = !deleteSectionOpen)}
-				size="14"
-			/>
-		</h1>
+		<h1 class="flex w-full items-center justify-between font-bold">Delete Client</h1>
 		<form method="post" class="flex gap-2">
 			<button
 				formaction="?/deleteClient"
 				onclick={handleDeleteClient}
-				class=" rounded-md bg-red-500 p-3 text-sm text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				type="submit">Delete</button
+				class=" rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				type="submit"
 			>
-			<div>
-				<ul class="pt-4 pl-3 text-xs text-yellow-500" class:hidden={!deleteSectionOpen}>
-					<li class="pb-1">
-						<p class="text-sm">
-							This will permanently delete this client and all inbounds from this client!
-						</p>
-					</li>
-				</ul>
-			</div>
+				<Trash2 />
+			</button>
 		</form>
 	</section>
 </main>

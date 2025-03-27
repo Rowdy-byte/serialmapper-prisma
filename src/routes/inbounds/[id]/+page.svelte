@@ -212,7 +212,7 @@
 			</li>
 		</ul>
 	</section>
-	<main class="grid grid-cols-1 gap-4 md:grid-cols-2">
+	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 		<section
 			class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md md:grid-cols-4 lg:grid-cols-5"
 		>
@@ -225,34 +225,32 @@
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
 			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
-		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
-			<div>
-				<h1 class="pb-4 font-bold">Map to Worksheet</h1>
-				<form
-					class="flex w-full flex-col gap-4"
-					action="?/mapSerialnumbersToWorksheet"
-					method="post"
-				>
+		<section class="flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
+			<h1 class="pb-4 font-bold">Options</h1>
+
+			<div class="flex gap-4">
+				<form action="?/mapSerialnumbersToWorksheet" method="post">
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<button
-						class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="flex h-11 w-11 items-center justify-center rounded-full border border-orange-500 bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						data-tooltip="Map Serialnumbers to Worksheet"
+						title="Map Serialnumbers to Worksheet"
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
 						Map
 					</button>
 				</form>
-			</div>
-			<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
-				<h1 class=" pb-4 font-bold">Delete Inbound</h1>
-				<form use:enhance method="post" class="flex flex-col gap-2">
+
+				<form use:enhance method="post" action="?/deleteInbound">
 					<button
-						formaction="?/deleteInbound"
 						onclick={handleDeleteInbound}
-						class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						data-tooltip="Delete Inbound"
+						title="Delete Inbound"
+						class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
-						Delete
+						Del
 					</button>
 				</form>
 			</div>
@@ -281,8 +279,14 @@
 				/>
 
 				<fieldset class="rounded-lg border border-gray-500 p-3">
-					<legend class="text-sm text-gray-500">Customs</legend>
-					<input type="checkbox" name="isSubscribed" checked={inbound?.isSubscribed} value="on" />
+					<legend class="text-sm font-bold text-gray-500">Customs</legend>
+					<input
+						type="checkbox"
+						name="isSubscribed"
+						checked={inbound?.isSubscribed}
+						value="on"
+						class="checkbox chat-bubble-neutral"
+					/>
 				</fieldset>
 				<button
 					disabled={isUpdatingInbound}

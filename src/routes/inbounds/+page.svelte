@@ -53,59 +53,52 @@
 
 <BackToTop scrollTo="scroll to top" />
 
-<h1 class="py-4 text-lg font-bold">Inbounds</h1>
+<div class="container lg:mx-auto">
+	<h1 class="py-4 text-lg font-bold">Inbounds</h1>
+	<main class=" flex flex-col gap-12">
+		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
+			<h1 class="pb-4 font-bold">Create Inbound</h1>
 
-<main class="max-auto flex max-w-3xl flex-col gap-12">
-	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
-		<h1 class="pb-4 font-bold">Create Inbound</h1>
+			<form class="flex flex-col gap-4" action="?/createInbound" method="post">
+				<select
+					disabled={form?.success}
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					name="clientName"
+					required
+				>
+					<option value="">-- Select Client --</option>
+					{#each clients as client}
+						<option value={client.name}>{client.name}</option>
+					{/each}
+				</select>
 
-		<form class="flex flex-col gap-4" action="?/createInbound" method="post">
-			<select
-				disabled={form?.success}
-				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				name="clientName"
-				required
-			>
-				<option value="">-- Select Client --</option>
-				{#each clients as client}
-					<option value={client.name}>{client.name}</option>
-				{/each}
-			</select>
+				<input
+					disabled={form?.success}
+					type="text"
+					name="description"
+					placeholder="Description"
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					required
+				/>
+				<button
+					disabled={form?.success}
+					onclick={handleCreateInbound}
+					type="submit"
+					class="rounded-full bg-orange-500 p-3 text-sm font-bold hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				>
+					Create Inbound
+				</button>
+			</form>
+		</section>
 
-			<input
-				disabled={form?.success}
-				type="text"
-				name="description"
-				placeholder="Description"
-				class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				required
-			/>
-			<!-- <fieldset class="rounded-lg border border-gray-500 p-3">
-				<legend class="text-sm text-gray-500">Customs</legend>
-				<input type="checkbox" name="isSubscribed" value="on" />
-			</fieldset> -->
-
-			<button
-				disabled={form?.success}
-				onclick={handleCreateInbound}
-				type="submit"
-				class="rounded-full bg-orange-500 p-3 text-sm font-bold hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-			>
-				Create Inbound
-			</button>
-		</form>
-	</section>
-
-	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
-		<section class="flex items-center justify-between">
-			<h1 class="text-center font-bold">List</h1>
+		<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 			<form class="relative py-1">
 				<input
 					bind:value={searchQuery}
 					type="text"
 					name="search"
 					placeholder="Search Inbounds"
-					class="w-full rounded border bg-gray-950 py-2 pr-4 pl-10 text-sm"
+					class="w-full max-w-sm rounded-full border bg-gray-950 py-2 pl-10 text-sm"
 				/>
 				<div
 					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
@@ -113,46 +106,46 @@
 					<Search size="18" />
 				</div>
 			</form>
-		</section>
-		<table class="w-full text-left text-sm">
-			<thead>
-				<tr class="text-gray-500">
-					<th class="border border-gray-500 p-2">No</th>
-					<th class="border border-gray-500 p-2">Client</th>
-					<th class="hidden border border-gray-500 p-2 md:table-cell">Description</th>
-					<th class="hidden border border-gray-500 p-2 md:table-cell">Customs</th>
+			<table class="w-full text-left text-sm">
+				<thead>
+					<tr class="text-gray-500">
+						<th class="border border-gray-500 p-2">No</th>
+						<th class="border border-gray-500 p-2">Client</th>
+						<th class="hidden border border-gray-500 p-2 md:table-cell">Description</th>
+						<th class="hidden border border-gray-500 p-2 md:table-cell">Customs</th>
 
-					<th class="hidden border border-gray-500 p-2 md:table-cell">Created</th>
-					<th class="border border-gray-500 p-2">Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each filterdInbounds as inbound}
-					<tr in:fly={{ y: 20 }} out:slide class="hover:bg-orange-800/20">
-						<td class="border border-gray-500 p-2">{inbound.inboundNumber}</td>
-						<td class="border border-gray-500 p-2">{inbound.clientName}</td>
-						<td class="hidden border border-gray-500 p-2 md:table-cell">{inbound.description}</td>
-						<td class="hidden border border-gray-500 p-2 md:table-cell"
-							>{inbound.isSubscribed ? 'T1' : 'exa'}</td
-						>
-						<td class="hidden border border-gray-500 p-2 md:table-cell">
-							{new Date(inbound.createdAt).toLocaleDateString()}
-						</td>
-						<td class="border border-gray-500 p-2">
-							<a
-								href={`/inbounds/${inbound.id}`}
-								class="text-blue-500 underline"
-								title="View Inbound"
-							>
-								<Eye size="16" />
-							</a>
-						</td>
+						<th class="hidden border border-gray-500 p-2 md:table-cell">Created</th>
+						<th class="border border-gray-500 p-2">Actions</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
-		{#if inbounds.length === 0}
-			<p class="mt-2 rounded-full bg-gray-500 p-1 px-2 text-sm">No inbounds found.</p>
-		{/if}
-	</section>
-</main>
+				</thead>
+				<tbody>
+					{#each filterdInbounds as inbound}
+						<tr in:fly={{ y: 20 }} out:slide class="hover:bg-orange-800/20">
+							<td class="border border-gray-500 p-2">{inbound.inboundNumber}</td>
+							<td class="border border-gray-500 p-2">{inbound.clientName}</td>
+							<td class="hidden border border-gray-500 p-2 md:table-cell">{inbound.description}</td>
+							<td class="hidden border border-gray-500 p-2 md:table-cell"
+								>{inbound.isSubscribed ? 'T1' : 'exa'}</td
+							>
+							<td class="hidden border border-gray-500 p-2 md:table-cell">
+								{new Date(inbound.createdAt).toLocaleDateString()}
+							</td>
+							<td class="border border-gray-500 p-2">
+								<a
+									href={`/inbounds/${inbound.id}`}
+									class="text-blue-500 underline"
+									title="View Inbound"
+								>
+									<Eye size="16" />
+								</a>
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+			{#if inbounds.length === 0}
+				<p class="mt-2 rounded-full bg-gray-500 p-1 px-2 text-sm">No inbounds found.</p>
+			{/if}
+		</section>
+	</main>
+</div>

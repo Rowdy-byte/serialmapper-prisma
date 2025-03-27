@@ -260,7 +260,7 @@
 			<form class="flex flex-col gap-4" method="post">
 				<select
 					disabled={isUpdatingInbound}
-					class=" rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 					name="clientName"
 				>
 					<option value="clientName">{inbound?.clientName}</option>
@@ -275,7 +275,7 @@
 					type="text"
 					name="description"
 					value={inbound?.description}
-					class=" rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 				/>
 
 				<fieldset class="rounded-lg border border-gray-500 p-3">
@@ -308,7 +308,7 @@
 				<input hidden type="text" name="inboundId" value={inbound?.id} />
 				<select
 					disabled={isAddingInboundProduct}
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 					name="product"
 				>
 					<option value="products">-- Select Product --</option>
@@ -322,14 +322,14 @@
 					type="text"
 					name="value"
 					placeholder="Value €"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 				/>
 
 				<textarea
 					disabled={isAddingInboundProduct}
 					name="serialnumber"
 					placeholder="Serialnumber"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 				></textarea>
 				<button
 					disabled={isAddingInboundProduct}
@@ -344,7 +344,7 @@
 						disabled={isAddingBatchInboundProduct}
 						name="batch"
 						placeholder="Batch Serialnumbers"
-						class="rounded-lg border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+						class="rounded-lg bg-gray-950 p-3 text-sm text-gray-500"
 					></textarea>
 					<div class="flex justify-center gap-4">
 						<button
@@ -376,7 +376,7 @@
 					type="text"
 					name="search"
 					placeholder="Search Products"
-					class="w-full rounded-full border bg-gray-950 py-2 pr-4 pl-10 text-sm"
+					class="w-full rounded-full bg-gray-950 py-2 pr-4 pl-10 text-sm"
 				/>
 				<div
 					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"

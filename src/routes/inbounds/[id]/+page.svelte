@@ -266,7 +266,7 @@
 					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 				/>
 
-				<fieldset class="rounded-lg border border-gray-500 p-3">
+				<fieldset class="rounded-lg border border-gray-500 bg-gray-950 p-3">
 					<legend class="text-sm font-bold text-gray-500">Customs</legend>
 					<input
 						type="checkbox"

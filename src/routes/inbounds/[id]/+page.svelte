@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { Eye, Search } from '@lucide/svelte';
+	import { Copy, Eye, Search } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
@@ -32,7 +32,7 @@
 	let euroPerMinute = $state(0);
 	let timeSavedPerSerial = $state(0);
 
-	let inboundProductId = $state();
+	let inboundProductIds = $state<number[]>([]);
 
 	let filteredInboundProducts = $state(
 		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
@@ -89,6 +89,24 @@
 		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
 	}
 
+	function copySelectedSerialsToClipboard() {
+		const selectedSerials = (filteredInboundProducts || [])
+			.filter((product) => inboundProductIds.includes(product.id))
+			.map((product) => product.serialnumber)
+			.join('\n');
+
+		navigator.clipboard
+			.writeText(selectedSerials)
+			.then(() => {
+				toast.success('Copy successfull!');
+			})
+			.catch((err) => {
+				toast.error('Copy error!');
+				console.error('Clipboard copy error:', err);
+			});
+		window.location.reload();
+	}
+
 	// Calculate time saved per serial, for showing in the Stats component
 	function calculateTimeSavedPerSerial(oldMinutes: number, newMinutes: number, serials: number) {
 		return (oldMinutes * 60) / serials - (newMinutes * 60) / serials;
@@ -105,7 +123,7 @@
 
 	$effect(() => {
 		switch (true) {
-			case form?.inboundUpdateSuccess:
+			case form?.success:
 				toast.success(form?.message, {
 					duration: 4000,
 					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
@@ -113,14 +131,14 @@
 				window.location.reload();
 				break;
 
-			case form?.duplicateSuccess === false:
+			case form?.success === false:
 				toast.error(form?.message, {
 					duration: 4000,
 					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
 				});
 				break;
 
-			case form?.addProductToInboundSuccess:
+			case form?.success:
 				toast.success(form?.message, {
 					duration: 4000,
 					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
@@ -128,7 +146,7 @@
 				window.location.reload();
 				break;
 
-			case form?.addBatchToInboundSuccess:
+			case form?.success:
 				toast.success(form?.message, {
 					duration: 4000,
 					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
@@ -136,7 +154,7 @@
 				window.location.reload();
 				break;
 
-			case form?.addBatchToInboundSuccess === false:
+			case form?.success === false:
 				toast.error(form?.message, {
 					duration: 4000,
 					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
@@ -152,51 +170,57 @@
 					product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
 					product.status?.toLowerCase().includes(searchQuery.toLowerCase()))
 		);
+	});
 
-		inboundProductId = inboundProducts?.map((product) => product.inboundId);
-		productsCount =
-			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
-		serialnumbersCount =
-			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+	$effect(() => {
+		// Filter inbound products for the current inbound
+		const inboundForThis =
+			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || [];
 
-		productValue = (
-			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []
-		).reduce((sum, product) => sum + (parseFloat(product.value ?? '0') || 0), 0);
+		// PRODUCTS: count distinct products (unique product names)
+		productsCount = new Set(inboundForThis.map((product) => product.product)).size;
 
-		productRevenue = parseFloat(
-			(
-				(inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []).length * 0.1
-			).toFixed(2)
+		// SERIALS: total number of inbound products
+		serialnumbersCount = inboundForThis.length;
+
+		// Sum the product values
+		productValue = inboundForThis.reduce(
+			(sum, product) => sum + (parseFloat(product.value ?? '0') || 0),
+			0
 		);
 
-		productStatusIn =
-			inboundProducts?.filter(
-				(product) => product.inboundId === inbound?.id && product.status === 'IN'
-			).length || 0;
+		// OLD REV: revenue calculated as 0.1 per inbound product
+		productRevenue = parseFloat((inboundForThis.length * 0.1).toFixed(2));
 
-		productStatusOut =
-			inboundProducts?.filter(
-				(product) => product.inboundId === inbound?.id && product.status === 'OUT'
-			).length || 0;
+		// Count statuses
+		productStatusIn = inboundForThis.filter((product) => product.status === 'IN').length;
+		productStatusOut = inboundForThis.filter((product) => product.status === 'OUT').length;
 
-		const currentSerials =
-			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+		// Define fixed times (in minutes) for the batch process
+		const oldTime = 30; // old total time in minutes
+		const newTime = 3; // new total time in minutes
 
-		if (currentSerials > 0) {
-			timeSaved = parseFloat(
-				((((30 * 60) / currentSerials - (3 * 60) / currentSerials) * currentSerials) / 60).toFixed(
-					2
-				)
-			);
-		}
+		// Total time saved remains constant for the batch
+		timeSaved = oldTime - newTime; // 27 minutes
 
-		timeSavedPerSerial = parseFloat(
-			((30 * 60) / currentSerials - (3 * 60) / currentSerials).toFixed(2)
-		); // in seconds
+		// Time saved per serial in minutes
+		timeSavedPerSerial =
+			inboundForThis.length > 0 ? parseFloat((timeSaved / inboundForThis.length).toFixed(2)) : 0;
 
-		if (timeSaved > 0) {
-			euroPerMinute = parseFloat((productRevenue / (30 - timeSaved)).toFixed(2));
-		}
+		// Euro per minute based on the new process time
+		euroPerMinute =
+			inboundForThis.length > 0 ? parseFloat((productRevenue / newTime).toFixed(2)) : 0;
+
+		// Filter products based on the search query
+		filteredInboundProducts = inboundForThis.filter(
+			(product) =>
+				searchQuery.trim() === '' ||
+				product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				product.status?.toLowerCase().includes(searchQuery.toLowerCase())
+		);
+
+		inboundProductIds = inboundForThis.map((product) => product.inboundId);
 	});
 </script>
 
@@ -212,7 +236,7 @@
 			</li>
 		</ul>
 	</section>
-	<main class="grid grid-cols-1 gap-4 md:grid-cols-2">
+	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 		<section
 			class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md md:grid-cols-4 lg:grid-cols-5"
 		>
@@ -221,27 +245,30 @@
 			<Stats statsName="IN / OUT" statsValue={`${productStatusIn}/${productStatusOut} `} />
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
-			<Stats statsName="T-SAVED" statsValue={timeSaved} suffix=" min" />
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
 			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
-		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
-			<div>
-				<h1 class="pb-4 font-bold">Map to Worksheet</h1>
-				<form
-					class="flex w-full flex-col gap-4"
-					action="?/mapSerialnumbersToWorksheet"
-					method="post"
-				>
+		<section class="flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
+			<h1 class="pb-4 font-bold">Options</h1>
+
+			<div class="flex gap-4">
+				<form action="?/mapSerialnumbersToWorksheet" method="post">
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<button
+<<<<<<< HEAD
 						class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+=======
+						class="flex h-11 w-11 items-center justify-center rounded-full border border-orange-500 bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						data-tooltip="Map Serialnumbers to Worksheet"
+						title="Map Serialnumbers to Worksheet"
+>>>>>>> development
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
 						Map
 					</button>
 				</form>
+<<<<<<< HEAD
 			</div>
 			<div class="border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4">
 				<h1 class=" pb-4 font-bold">Delete Inbound</h1>
@@ -249,9 +276,18 @@
 					<button
 						onclick={handleDeleteInbound}
 						class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+=======
+
+				<form use:enhance method="post" action="?/deleteInbound">
+					<button
+						onclick={handleDeleteInbound}
+						data-tooltip="Delete Inbound"
+						title="Delete Inbound"
+						class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+>>>>>>> development
 						type="submit"
 					>
-						Delete
+						Del
 					</button>
 				</form>
 			</div>
@@ -261,7 +297,7 @@
 			<form class="flex flex-col gap-4" method="post">
 				<select
 					disabled={isUpdatingInbound}
-					class=" rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 					name="clientName"
 				>
 					<option value="clientName">{inbound?.clientName}</option>
@@ -276,12 +312,18 @@
 					type="text"
 					name="description"
 					value={inbound?.description}
-					class=" rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 				/>
 
 				<fieldset class="rounded-lg border border-gray-500 p-3">
-					<legend class="text-sm text-gray-500">Customs</legend>
-					<input type="checkbox" name="isSubscribed" checked={inbound?.isSubscribed} value="on" />
+					<legend class="text-sm font-bold text-gray-500">Customs</legend>
+					<input
+						type="checkbox"
+						name="isSubscribed"
+						checked={inbound?.isSubscribed}
+						value="on"
+						class="checkbox checkbox-xs chat-bubble-neutral"
+					/>
 				</fieldset>
 				<button
 					disabled={isUpdatingInbound}
@@ -303,7 +345,7 @@
 				<input hidden type="text" name="inboundId" value={inbound?.id} />
 				<select
 					disabled={isAddingInboundProduct}
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 					name="product"
 				>
 					<option value="products">-- Select Product --</option>
@@ -317,14 +359,13 @@
 					type="text"
 					name="value"
 					placeholder="Value €"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 				/>
-
 				<textarea
 					disabled={isAddingInboundProduct}
 					name="serialnumber"
 					placeholder="Serialnumber"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 				></textarea>
 				<button
 					disabled={isAddingInboundProduct}
@@ -339,7 +380,7 @@
 						disabled={isAddingBatchInboundProduct}
 						name="batch"
 						placeholder="Batch Serialnumbers"
-						class="rounded-lg border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+						class="rounded-lg bg-gray-950 p-3 text-sm text-gray-500"
 					></textarea>
 					<div class="flex justify-center gap-4">
 						<button
@@ -371,7 +412,7 @@
 					type="text"
 					name="search"
 					placeholder="Search Products"
-					class="w-full rounded border bg-gray-950 py-2 pr-4 pl-10 text-sm"
+					class="w-full rounded-full bg-gray-950 py-2 pr-4 pl-10 text-sm"
 				/>
 				<div
 					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
@@ -379,8 +420,17 @@
 					<Search size="18" />
 				</div>
 			</form>
+			<div>
+				<button
+					onclick={copySelectedSerialsToClipboard}
+					data-tooltip="Copy selected serialnumbers to clipboard"
+					title="Copy selected serialnumbers to clipboard"
+					class="flex w-full rounded-full p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-gray-500 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					><Copy /></button
+				>
+			</div>
 		</section>
-		<div class="overflow-x-auto">
+		<section class="overflow-x-auto">
 			<table class="min-w-full text-left text-sm">
 				<thead>
 					<tr class="text-gray-500">
@@ -396,7 +446,14 @@
 					{#if filteredInboundProducts}
 						{#each filteredInboundProducts as inboundProduct, i}
 							<tr class="hover:bg-orange-500/20">
-								<td class="border border-gray-500 p-2">{i + 1}</td>
+								<td class="flex justify-between border border-gray-500 p-2">
+									<input
+										type="checkbox"
+										bind:group={inboundProductIds}
+										value={inboundProduct.id}
+										class="checkbox chat-bubble-neutral checkbox-xs"
+									/>{i + 1}
+								</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.value}</td>
@@ -415,7 +472,7 @@
 					{/if}
 				</tbody>
 			</table>
-		</div>
+		</section>
 		{#if filteredInboundProducts?.length === 0}
 			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
 		{/if}

@@ -2,21 +2,13 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { CircleHelp, Eye, Search } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
+	import { Eye, Search } from '@lucide/svelte';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
-	import SectionIsOpen from '$lib/components/SectionIsOpen.svelte';
 
 	let { data, form }: PageProps = $props();
-
-	let inboundsProducts = data.outboundProducts;
-
-	let outboundSectionOpen = $state(false);
-	let singleSectionOpen = $state(false);
-	let multiSectionOpen = $state(false);
-	let deleteSectionOpen = $state(false);
 
 	let isUpdatingOutbound = $state(false);
 	let isAddingOutboundProduct = $state(false);
@@ -35,6 +27,11 @@
 	let productStatusOut = $state();
 	let productsCount = $state<number>(0);
 	let serialnumbersCount = $state<number>(0);
+
+	let timeSaved = $state(0);
+	let timeSavedPerSerial = $state(0);
+	let euroPerMinute = $state(0);
+	let inboundProductIds = $state<number[]>([]);
 
 	let filteredOutboundProducts = $state(
 		outboundProducts?.filter(
@@ -75,17 +72,17 @@
 		}
 	}
 
-	// function handleAddSingle(event: Event) {
-	// 	if (!confirm('Are you sure you want to add this product to this outbound?')) {
-	// 		event.preventDefault();
-	// 	}
-	// }
+	function handleAddSingle(event: Event) {
+		if (!confirm('Are you sure you want to add this product to this outbound?')) {
+			event.preventDefault();
+		}
+	}
 
-	// function handleAddBatch(event: Event) {
-	// 	if (!confirm('Are you sure you want to add this batch to this outbound?')) {
-	// 		event.preventDefault();
-	// 	}
-	// }
+	function handleAddBatch(event: Event) {
+		if (!confirm('Are you sure you want to add this batch to this outbound?')) {
+			event.preventDefault();
+		}
+	}
 
 	// function scanBarcodetoSingleTextarea() {}
 
@@ -158,19 +155,57 @@
 			// 	});
 			// 	break;
 		}
+	});
 
-		productValue = (
-			outboundProducts?.filter((product) => product.outboundId === outbound?.id) || []
-		).reduce((sum, product) => sum + (parseFloat((product as any).value ?? '0') || 0), 0);
+	$effect(() => {
+		// Filter inbound products for the current inbound
+		const inboundForThis =
+			outboundProducts?.filter((product) => product.outboundId === outbound?.id) || [];
 
-		productRevenue = parseFloat(
-			(
-				(outboundProducts?.filter((product) => product.outboundId === outbound?.id) || []).length *
-				0.1
-			).toFixed(2)
+		// PRODUCTS: count distinct products (unique product names)
+		productsCount = new Set(inboundForThis.map((product) => product.product)).size;
+
+		// SERIALS: total number of inbound products
+		serialnumbersCount = inboundForThis.length;
+
+		// Sum the product values
+		productValue = inboundForThis.reduce(
+			(sum, product) => sum + (parseFloat(product.value ?? '0') || 0),
+			0
 		);
 
-		// Status counts: number of products with status 'IN' and 'OUT'
+		// OLD REV: revenue calculated as 0.1 per inbound product
+		productRevenue = parseFloat((inboundForThis.length * 0.1).toFixed(2));
+
+		// Count statuses
+		productStatusIn = inboundForThis.filter((product) => product.status === 'IN').length;
+		productStatusOut = inboundForThis.filter((product) => product.status === 'OUT').length;
+
+		// Define fixed times (in minutes) for the batch process
+		const oldTime = 30; // old total time in minutes
+		const newTime = 3; // new total time in minutes
+
+		// Total time saved remains constant for the batch
+		timeSaved = oldTime - newTime; // 27 minutes
+
+		// Time saved per serial in minutes
+		timeSavedPerSerial =
+			inboundForThis.length > 0 ? parseFloat((timeSaved / inboundForThis.length).toFixed(2)) : 0;
+
+		// Euro per minute based on the new process time
+		euroPerMinute =
+			inboundForThis.length > 0 ? parseFloat((productRevenue / newTime).toFixed(2)) : 0;
+
+		// Filter products based on the search query
+		filteredOutboundProducts = inboundForThis.filter(
+			(product) =>
+				searchQuery.trim() === '' ||
+				product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				product.status?.toLowerCase().includes(searchQuery.toLowerCase())
+		);
+
+		inboundProductIds = inboundForThis.map((product) => product.outboundId);
 	});
 </script>
 
@@ -186,55 +221,48 @@
 			</li>
 		</ul>
 	</section>
-	<main class="grid grid-cols-1 gap-4 md:grid-cols-2">
+	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 		<section
-			class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-5 md:grid-cols-5 lg:grid-cols-6"
+			class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md md:grid-cols-4 lg:grid-cols-5"
 		>
-			<Stats statsName="PRODUCTS" statsValue={outboundProducts?.length ?? 0} />
-			<Stats statsName="SERIALS" statsValue={outboundProducts?.length ?? 0} />
+			<Stats statsName="PRODUCTS" statsValue={productsCount} />
+			<Stats statsName="SERIALS" statsValue={serialnumbersCount} />
+			<Stats statsName="IN / OUT" statsValue={`${productStatusIn}/${productStatusOut} `} />
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
-			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
-			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
-			<Stats statsName="REVENUE" statsValue={productRevenue} prefix="€ " />
+			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
+			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
+			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
-		<section class="grid gap-4 rounded-lg bg-gray-900 p-4 shadow-md sm:grid-cols-2">
-			<div>
-				<h1 class="pb-4 font-bold">Map to Worksheet</h1>
-				<form class="flex flex-col gap-4" action="?/mapSerialnumbersToWorksheet" method="post">
-					<input hidden type="text" name="outboundId" value={outbound?.id} />
+		<section class="flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
+			<h1 class="pb-4 font-bold">Options</h1>
+			<div class="flex gap-4">
+				<form action="?/mapSerialnumbersToWorksheet" method="post">
+					<input hidden type="text" name="inboundId" value={outbound?.id} />
 					<button
-						class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="flex h-11 w-11 items-center justify-center rounded-full border border-orange-500 bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						data-tooltip="Map Serialnumbers to Worksheet"
+						title="Map Serialnumbers to Worksheet"
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
 						Map
 					</button>
 				</form>
-			</div>
-			<div
-				class="max-h-48 border-t-1 border-gray-500 pt-4 sm:border-t-0 sm:border-l-1 sm:pt-0 sm:pl-4"
-			>
-				<h1 class="flex items-center justify-between pb-4 font-bold">Delete Outbound</h1>
-				<form use:enhance method="post" class="flex flex-col gap-4">
+				<form use:enhance method="post" action="?/deleteInbound">
 					<button
-						formaction="?/deleteOutbound"
 						onclick={handleDeleteOutbound}
-						class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						data-tooltip="Delete Inbound"
+						title="Delete Inbound"
+						class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
-						Delete
+						Del
 					</button>
 				</form>
 			</div>
 		</section>
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Outbound</h1>
-			<SectionIsOpen
-				SectionOpen={outboundSectionOpen}
-				lineOne="Always select client again when updating."
-				lineTwo="Choose fields to update."
-				lineThree="Click Update"
-			/>
 			<form class="flex flex-col gap-4" method="post">
 				<select
 					disabled={isUpdatingOutbound}
@@ -259,7 +287,7 @@
 					disabled={isUpdatingOutbound}
 					formaction="?/updateOutbound"
 					onclick={handleUpdateOutbound}
-					class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit"
 				>
 					Update
@@ -277,15 +305,6 @@
 				use:enhance
 			>
 				<input
-					id="serial"
-					type="text"
-					name="serial"
-					placeholder="Enter Serialnumber"
-					required
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				/>
-
-				<input
 					id="outboundNumber"
 					type="text"
 					name="outboundNumber"
@@ -293,19 +312,37 @@
 					required
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				/>
-
+				<input
+					id="serial"
+					type="text"
+					name="serial"
+					placeholder="Enter Serialnumber"
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+				/>
 				<button
 					type="submit"
 					onclick={handleMoveToOutbound}
-					class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				>
-					Move Product
+					Move
+				</button>
+				<textarea
+					disabled={isAddingBatchOutboundProduct}
+					name="batch"
+					placeholder="Batch Serialnumbers"
+					class="rounded-lg bg-gray-950 p-3 text-sm text-gray-500"
+				></textarea>
+				<button
+					type="submit"
+					formaction="?/moveBatchToOutbound"
+					onclick={handleMoveToOutbound}
+					class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				>
+					Move Batch
 				</button>
 			</form>
 		</section>
 	</main>
-
-	<!-- List Section with Search Filter -->
 	<section class="mt-4">
 		<section class="mb-4 flex items-center justify-between">
 			<form class="relative py-1">

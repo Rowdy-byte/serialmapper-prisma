@@ -7,6 +7,113 @@
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
+	import { Chart } from 'chart.js/auto';
+	import { getRelativePosition } from 'chart.js/helpers';
+
+	// Initialize chart variable to be used later
+	let chart: Chart<'pie', number[], string> | null = $state(null);
+	let chartCanvas: HTMLCanvasElement | undefined = $state();
+
+	let chartStatus: Chart<'doughnut', (number | object)[], string> | null = $state(null);
+	let chartStatusCanvas: HTMLCanvasElement | undefined = $state();
+
+	// Function to initialize chart when canvas is available
+	function initChart() {
+		if (!chartCanvas) return;
+		const ctx = chartCanvas.getContext('2d');
+		if (!ctx) return;
+
+		// Aggregeer het aantal per product uit de inbound producten
+		const inboundProductsForChart = filteredInboundProducts || [];
+		const productCounts: { [key: string]: number } = {};
+
+		inboundProductsForChart.forEach((product) => {
+			const productName = product.product || 'Onbekend';
+			productCounts[productName] = (productCounts[productName] || 0) + 1;
+		});
+
+		const labels = Object.keys(productCounts);
+		const dataValues = Object.values(productCounts);
+
+		// Maak een pie chart met de geaggregeerde data
+		chart = new Chart(ctx, {
+			type: 'pie',
+			data: {
+				labels: labels,
+				datasets: [
+					{
+						label: 'Productverdeling',
+						data: dataValues,
+						backgroundColor: [
+							'rgba(255, 105, 0, 1)',
+							'rgba(43, 127, 255, 1)',
+							'rgba(255, 206, 86, 0.2)',
+							'rgba(75, 192, 192, 0.2)',
+							'rgba(153, 102, 255, 0.2)',
+							'rgba(255, 159, 64, 0.2)'
+						],
+						borderColor: [
+							// 'rgba(255,99,132,1)',
+							// 'rgba(54, 162, 235, 1)',
+							// 'rgba(255, 206, 86, 1)',
+							// 'rgba(75, 192, 192, 1)',
+							// 'rgba(153, 102, 255, 1)',
+							// 'rgba(255, 159, 64, 1)'
+						],
+						borderWidth: 1
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				plugins: {
+					legend: {
+						position: 'top'
+					},
+					tooltip: {
+						enabled: true
+					}
+				}
+			}
+		});
+	}
+
+	function initStatusChart() {
+		if (!chartStatusCanvas) return;
+		const ctx = chartStatusCanvas.getContext('2d');
+		if (!ctx) return;
+
+		// Use your computed product status values
+		const inStatus = productStatusIn || 0;
+		const outStatus = productStatusOut || 0;
+
+		chartStatus = new Chart(ctx, {
+			type: 'doughnut',
+			data: {
+				labels: ['IN', 'OUT'],
+				datasets: [
+					{
+						label: 'Product Status Distribution',
+						data: [inStatus, outStatus],
+						backgroundColor: ['rgba(255, 105, 0, 1)', 'rgba(43, 127, 255, 1)'],
+						borderColor: [],
+						borderWidth: 1
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				plugins: {
+					legend: {
+						position: 'top'
+					},
+					tooltip: {
+						enabled: true
+					}
+				}
+			}
+		});
+	}
 
 	let { data, form }: PageProps = $props();
 
@@ -222,6 +329,18 @@
 
 		inboundProductIds = inboundForThis.map((product) => product.inboundId);
 	});
+
+	$effect(() => {
+		if (chart) {
+			chart.destroy();
+		}
+		initChart();
+
+		if (chartStatus) {
+			chartStatus.destroy();
+		}
+		initStatusChart();
+	});
 </script>
 
 <BackToTop scrollTo="scroll to top" />
@@ -278,7 +397,7 @@
 				</form>
 			</div>
 		</section>
-		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
 			<form class="flex flex-col gap-4" method="post">
 				<select
@@ -325,73 +444,89 @@
 			</form>
 		</section>
 		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
-			<h1 class="flex items-center justify-between pb-4 font-bold">
-				Add Single Product to Inbound
-			</h1>
+			<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+				<h1 class="flex items-center justify-between pb-4 font-bold">
+					Add Single Product to Inbound
+				</h1>
 
-			<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
-				<input hidden type="text" name="inboundId" value={inbound?.id} />
-				<select
-					disabled={isAddingInboundProduct}
-					class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
-					name="product"
-				>
-					<option value="products">-- Select Product --</option>
-					{#if products}
-						{#each products as product}
-							<option value={product.name}>{product.number}</option>
-						{/each}
-					{/if}
-				</select>
-				<input
-					type="text"
-					name="value"
-					placeholder="Value €"
-					class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
-				/>
-				<textarea
-					disabled={isAddingInboundProduct}
-					name="serialnumber"
-					placeholder="Serialnumber"
-					class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
-				></textarea>
-				<button
-					disabled={isAddingInboundProduct}
-					class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					onclick={handleAddSingle}
-					type="submit"
-				>
-					Add Single
-				</button>
-				<section class="flex flex-col gap-4 pt-8">
+				<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
+					<input hidden type="text" name="inboundId" value={inbound?.id} />
+					<select
+						disabled={isAddingInboundProduct}
+						class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
+						name="product"
+					>
+						<option value="products">-- Select Product --</option>
+						{#if products}
+							{#each products as product}
+								<option value={product.name}>{product.number}</option>
+							{/each}
+						{/if}
+					</select>
+					<input
+						type="text"
+						name="value"
+						placeholder="Value €"
+						class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
+					/>
 					<textarea
-						disabled={isAddingBatchInboundProduct}
-						name="batch"
-						placeholder="Batch Serialnumbers"
-						class="rounded-lg bg-gray-950 p-3 text-sm text-gray-500"
+						disabled={isAddingInboundProduct}
+						name="serialnumber"
+						placeholder="Serialnumber"
+						class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 					></textarea>
-					<div class="flex justify-center gap-4">
-						<button
+					<button
+						disabled={isAddingInboundProduct}
+						class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						onclick={handleAddSingle}
+						type="submit"
+					>
+						Add Single
+					</button>
+					<section class="flex flex-col gap-4 pt-8">
+						<textarea
 							disabled={isAddingBatchInboundProduct}
-							formaction="?/addBatchInboundProductToInbound"
-							onclick={handleAddBatch}
-							class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-							type="submit"
-						>
-							Add Batch
-						</button>
-						<button
-							type="button"
-							data-tooltip="Scan Barcode to Single"
-							title="Scan Barcode to Single"
-							onclick={handleScanQr}
-							class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						>
-							<QrCode />
-						</button>
-					</div>
-				</section>
-			</form>
+							name="batch"
+							placeholder="Batch Serialnumbers"
+							class="rounded-lg bg-gray-950 p-3 text-sm text-gray-500"
+						></textarea>
+						<div class="flex justify-center gap-4">
+							<button
+								disabled={isAddingBatchInboundProduct}
+								formaction="?/addBatchInboundProductToInbound"
+								onclick={handleAddBatch}
+								class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+								type="submit"
+							>
+								Add Batch
+							</button>
+							<button
+								type="button"
+								data-tooltip="Scan Barcode to Single"
+								title="Scan Barcode to Single"
+								onclick={handleScanQr}
+								class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+							>
+								<QrCode />
+							</button>
+						</div>
+					</section>
+				</form>
+			</section>
+		</section>
+		<section class="chart-status-section flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
+			<canvas
+				id="statusChart"
+				bind:this={chartStatusCanvas}
+				class="mx-auto h-64 w-full rounded-lg bg-gray-950 p-3"
+			></canvas>
+		</section>
+		<section class="chart-section flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
+			<canvas
+				id="myChart"
+				bind:this={chartCanvas}
+				class="mx-auto h-64 w-full rounded-lg bg-gray-950 p-3"
+			></canvas>
 		</section>
 	</main>
 	<section class="mt-4">

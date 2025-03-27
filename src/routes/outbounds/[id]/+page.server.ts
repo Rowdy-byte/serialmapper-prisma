@@ -136,5 +136,79 @@ export const actions = {
             console.error("Error in moveInboundProductToOutbound:", error);
             return { success: false, error: errorMessage };
         }
+    },
+
+    async moveBatchToOutbound({ request }: { request: Request }) {
+        const formData = await request.formData();
+        const outboundNumber = formData.get("outboundNumber") as string;
+        const batchRaw = formData.get("batch") as string;
+
+        const batch = batchRaw
+            .split(/[\s\n]+/)
+            .map(s => s.trim())
+            .filter(s => s.length > 0);
+
+        if (batch.length === 0) {
+            return fail(400, { message: "No serial numbers provided." });
+        }
+
+        try {
+            const result = await db.$transaction(async (tx) => {
+                const outboundRecord = await tx.outbound.findUnique({
+                    where: { outboundNumber }
+                });
+                if (!outboundRecord) {
+                    throw new Error(`Outbound with number ${outboundNumber} not found.`);
+                }
+
+                const inboundProducts = await tx.inboundProduct.findMany({
+                    where: { serialnumber: { in: batch } }
+                });
+
+                const validInbound = inboundProducts.filter(p => p.status === "IN");
+                const alreadyAssigned = inboundProducts.filter(p => p.status !== "IN");
+                const notFoundSerials = batch.filter(
+                    serial => !inboundProducts.find(p => p.serialnumber === serial)
+                );
+
+                if (validInbound.length === 0) {
+                    return {
+                        success: false,
+                        message: "No valid products found to move.",
+                        alreadyAssigned: alreadyAssigned.map(p => p.serialnumber),
+                        notFoundSerials
+                    };
+                }
+
+                await tx.outboundProduct.createMany({
+                    data: validInbound.map(product => ({
+                        product: product.product,
+                        serialnumber: product.serialnumber,
+                        value: product.value ?? "",
+                        outboundId: outboundRecord.id,
+                        originInboundId: product.inboundId
+                    }))
+                });
+
+                await tx.inboundProduct.updateMany({
+                    where: { id: { in: validInbound.map(p => p.id) } },
+                    data: { status: "OUT" }
+                });
+
+                return {
+                    success: true,
+                    createdCount: validInbound.length,
+                    skipped: alreadyAssigned.map(p => p.serialnumber),
+                    notFound: notFoundSerials
+                };
+            });
+
+            return { status: 200, ...result };
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Unexpected error.";
+            console.error("moveBatchToOutbound error:", err);
+            return fail(500, { success: false, message });
+        }
     }
+
 };

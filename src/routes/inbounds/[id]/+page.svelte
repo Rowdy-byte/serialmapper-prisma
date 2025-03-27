@@ -227,7 +227,6 @@
 			<Stats statsName="IN / OUT" statsValue={`${productStatusIn}/${productStatusOut} `} />
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
-			<Stats statsName="T-SAVED" statsValue={timeSaved} suffix=" min" />
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
 			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
@@ -330,7 +329,6 @@
 					placeholder="Value €"
 					class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 				/>
-
 				<textarea
 					disabled={isAddingInboundProduct}
 					name="serialnumber"

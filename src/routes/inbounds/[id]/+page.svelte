@@ -7,8 +7,6 @@
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
-	import { Chart } from 'chart.js/auto';
-
 	import ChartPie from '$lib/components/charts/ChartPie.svelte';
 	import ChartPieStatus from '$lib/components/charts/ChartPieStatus.svelte';
 
@@ -42,8 +40,6 @@
 		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
 	);
 
-	$effect(() => {});
-
 	function handleDeleteInbound(event: Event) {
 		if (!confirm('Are you sure you want to delete this inbound?')) {
 			event.preventDefault();
@@ -70,10 +66,6 @@
 			event.preventDefault();
 		}
 	}
-
-	function scanBarcodetoSingleTextarea() {}
-
-	function scanBarcodetoBatchTextarea() {}
 
 	function handleScanQr() {
 		alert('Buy Pro!');
@@ -111,7 +103,6 @@
 		window.location.reload();
 	}
 
-	// Calculate time saved per serial, for showing in the Stats component
 	function calculateTimeSavedPerSerial(oldMinutes: number, newMinutes: number, serials: number) {
 		return (oldMinutes * 60) / serials - (newMinutes * 60) / serials;
 	}
@@ -165,7 +156,9 @@
 				});
 				break;
 		}
+	});
 
+	$effect(() => {
 		filteredInboundProducts = inboundProducts?.filter(
 			(product) =>
 				product.inboundId === inbound?.id &&
@@ -177,7 +170,6 @@
 	});
 
 	$effect(() => {
-		// Filter inbound products for the current inbound
 		const inboundForThis =
 			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || [];
 
@@ -225,18 +217,6 @@
 		);
 
 		inboundProductIds = inboundForThis.map((product) => product.inboundId);
-	});
-
-	$effect(() => {
-		if (chart) {
-			chart.destroy();
-		}
-		initChart();
-
-		if (chartStatus) {
-			chartStatus.destroy();
-		}
-		initStatusChart();
 	});
 </script>
 

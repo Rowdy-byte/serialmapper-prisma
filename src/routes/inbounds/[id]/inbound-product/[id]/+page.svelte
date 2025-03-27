@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { page } from '$app/state';
-	import { MoveRight } from '@lucide/svelte';
+	import { MoveRight, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 
 	const { params, url } = page;
@@ -114,7 +114,7 @@
 				formaction="?/deleteInboundProduct"
 				onclick={handleDeleteInboundProduct}
 				class=" fo rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				type="submit">Delete</button
+				type="submit"><Trash2 /></button
 			>
 		</form>
 	</section>

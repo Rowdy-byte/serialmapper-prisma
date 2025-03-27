@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { page } from '$app/state';
-	import { MoveRight } from '@lucide/svelte';
+	import { MoveRight, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 
 	const { params, url } = page;
@@ -108,7 +108,6 @@
 			{/if}
 		{/each}
 	</section>
-
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="flex w-full items-center justify-between font-bold">Delete product from Inbound</h1>
 		<form method="post" class="flex gap-2">
@@ -116,8 +115,10 @@
 				formaction="?/deleteOutboundProduct"
 				onclick={handleDeleteOutboundProduct}
 				class=" rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-red-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				type="submit">Delete</button
+				type="submit"
 			>
+				<Trash2 />
+			</button>
 		</form>
 	</section>
 </main>

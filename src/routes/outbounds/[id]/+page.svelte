@@ -3,7 +3,7 @@
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
 	import toast from 'svelte-french-toast';
-	import { Eye, Search } from '@lucide/svelte';
+	import { Eye, Search, Sheet, Trash2 } from '@lucide/svelte';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
@@ -245,7 +245,7 @@
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
-						Map
+						<Sheet />
 					</button>
 				</form>
 				<form use:enhance method="post" action="?/deleteInbound">
@@ -256,7 +256,7 @@
 						class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
-						Del
+						<Trash2 />
 					</button>
 				</form>
 			</div>

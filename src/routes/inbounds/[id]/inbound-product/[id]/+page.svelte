@@ -1,16 +1,12 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { page } from '$app/state';
-	import { CircleHelp, MoveRight } from '@lucide/svelte';
+	import { MoveRight } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
-
-	let deleteSectionOpen = $state(false);
 
 	const { params, url } = page;
 	const urlArray = url.pathname.split('/');
 	const inboundId = urlArray[2];
-
-	const { pathname } = page.url;
 
 	let { data, form }: PageProps = $props();
 	let { inboundProducts } = data;
@@ -48,7 +44,7 @@
 	});
 </script>
 
-<section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
+<section class="text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="flex items-center gap-2">
 		<li>
 			<a href={`/inbounds/${inboundId}`} class="font-bold text-gray-500 hover:text-blue-500">
@@ -103,7 +99,7 @@
 					<button
 						formaction="?/updateInboundProduct"
 						onclick={handleUpdateInboundProduct}
-						class="rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit">Update</button
 					>
 				</form>
@@ -117,7 +113,7 @@
 			<button
 				formaction="?/deleteInboundProduct"
 				onclick={handleDeleteInboundProduct}
-				class=" rounded-md bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class=" fo rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 				type="submit">Delete</button
 			>
 		</form>

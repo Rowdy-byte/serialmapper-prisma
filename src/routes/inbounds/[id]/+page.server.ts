@@ -4,6 +4,7 @@ import db from "$lib/server/db";
 import { CreateInboundSchema } from "$lib/zod/zod-schemas";
 import { AddSingleProductSchema, AddMultipleProductSchema } from "$lib/zod/zod-schemas";
 import { error } from "@sveltejs/kit";
+
 export const load: PageServerLoad = async ({ params }) => {
 
     const client = await db.inbound.findUnique({
@@ -83,7 +84,7 @@ export const actions = {
 
         return {
             status: 200,
-            inboundUpdateSuccess: true,
+            success: true,
             message: 'Inbound updated successfully',
 
         }
@@ -114,7 +115,7 @@ export const actions = {
         if (existingProduct) {
             return {
                 status: 400,
-                duplicateSuccess: false,
+                success: false,
                 message: 'Duplicate serialnumber detected.'
             };
         }
@@ -134,8 +135,8 @@ export const actions = {
 
         return {
             status: 200,
-            addProductToInboundSuccess: true,
-            message: 'Product added to inbound successfully.',
+            success: true,
+            message: 'Product added successfully.',
             inboundProduct
         };
     },
@@ -174,7 +175,7 @@ export const actions = {
         if (uniqueSerialNumbers.length === 0) {
             return {
                 status: 400,
-                addBatchToInboundSuccess: false,
+                success: false,
                 message: 'Duplicate serialnumbers detected.'
             };
         }
@@ -190,7 +191,7 @@ export const actions = {
 
         return {
             status: 200,
-            addBatchToInboundSuccess: true,
+            success: true,
             message: 'Batch added to inbound successfully.',
             inboundProducts
         };
@@ -210,14 +211,14 @@ export const actions = {
         if (inbound) {
             return {
                 status: 500,
-                inboundDeleteSuccess: false,
+                success: false,
                 message: 'Inbound delete not successfully.'
             }
         }
 
         return {
             status: 200,
-            inboundDeletesuccess: true,
+            success: true,
             message: 'Inbound deleted successfully!'
         }
     }

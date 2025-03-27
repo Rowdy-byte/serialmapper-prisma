@@ -32,7 +32,7 @@
 	let euroPerMinute = $state(0);
 	let timeSavedPerSerial = $state(0);
 
-	let inboundProductId = $state();
+	let inboundProductIds = $state<number[]>([]);
 
 	let filteredInboundProducts = $state(
 		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
@@ -105,7 +105,7 @@
 
 	$effect(() => {
 		switch (true) {
-			case form?.inboundUpdateSuccess:
+			case form?.success:
 				toast.success(form?.message, {
 					duration: 4000,
 					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
@@ -113,14 +113,14 @@
 				window.location.reload();
 				break;
 
-			case form?.duplicateSuccess === false:
+			case form?.success === false:
 				toast.error(form?.message, {
 					duration: 4000,
 					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
 				});
 				break;
 
-			case form?.addProductToInboundSuccess:
+			case form?.success:
 				toast.success(form?.message, {
 					duration: 4000,
 					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
@@ -128,7 +128,7 @@
 				window.location.reload();
 				break;
 
-			case form?.addBatchToInboundSuccess:
+			case form?.success:
 				toast.success(form?.message, {
 					duration: 4000,
 					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
@@ -136,7 +136,7 @@
 				window.location.reload();
 				break;
 
-			case form?.addBatchToInboundSuccess === false:
+			case form?.success === false:
 				toast.error(form?.message, {
 					duration: 4000,
 					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
@@ -152,51 +152,57 @@
 					product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
 					product.status?.toLowerCase().includes(searchQuery.toLowerCase()))
 		);
+	});
 
-		inboundProductId = inboundProducts?.map((product) => product.inboundId);
-		productsCount =
-			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
-		serialnumbersCount =
-			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+	$effect(() => {
+		// Filter inbound products for the current inbound
+		const inboundForThis =
+			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || [];
 
-		productValue = (
-			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []
-		).reduce((sum, product) => sum + (parseFloat(product.value ?? '0') || 0), 0);
+		// PRODUCTS: count distinct products (unique product names)
+		productsCount = new Set(inboundForThis.map((product) => product.product)).size;
 
-		productRevenue = parseFloat(
-			(
-				(inboundProducts?.filter((product) => product.inboundId === inbound?.id) || []).length * 0.1
-			).toFixed(2)
+		// SERIALS: total number of inbound products
+		serialnumbersCount = inboundForThis.length;
+
+		// Sum the product values
+		productValue = inboundForThis.reduce(
+			(sum, product) => sum + (parseFloat(product.value ?? '0') || 0),
+			0
 		);
 
-		productStatusIn =
-			inboundProducts?.filter(
-				(product) => product.inboundId === inbound?.id && product.status === 'IN'
-			).length || 0;
+		// OLD REV: revenue calculated as 0.1 per inbound product
+		productRevenue = parseFloat((inboundForThis.length * 0.1).toFixed(2));
 
-		productStatusOut =
-			inboundProducts?.filter(
-				(product) => product.inboundId === inbound?.id && product.status === 'OUT'
-			).length || 0;
+		// Count statuses
+		productStatusIn = inboundForThis.filter((product) => product.status === 'IN').length;
+		productStatusOut = inboundForThis.filter((product) => product.status === 'OUT').length;
 
-		const currentSerials =
-			inboundProducts?.filter((product) => product.inboundId === inbound?.id).length || 0;
+		// Define fixed times (in minutes) for the batch process
+		const oldTime = 30; // old total time in minutes
+		const newTime = 3; // new total time in minutes
 
-		if (currentSerials > 0) {
-			timeSaved = parseFloat(
-				((((30 * 60) / currentSerials - (3 * 60) / currentSerials) * currentSerials) / 60).toFixed(
-					2
-				)
-			);
-		}
+		// Total time saved remains constant for the batch
+		timeSaved = oldTime - newTime; // 27 minutes
 
-		timeSavedPerSerial = parseFloat(
-			((30 * 60) / currentSerials - (3 * 60) / currentSerials).toFixed(2)
-		); // in seconds
+		// Time saved per serial in minutes
+		timeSavedPerSerial =
+			inboundForThis.length > 0 ? parseFloat((timeSaved / inboundForThis.length).toFixed(2)) : 0;
 
-		if (timeSaved > 0) {
-			euroPerMinute = parseFloat((productRevenue / (30 - timeSaved)).toFixed(2));
-		}
+		// Euro per minute based on the new process time
+		euroPerMinute =
+			inboundForThis.length > 0 ? parseFloat((productRevenue / newTime).toFixed(2)) : 0;
+
+		// Filter products based on the search query
+		filteredInboundProducts = inboundForThis.filter(
+			(product) =>
+				searchQuery.trim() === '' ||
+				product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				product.status?.toLowerCase().includes(searchQuery.toLowerCase())
+		);
+
+		inboundProductIds = inboundForThis.map((product) => product.inboundId);
 	});
 </script>
 

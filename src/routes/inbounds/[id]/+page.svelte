@@ -89,6 +89,23 @@
 		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
 	}
 
+	function copySelectedSerialsToClipboard() {
+		const selectedSerials = (filteredInboundProducts || [])
+			.filter((product) => inboundProductIds.includes(product.id))
+			.map((product) => product.serialnumber)
+			.join('\n');
+
+		navigator.clipboard
+			.writeText(selectedSerials)
+			.then(() => {
+				toast.success('Copy successfull!');
+			})
+			.catch((err) => {
+				toast.error('Copy error!');
+				console.error('Clipboard copy error:', err);
+			});
+	}
+
 	// Calculate time saved per serial, for showing in the Stats component
 	function calculateTimeSavedPerSerial(oldMinutes: number, newMinutes: number, serials: number) {
 		return (oldMinutes * 60) / serials - (newMinutes * 60) / serials;
@@ -290,7 +307,7 @@
 						name="isSubscribed"
 						checked={inbound?.isSubscribed}
 						value="on"
-						class="checkbox chat-bubble-neutral"
+						class="checkbox checkbox-xs chat-bubble-neutral"
 					/>
 				</fieldset>
 				<button
@@ -388,6 +405,13 @@
 					<Search size="18" />
 				</div>
 			</form>
+			<div>
+				<button
+					onclick={copySelectedSerialsToClipboard}
+					class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					>Copy Serials</button
+				>
+			</div>
 		</section>
 		<section class="overflow-x-auto">
 			<table class="min-w-full text-left text-sm">
@@ -405,7 +429,15 @@
 					{#if filteredInboundProducts}
 						{#each filteredInboundProducts as inboundProduct, i}
 							<tr class="hover:bg-orange-500/20">
-								<td class="border border-gray-500 p-2">{i + 1}</td>
+								<td class="flex justify-between border border-gray-500 p-2"
+									>{i + 1}
+									<input
+										type="checkbox"
+										bind:group={inboundProductIds}
+										value={inboundProduct.id}
+										class="checkbox chat-bubble-neutral checkbox-xs"
+									/>
+								</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.value}</td>

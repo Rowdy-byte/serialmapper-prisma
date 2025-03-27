@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { Eye, Search } from '@lucide/svelte';
+	import { Copy, Eye, Search } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
@@ -104,6 +104,7 @@
 				toast.error('Copy error!');
 				console.error('Clipboard copy error:', err);
 			});
+		window.location.reload();
 	}
 
 	// Calculate time saved per serial, for showing in the Stats component
@@ -408,8 +409,10 @@
 			<div>
 				<button
 					onclick={copySelectedSerialsToClipboard}
-					class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					>Copy Serials</button
+					data-tooltip="Copy selected serialnumbers to clipboard"
+					title="Copy selected serialnumbers to clipboard"
+					class="flex w-full rounded-full p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-gray-500 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					><Copy /></button
 				>
 			</div>
 		</section>
@@ -429,14 +432,13 @@
 					{#if filteredInboundProducts}
 						{#each filteredInboundProducts as inboundProduct, i}
 							<tr class="hover:bg-orange-500/20">
-								<td class="flex justify-between border border-gray-500 p-2"
-									>{i + 1}
+								<td class="flex justify-between border border-gray-500 p-2">
 									<input
 										type="checkbox"
 										bind:group={inboundProductIds}
 										value={inboundProduct.id}
 										class="checkbox chat-bubble-neutral checkbox-xs"
-									/>
+									/>{i + 1}
 								</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>

@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
     const outboundProducts = await db.outboundProduct.findMany()
 
-    const outbound = await db.inbound.findUnique({
+    const outbound = await db.outbound.findUnique({
         where: { id: Number(basePath) },
     })
 

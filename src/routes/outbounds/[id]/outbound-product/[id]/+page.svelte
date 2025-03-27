@@ -1,10 +1,8 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { page } from '$app/state';
-	import { CircleHelp, MoveRight } from '@lucide/svelte';
+	import { MoveRight } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
-
-	let deleteSectionOpen = $state(false);
 
 	const { params, url } = page;
 	const urlArray = url.pathname.split('/');
@@ -14,12 +12,18 @@
 	const segments = pathname.split('/');
 
 	let { data, form }: PageProps = $props();
-	let { outboundProducts } = data;
+	let { outboundProducts = [] } = data;
 	let { outbound } = data;
 
-	const filteredInboundProducts = outboundProducts.filter(
-		(product) => product.outboundId === outbound?.id
-	);
+	interface OutboundProduct {
+		id: number;
+		product: string;
+		serialnumber: string;
+		outboundId: number;
+	}
+
+	const filteredOutboundProducts =
+		outboundProducts?.filter((product) => product.outboundId === outbound?.id) || [];
 
 	function handleUpdateOutboundProduct(event: Event) {
 		if (!confirm('Are you sure you want to update this outbound product?')) {
@@ -52,20 +56,19 @@
 <section class="breadcrums text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="flex items-center gap-2">
 		<li>
-			<a href={`/outbounds/${outboundId}`} class="font-bold text-gray-500 hover:text-blue-500">
-				<span class="hidden md:inline">Outbound: </span>
-				{outbound?.outboundNumber}
-			</a>
+			<a href={`/inbounds/${outboundId}`} class="font-bold text-gray-500 hover:text-blue-500">
+				<span class="hidden font-bold md:inline">Outbound: </span> {outbound?.outboundNumber}</a
+			>
 		</li>
 		<li>
 			<MoveRight size="24" class="px-1" />
 		</li>
 		<li>
 			<p class="text-gray-500">
-				{#each filteredInboundProducts as inboundProduct, i}
-					{#if inboundProduct.id === Number(params.id)}
+				{#each filteredOutboundProducts as outboundProduct, i}
+					{#if outboundProduct.id === Number(params.id)}
 						<span class="text-gray-500">
-							<span class="hidden md:inline">Outbound Product:</span>
+							<span class="hidden font-bold md:inline">Outbound Product:</span>
 							{i + 1}
 						</span>
 					{/if}

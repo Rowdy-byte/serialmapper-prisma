@@ -76,8 +76,8 @@
 			/>
 			<button
 				onclick={handleCreateClient}
-				class="rounded-md
-            bg-green-500 p-3 text-sm hover:cursor-pointer hover:border-gray-400 hover:bg-green-800 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="rounded-full bg-orange-500
+            p-3 text-sm font-bold hover:cursor-pointer hover:bg-green-800 hover:text-orange-600 hover:shadow-md hover:transition-all"
 				type="submit">Create</button
 			>
 		</form>

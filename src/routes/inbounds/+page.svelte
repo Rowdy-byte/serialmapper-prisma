@@ -55,7 +55,7 @@
 
 <div class="container lg:mx-auto">
 	<h1 class="py-4 text-lg font-bold">Inbounds</h1>
-	<main class=" flex flex-col gap-12">
+	<main class="flex flex-col gap-12">
 		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Create Inbound</h1>
 
@@ -125,7 +125,7 @@
 							<td class="border border-gray-500 p-2">{inbound.clientName}</td>
 							<td class="hidden border border-gray-500 p-2 md:table-cell">{inbound.description}</td>
 							<td class="hidden border border-gray-500 p-2 md:table-cell"
-								>{inbound.isSubscribed ? 'T1' : 'exa'}</td
+								>{inbound.isSubscribed ? 'T1' : 'EXA'}</td
 							>
 							<td class="hidden border border-gray-500 p-2 md:table-cell">
 								{new Date(inbound.createdAt).toLocaleDateString()}

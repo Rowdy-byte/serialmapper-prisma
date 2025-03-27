@@ -7,113 +7,8 @@
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
-	import { Chart } from 'chart.js/auto';
-	import { getRelativePosition } from 'chart.js/helpers';
-
-	// Initialize chart variable to be used later
-	let chart: Chart<'pie', number[], string> | null = $state(null);
-	let chartCanvas: HTMLCanvasElement | undefined = $state();
-
-	let chartStatus: Chart<'doughnut', (number | object)[], string> | null = $state(null);
-	let chartStatusCanvas: HTMLCanvasElement | undefined = $state();
-
-	// Function to initialize chart when canvas is available
-	function initChart() {
-		if (!chartCanvas) return;
-		const ctx = chartCanvas.getContext('2d');
-		if (!ctx) return;
-
-		// Aggregeer het aantal per product uit de inbound producten
-		const inboundProductsForChart = filteredInboundProducts || [];
-		const productCounts: { [key: string]: number } = {};
-
-		inboundProductsForChart.forEach((product) => {
-			const productName = product.product || 'Onbekend';
-			productCounts[productName] = (productCounts[productName] || 0) + 1;
-		});
-
-		const labels = Object.keys(productCounts);
-		const dataValues = Object.values(productCounts);
-
-		// Maak een pie chart met de geaggregeerde data
-		chart = new Chart(ctx, {
-			type: 'pie',
-			data: {
-				labels: labels,
-				datasets: [
-					{
-						label: 'Productverdeling',
-						data: dataValues,
-						backgroundColor: [
-							'rgba(255, 105, 0, 1)',
-							'rgba(43, 127, 255, 1)',
-							'rgba(255, 206, 86, 0.2)',
-							'rgba(75, 192, 192, 0.2)',
-							'rgba(153, 102, 255, 0.2)',
-							'rgba(255, 159, 64, 0.2)'
-						],
-						borderColor: [
-							// 'rgba(255,99,132,1)',
-							// 'rgba(54, 162, 235, 1)',
-							// 'rgba(255, 206, 86, 1)',
-							// 'rgba(75, 192, 192, 1)',
-							// 'rgba(153, 102, 255, 1)',
-							// 'rgba(255, 159, 64, 1)'
-						],
-						borderWidth: 1
-					}
-				]
-			},
-			options: {
-				responsive: true,
-				plugins: {
-					legend: {
-						position: 'top'
-					},
-					tooltip: {
-						enabled: true
-					}
-				}
-			}
-		});
-	}
-
-	function initStatusChart() {
-		if (!chartStatusCanvas) return;
-		const ctx = chartStatusCanvas.getContext('2d');
-		if (!ctx) return;
-
-		// Use your computed product status values
-		const inStatus = productStatusIn || 0;
-		const outStatus = productStatusOut || 0;
-
-		chartStatus = new Chart(ctx, {
-			type: 'doughnut',
-			data: {
-				labels: ['IN', 'OUT'],
-				datasets: [
-					{
-						label: 'Product Status Distribution',
-						data: [inStatus, outStatus],
-						backgroundColor: ['rgba(255, 105, 0, 1)', 'rgba(43, 127, 255, 1)'],
-						borderColor: [],
-						borderWidth: 1
-					}
-				]
-			},
-			options: {
-				responsive: true,
-				plugins: {
-					legend: {
-						position: 'top'
-					},
-					tooltip: {
-						enabled: true
-					}
-				}
-			}
-		});
-	}
+	import ChartPie from '$lib/components/charts/ChartPie.svelte';
+	import ChartPieStatus from '$lib/components/charts/ChartPieStatus.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -145,8 +40,6 @@
 		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
 	);
 
-	$effect(() => {});
-
 	function handleDeleteInbound(event: Event) {
 		if (!confirm('Are you sure you want to delete this inbound?')) {
 			event.preventDefault();
@@ -173,10 +66,6 @@
 			event.preventDefault();
 		}
 	}
-
-	function scanBarcodetoSingleTextarea() {}
-
-	function scanBarcodetoBatchTextarea() {}
 
 	function handleScanQr() {
 		alert('Buy Pro!');
@@ -214,7 +103,6 @@
 		window.location.reload();
 	}
 
-	// Calculate time saved per serial, for showing in the Stats component
 	function calculateTimeSavedPerSerial(oldMinutes: number, newMinutes: number, serials: number) {
 		return (oldMinutes * 60) / serials - (newMinutes * 60) / serials;
 	}
@@ -268,7 +156,9 @@
 				});
 				break;
 		}
+	});
 
+	$effect(() => {
 		filteredInboundProducts = inboundProducts?.filter(
 			(product) =>
 				product.inboundId === inbound?.id &&
@@ -280,7 +170,6 @@
 	});
 
 	$effect(() => {
-		// Filter inbound products for the current inbound
 		const inboundForThis =
 			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || [];
 
@@ -329,18 +218,6 @@
 
 		inboundProductIds = inboundForThis.map((product) => product.inboundId);
 	});
-
-	$effect(() => {
-		if (chart) {
-			chart.destroy();
-		}
-		initChart();
-
-		if (chartStatus) {
-			chartStatus.destroy();
-		}
-		initStatusChart();
-	});
 </script>
 
 <BackToTop scrollTo="scroll to top" />
@@ -357,7 +234,7 @@
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 		<section
-			class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md md:grid-cols-3 lg:grid-cols-4"
+			class="order-2 grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md md:grid-cols-3 lg:grid-cols-4"
 		>
 			<Stats statsName="PRODUCTS" statsValue={productsCount} />
 			<Stats statsName="SERIALS" statsValue={serialnumbersCount} />
@@ -367,7 +244,7 @@
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
 			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
-		<section class="flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="order-1 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Options</h1>
 
 			<div class="flex gap-4">
@@ -397,7 +274,7 @@
 				</form>
 			</div>
 		</section>
-		<section class="flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
 			<form class="flex flex-col gap-4" method="post">
 				<select
@@ -443,7 +320,7 @@
 				</button>
 			</form>
 		</section>
-		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="order-4 rounded-lg bg-gray-900 p-4 shadow-md">
 			<section class="rounded-lg bg-gray-900 p-4 shadow-md">
 				<h1 class="flex items-center justify-between pb-4 font-bold">
 					Add Single Product to Inbound
@@ -514,19 +391,18 @@
 				</form>
 			</section>
 		</section>
-		<section class="chart-status-section flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
-			<canvas
-				id="statusChart"
-				bind:this={chartStatusCanvas}
-				class="mx-auto h-64 w-full rounded-lg bg-gray-950 p-3"
-			></canvas>
+		<section
+			class="chart-status-section order-6 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
+		>
+			<!-- charts -->
+			<ChartPie {filteredInboundProducts} />
 		</section>
-		<section class="chart-section flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
-			<canvas
-				id="myChart"
-				bind:this={chartCanvas}
-				class="mx-auto h-64 w-full rounded-lg bg-gray-950 p-3"
-			></canvas>
+		<section
+			class="chart-status-section order-6 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
+		>
+			<!-- charts -->
+
+			<ChartPieStatus {productStatusIn} {productStatusOut} />
 		</section>
 	</main>
 	<section class="mt-4">
@@ -555,7 +431,7 @@
 				>
 			</div>
 		</section>
-		<section class="overflow-x-auto">
+		<section class="order-5 overflow-x-auto">
 			<table class="min-w-full text-left text-sm">
 				<thead>
 					<tr class="text-gray-500">

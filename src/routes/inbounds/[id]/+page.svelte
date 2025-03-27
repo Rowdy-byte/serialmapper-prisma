@@ -233,12 +233,7 @@
 		</ul>
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-		<section
-			class="order-2 grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md md:grid-cols-3 lg:grid-cols-4"
-		>
-			<Stats statsName="PRODUCTS" statsValue={productsCount} />
-			<Stats statsName="SERIALS" statsValue={serialnumbersCount} />
-			<Stats statsName="IN / OUT" statsValue={`${productStatusIn}/${productStatusOut} `} />
+		<section class="order-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
@@ -447,13 +442,14 @@
 					{#if filteredInboundProducts}
 						{#each filteredInboundProducts as inboundProduct, i}
 							<tr class="hover:bg-orange-500/20">
-								<td class="flex justify-between border border-gray-500 p-2">
+								<td class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2">
 									<input
 										type="checkbox"
 										bind:group={inboundProductIds}
 										value={inboundProduct.id}
-										class="checkbox chat-bubble-neutral checkbox-xs"
-									/>{i + 1}
+										class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
+									/>
+									{i + 1}
 								</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>

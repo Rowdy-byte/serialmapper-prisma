@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { Copy, Eye, Search } from '@lucide/svelte';
+	import { Copy, Eye, QrCode, RefreshCcw, Search, Sheet, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
@@ -238,7 +238,7 @@
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 		<section
-			class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md md:grid-cols-4 lg:grid-cols-5"
+			class="grid grid-cols-3 gap-2 rounded-lg bg-gray-900 p-4 shadow-md md:grid-cols-3 lg:grid-cols-4"
 		>
 			<Stats statsName="PRODUCTS" statsValue={productsCount} />
 			<Stats statsName="SERIALS" statsValue={serialnumbersCount} />
@@ -261,7 +261,7 @@
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
-						Map
+						<Sheet />
 					</button>
 				</form>
 
@@ -273,7 +273,7 @@
 						class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						type="submit"
 					>
-						Del
+						<Trash2 />
 					</button>
 				</form>
 			</div>
@@ -315,10 +315,12 @@
 					disabled={isUpdatingInbound}
 					formaction="?/updateInbound"
 					onclick={handleUpdateInbound}
-					class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					data-tooltip="Update Inbound"
+					title="Update Inbound"
+					class=" rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit"
 				>
-					Update
+					Update Inbound
 				</button>
 			</form>
 		</section>
@@ -380,10 +382,12 @@
 						</button>
 						<button
 							type="button"
+							data-tooltip="Scan Barcode to Single"
+							title="Scan Barcode to Single"
 							onclick={handleScanQr}
-							class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+							class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						>
-							Scan QR code
+							<QrCode />
 						</button>
 					</div>
 				</section>
@@ -411,8 +415,8 @@
 					onclick={copySelectedSerialsToClipboard}
 					data-tooltip="Copy selected serialnumbers to clipboard"
 					title="Copy selected serialnumbers to clipboard"
-					class="flex w-full rounded-full p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-gray-500 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					><Copy /></button
+					class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					><Copy size="24" strokeWidth="1px" /></button
 				>
 			</div>
 		</section>

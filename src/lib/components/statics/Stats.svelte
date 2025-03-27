@@ -10,7 +10,7 @@
 </script>
 
 <section
-	class="flex aspect-square flex-col items-center justify-center rounded-lg bg-gray-900 text-gray-500 shadow-2xl sm:max-w-28 md:max-w-32 lg:max-w-36 xl:max-w-40 2xl:max-w-44"
+	class="flex aspect-square flex-col items-center justify-center rounded-lg bg-gray-900 text-gray-500 shadow-2xl"
 >
 	<h1 class="sm:text-md text-xs font-bold">{statsName}</h1>
 

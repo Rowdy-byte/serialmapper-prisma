@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { Copy, Eye, QrCode, RefreshCcw, Search, Sheet, Trash2 } from '@lucide/svelte';
+	import { Copy, Eye, QrCode, Search, Sheet, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';

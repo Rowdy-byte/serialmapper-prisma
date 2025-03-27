@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { Copy, Eye, QrCode, Search, Trash2 } from '@lucide/svelte';
+	import { Copy, Eye, QrCode, RefreshCcw, Search, Sheet, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
@@ -67,8 +67,19 @@
 		}
 	}
 
+	function scanBarcodetoSingleTextarea() {}
+
+	function scanBarcodetoBatchTextarea() {}
+
 	function handleScanQr() {
 		alert('Buy Pro!');
+	}
+
+	function handleMapSerialToWorksheet(event: Event) {
+		if (!confirm('Are you sure you want to map the serialnumbers to a worksheet?')) {
+			event.preventDefault();
+		}
+		mapSerialToWorksheet();
 	}
 
 	function mapSerialToWorksheet() {
@@ -107,7 +118,10 @@
 				duration: 3000,
 				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
 			});
-	// Calculate time saved per serial, for showing in the Stats component
+		}
+	}
+
+	$effect(() => {
 		switch (true) {
 			case form?.success:
 				toast.success(form?.message, {
@@ -238,20 +252,41 @@
 			<h1 class="pb-4 font-bold">Options</h1>
 
 			<div class="flex gap-4">
-<form action="?/mapSerialnumbersToWorksheet" method="post">
-	<input hidden type="text" name="inboundId" value={inbound?.id} />
-	<button type="submit" class="btn">Export to Excel</button>
-</form>
+				<form action="?/mapSerialnumbersToWorksheet" method="post">
+					<input hidden type="text" name="inboundId" value={inbound?.id} />
+					<button
+						class="flex h-11 w-11 items-center justify-center rounded-full border border-orange-500 bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						data-tooltip="Map Serialnumbers to Worksheet"
+						title="Map Serialnumbers to Worksheet"
+						onclick={handleMapSerialToWorksheet}
+						type="button"
+					>
+						<Sheet />
+					</button>
+				</form>
 
-<div class="flex gap-4">
-	<form use:enhance method="post" action="?/deleteInbound">
-		<button
-			onclick={handleDeleteInbound}
-			data-tooltip="Delete Inbound"
-			title="Delete Inbound"
-			class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-			type="submit"
-		>
+				<form use:enhance method="post" action="?/deleteInbound">
+					<button
+						onclick={handleDeleteInbound}
+						data-tooltip="Delete Inbound"
+						title="Delete Inbound"
+						class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						type="submit"
+					>
+						<Trash2 />
+					</button>
+				</form>
+			</div>
+		</section>
+		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
+			<form class="flex flex-col gap-4" method="post">
+				<select
+					disabled={isUpdatingInbound}
+					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"
+					name="clientName"
+				>
+					<option value="clientName">{inbound?.clientName}</option>
 					{#if clients}
 						{#each clients as client}
 							<option value={client.name}>{client.name}</option>

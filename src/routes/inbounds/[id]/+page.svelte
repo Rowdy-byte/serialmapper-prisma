@@ -2,13 +2,15 @@
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { Copy, Eye, QrCode, Search, Sheet, Trash2 } from '@lucide/svelte';
+	import { Copy, Eye, Printer, QrCode, Search, Sheet, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
 	import ChartPieInboundProducts from '$lib/components/charts/ChartPieInboundProducts.svelte';
 	import ChartPieStatus from '$lib/components/charts/ChartPieStatus.svelte';
+	import jsPDF from 'jspdf';
+	import JsBarcode from 'jsbarcode';
 
 	let { data, form }: PageProps = $props();
 
@@ -33,6 +35,54 @@
 	let timeSavedPerSerial = $state(0);
 
 	let inboundProductIds = $state<number[]>([]);
+
+	function printSelectedLabels() {
+		const selectedProducts =
+			filteredInboundProducts?.filter((product) => inboundProductIds.includes(product.id)) || [];
+
+		if (selectedProducts.length === 0) {
+			toast.error('Select at least one product to print labels.');
+			return;
+		}
+
+		const doc = new jsPDF({
+			orientation: 'portrait',
+			unit: 'mm',
+			format: 'a4'
+		});
+
+		let yOffset = 10;
+
+		selectedProducts.forEach((product, index) => {
+			doc.setFont('helvetica', 'bold');
+			doc.setFontSize(10);
+
+			doc.text(`Product: ${product.product}`, 5, yOffset + 5);
+			doc.text(`Serial: ${product.serialnumber}`, 5, yOffset + 12);
+			doc.text(`Inboundnumber: ${inbound?.inboundNumber}`, 5, yOffset + 19);
+
+			const barcodeCanvas = document.createElement('canvas');
+
+			JsBarcode(barcodeCanvas, product.barcode || product.serialnumber || '', {
+				format: 'CODE128',
+				displayValue: false,
+				width: 1.2,
+				height: 15
+			});
+
+			const barcodeImage = barcodeCanvas.toDataURL('image/png');
+			doc.addImage(barcodeImage, 'PNG', 5, yOffset + 22, 50, 10);
+
+			yOffset += 35;
+
+			if (yOffset > 270 && index !== selectedProducts.length - 1) {
+				doc.addPage();
+				yOffset = 10;
+			}
+		});
+
+		doc.save(`bulk_labels_${data.inbound?.inboundNumber}.pdf`);
+	}
 
 	let filteredInboundProducts = $state(
 		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
@@ -406,13 +456,20 @@
 					<Search size="18" />
 				</div>
 			</form>
-			<div>
+			<div class="flex gap-4">
 				<button
 					onclick={copySelectedSerialsToClipboard}
 					data-tooltip="Copy selected serialnumbers to clipboard"
 					title="Copy selected serialnumbers to clipboard"
 					class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 					><Copy size="24" strokeWidth="1px" /></button
+				>
+				<button
+					onclick={printSelectedLabels}
+					data-tooltip="Copy selected serialnumbers to clipboard"
+					title="Copy selected serialnumbers to clipboard"
+					class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					><Printer size="24" strokeWidth="1px" /></button
 				>
 			</div>
 		</section>

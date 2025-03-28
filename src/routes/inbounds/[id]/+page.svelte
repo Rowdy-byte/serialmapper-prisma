@@ -28,8 +28,6 @@
 	let productStatusIn = $state();
 	let productStatusOut = $state();
 
-	let productsCount = $state(0);
-	let serialnumbersCount = $state(0);
 	let timeSaved = $state(0);
 	let euroPerMinute = $state(0);
 	let timeSavedPerSerial = $state(0);
@@ -173,12 +171,6 @@
 		const inboundForThis =
 			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || [];
 
-		// PRODUCTS: count distinct products (unique product names)
-		productsCount = new Set(inboundForThis.map((product) => product.product)).size;
-
-		// SERIALS: total number of inbound products
-		serialnumbersCount = inboundForThis.length;
-
 		// Sum the product values
 		productValue = inboundForThis.reduce(
 			(sum, product) => sum + (parseFloat(product.value ?? '0') || 0),
@@ -213,7 +205,8 @@
 				searchQuery.trim() === '' ||
 				product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				product.status?.toLowerCase().includes(searchQuery.toLowerCase())
+				product.status?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				product.value?.toString().includes(searchQuery.toLowerCase())
 		);
 
 		inboundProductIds = inboundForThis.map((product) => product.inboundId);
@@ -233,7 +226,7 @@
 		</ul>
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-		<section class="order-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="order-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md lg:order-4">
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
@@ -269,7 +262,7 @@
 				</form>
 			</div>
 		</section>
-		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
 			<form class="flex flex-col gap-4" method="post">
 				<select
@@ -315,8 +308,8 @@
 				</button>
 			</form>
 		</section>
-		<section class="order-4 rounded-lg bg-gray-900 p-4 shadow-md">
-			<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="order-4 rounded-lg bg-gray-900 p-4 shadow-md lg:order-3">
+			<section class="rounded-lg bg-gray-900 shadow-md">
 				<h1 class="flex items-center justify-between pb-4 font-bold">
 					Add Single Product to Inbound
 				</h1>
@@ -387,7 +380,7 @@
 			</section>
 		</section>
 		<section
-			class="chart-status-section order-6 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
+			class="chart-status-section bg-gray- order-6 flex flex-col items-center justify-center rounded-lg p-4 shadow-md"
 		>
 			<!-- charts -->
 			<ChartPie {filteredInboundProducts} />

@@ -14,7 +14,7 @@
 >
 	<h1 class="sm:text-md text-xs font-bold">{statsName}</h1>
 
-	<p class="text-lg font-bold text-blue-500 md:text-xl xl:text-2xl">
+	<p class="sm:4xl text-3xl font-bold text-blue-500 xl:text-4xl">
 		<span class="text-sm">{prefix}</span>{statsValue}<span class="text-xs">{suffix}</span>
 	</p>
 </section>

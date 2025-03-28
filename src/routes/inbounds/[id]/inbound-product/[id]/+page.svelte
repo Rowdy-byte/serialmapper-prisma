@@ -118,7 +118,7 @@
 		{/each}
 	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
-		<h1 class="flex w-full items-center justify-between font-bold">Delete product from Inbound</h1>
+		<h1 class="flex w-full items-center justify-between font-bold">Delete Product from Inbound</h1>
 		<form method="post" class="flex gap-2">
 			<button
 				formaction="?/deleteInboundProduct"

@@ -2,8 +2,9 @@ import type { PageServerLoad } from "./$types";
 import { fail } from "@sveltejs/kit";
 import db from "$lib/server/db";
 import { CreateInboundSchema } from "$lib/zod/zod-schemas";
-import { AddSingleProductSchema } from "$lib/zod/zod-schemas";
+import { AddSingleProductSchema, AddMultipleProductSchema } from "$lib/zod/zod-schemas";
 import { error } from "@sveltejs/kit";
+
 import { customAlphabet } from 'nanoid';
 
 // Barcode generator: 12 tekens, alleen cijfers en hoofdletters
@@ -48,7 +49,7 @@ export const load: PageServerLoad = async ({ params }) => {
 export const actions = {
     async updateInbound({ params, request }: { params: { id: string }, request: Request }) {
 
-        await new Promise((fulfil: (value: unknown) => void) => setTimeout(fulfil, 2000));
+        await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
         const formData = Object.fromEntries(await request.formData());
 
@@ -148,6 +149,64 @@ export const actions = {
             success: true,
             message: 'Product added successfully.',
             inboundProduct
+        };
+    },
+
+    async addBatchInboundProductToInbound({ params, request }: { params: { id: string }, request: Request }) {
+        await new Promise((fulfil) => setTimeout(fulfil, 2000));
+
+        const inboundId = Number(params.id);
+        const formData = await request.formData();
+
+        const batch = (formData.get('batch') as string)
+            .split(/[\s\n]+/)
+            .map(serialnumber => serialnumber.trim())
+            .filter(serialnumber => serialnumber.length > 0);
+
+        // Validate data using Zod schema
+        const safeParse = AddMultipleProductSchema.safeParse({
+            ...Object.fromEntries(formData),
+            inboundId: formData.get('inboundId')
+        });
+
+        if (!safeParse.success) {
+            return fail(400, { issues: safeParse.error.issues });
+        }
+
+        // Check for duplicate serial numbers in the database
+        const existingSerialNumbers = new Set(
+            (await db.inboundProduct.findMany({
+                where: { serialnumber: { in: batch } },
+                select: { serialnumber: true }
+            })).map(({ serialnumber }) => serialnumber)
+        );
+
+        const uniqueSerialNumbers = batch.filter(serialnumber => !existingSerialNumbers.has(serialnumber));
+
+        if (uniqueSerialNumbers.length === 0) {
+            return {
+                status: 400,
+                success: false,
+                message: 'Duplicate serial numbers detected.'
+            };
+        }
+
+        // **Generate barcodes for each inbound product**
+        const inboundProducts = await db.inboundProduct.createMany({
+            data: uniqueSerialNumbers.map(serialnumber => ({
+                product: safeParse.data.product as string,
+                serialnumber,
+                value: safeParse.data.value as string,
+                barcode: generateBarcode(), // ✅ Each product gets a unique barcode
+                inboundId: inboundId
+            }))
+        });
+
+        return {
+            status: 200,
+            success: true,
+            message: 'Batch added to inbound successfully.',
+            inboundProducts
         };
     },
 

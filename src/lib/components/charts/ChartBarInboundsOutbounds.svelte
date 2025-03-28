@@ -3,7 +3,7 @@
 
 	// Expecting clients as an array of objects from Prisma
 	// Each client is assumed to have a 'createdAt' property
-	const { inbounds, outbounds } = $props<{ inbounds: { createdAt: string }[] }>();
+	const { inbounds, outbounds } = $props();
 
 	let chart: Chart<'bar', number[], string> | null = $state(null);
 	let chartCanvas: HTMLCanvasElement | null = $state(null);

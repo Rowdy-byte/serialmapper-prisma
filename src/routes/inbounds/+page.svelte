@@ -54,8 +54,11 @@
 <BackToTop scrollTo="scroll to top" />
 
 <div class="container lg:mx-auto">
-	<h1 class="py-4 text-lg font-bold">Inbounds</h1>
-	<main class="flex flex-col gap-12">
+	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
+		<h1 class="py-4 text-lg font-bold">Inbounds</h1>
+	</section>
+
+	<main class="flex flex-col gap-4">
 		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Create Inbound</h1>
 

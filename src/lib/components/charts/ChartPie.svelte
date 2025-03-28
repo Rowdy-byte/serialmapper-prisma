@@ -30,15 +30,15 @@
 				labels: labels,
 				datasets: [
 					{
-						label: 'Productverdeling',
+						label: 'Products',
 						data: dataValues,
 						backgroundColor: [
-							'rgba(255, 105, 0, 1)',
-							'rgba(43, 127, 255, 1)',
+							'rgba(249, 115, 22,1)',
+							'rgba(59, 130, 246, 1)',
 							'rgba(34, 197, 94, 1)',
-							'rgba(75, 192, 192, 0.2)',
-							'rgba(153, 102, 255, 0.2)',
-							'rgba(255, 159, 64, 0.2)'
+							'rgba(75, 192, 192, 1)',
+							'rgba(153, 102, 255, 1)',
+							'rgba(255, 159, 64, 1)'
 						],
 						borderColor: [
 							// 'rgba(255,99,132,1)',
@@ -71,5 +71,8 @@
 	});
 </script>
 
-<canvas id="myChart" bind:this={chartCanvas} class="mx-auto h-64 w-full rounded-lg bg-gray-950 p-3"
+<canvas
+	id="myChart"
+	bind:this={chartCanvas}
+	class="mx-auto max-h-60 w-full rounded-lg bg-gray-900 p-3 shadow-2xl"
 ></canvas>

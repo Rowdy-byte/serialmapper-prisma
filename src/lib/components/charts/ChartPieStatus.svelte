@@ -3,7 +3,7 @@
 
 	let { productStatusIn, productStatusOut } = $props();
 
-	let chartStatus: Chart<'doughnut', (number | object)[], string> | null = $state(null);
+	let chartStatus: Chart<'pie', (number | object)[], string> | null = $state(null);
 	let chartStatusCanvas: HTMLCanvasElement | undefined = $state();
 
 	function initStatusChart() {
@@ -16,14 +16,18 @@
 		const outStatus = productStatusOut || 0;
 
 		chartStatus = new Chart(ctx, {
-			type: 'doughnut',
+			type: 'pie',
 			data: {
 				labels: ['IN', 'OUT'],
 				datasets: [
 					{
 						label: 'Product Status Distribution',
 						data: [inStatus, outStatus],
-						backgroundColor: ['rgba(255, 105, 0, 1)', 'rgba(43, 127, 255, 1)'],
+						backgroundColor: [
+							'rgba(249, 115, 22,1)',
+							'rgba(59, 130, 246, 1)',
+							'rgba(34, 197, 94, 1)'
+						],
 						borderColor: [],
 						borderWidth: 1
 					}
@@ -51,5 +55,5 @@
 <canvas
 	id="statusChart"
 	bind:this={chartStatusCanvas}
-	class="mx-auto h-50 w-full rounded-lg bg-gray-950 p-3"
+	class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-lg"
 ></canvas>

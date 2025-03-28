@@ -175,7 +175,9 @@
 <BackToTop scrollTo="scroll to top" />
 
 <div class="container mx-auto px-4 py-4">
-	<section class="breadcrums text-md mb-4 rounded-lg bg-gray-900 p-4 shadow-md">
+	<section
+		class="breadcrums text-md mb-4 flex items-center justify-between rounded-lg bg-gray-900 p-4 shadow-md"
+	>
 		<ul class="text-gray-500">
 			<li class="font-bold">
 				<a href="/outbounds" class="transition-all hover:text-blue-500">
@@ -183,6 +185,19 @@
 				</a>
 			</li>
 		</ul>
+		<div>
+			<form use:enhance method="post" action="?/deleteInbound">
+				<button
+					onclick={handleDeleteOutbound}
+					data-tooltip="Delete Inbound"
+					title="Delete Inbound"
+					class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					type="submit"
+				>
+					<Trash2 />
+				</button>
+			</form>
+		</div>
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 		<section class="order-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md lg:order-4">
@@ -191,34 +206,7 @@
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
 			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
-		<section class="order-1 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
-			<h1 class="pb-4 font-bold">Options</h1>
-			<div class="flex gap-4">
-				<form action="?/mapSerialnumbersToWorksheet" method="post">
-					<input hidden type="text" name="inboundId" value={outbound?.id} />
-					<button
-						class="flex h-11 w-11 items-center justify-center rounded-full border border-orange-500 bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						data-tooltip="Map Serialnumbers to Worksheet"
-						title="Map Serialnumbers to Worksheet"
-						onclick={handleMapSerialToWorksheet}
-						type="button"
-					>
-						<Sheet />
-					</button>
-				</form>
-				<form use:enhance method="post" action="?/deleteInbound">
-					<button
-						onclick={handleDeleteOutbound}
-						data-tooltip="Delete Inbound"
-						title="Delete Inbound"
-						class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						type="submit"
-					>
-						<Trash2 />
-					</button>
-				</form>
-			</div>
-		</section>
+
 		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Outbound</h1>
 			<form class="flex flex-col gap-4" method="post">
@@ -315,13 +303,25 @@
 					type="text"
 					name="search"
 					placeholder="Search Products"
-					class="w-full rounded border bg-gray-950 py-2 pr-4 pl-10 text-sm"
+					class="w-full rounded-full bg-gray-950 py-2 pr-4 pl-10 text-sm"
 				/>
 				<div
 					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
 				>
 					<Search size="18" />
 				</div>
+			</form>
+			<form action="?/mapSerialnumbersToWorksheet" method="post">
+				<input hidden type="text" name="inboundId" value={outbound?.id} />
+				<button
+					class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					data-tooltip="Map Serialnumbers to Worksheet"
+					title="Map Serialnumbers to Worksheet"
+					onclick={handleMapSerialToWorksheet}
+					type="button"
+				>
+					<Sheet />
+				</button>
 			</form>
 		</section>
 

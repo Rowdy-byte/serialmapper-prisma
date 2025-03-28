@@ -56,8 +56,10 @@
 
 <BackToTop scrollTo="scroll to top" />
 
-<div class="container lg:mx-auto">
-	<h1 class="py-4 text-lg font-bold">Outbounds</h1>
+<div class="container mx-auto py-4">
+	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
+		<h1 class="py-4 text-lg font-bold">Outbounds</h1>
+	</section>
 
 	<main class="flex flex-col gap-12">
 		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
@@ -151,5 +153,6 @@
 				<p class="mt-2 rounded-full bg-gray-500 p-1 text-sm">No outbounds found.</p>
 			{/if}
 		</section>
+		<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md"></section>
 	</main>
 </div>

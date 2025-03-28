@@ -39,7 +39,9 @@
 </script>
 
 <div class="container mx-auto py-4">
-	<h1 class="py-4 text-xl font-bold">Products</h1>
+	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
+		<h1 class="py-4 text-xl font-bold">Products</h1>
+	</section>
 
 	<main class="flex flex-col gap-12">
 		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
@@ -106,5 +108,6 @@
 				</tbody>
 			</table>
 		</section>
+		<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md"></section>
 	</main>
 </div>

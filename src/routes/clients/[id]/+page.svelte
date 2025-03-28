@@ -67,6 +67,34 @@
 	            bg-gray-950 p-3 text-sm text-gray-500"
 					value={client?.name}
 				/>
+				<input
+					type="email"
+					name="email"
+					value={client?.email}
+					placeholder="Email"
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+				/>
+				<input
+					type="text"
+					name="phone"
+					value={client?.phone}
+					placeholder="Phone"
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+				/>
+				<input
+					type="text"
+					name="address"
+					value={client?.address}
+					placeholder="Address"
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+				/>
+				<input
+					type="text"
+					name="city"
+					value={client?.city}
+					placeholder="City"
+					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+				/>
 				<button
 					formaction="?/updateClient"
 					onclick={handleUpdateClient}

@@ -30,9 +30,7 @@
 
 			<!-- <img class="w-32" src="/logo.png" alt="serialmapper-logo" /> -->
 		</section>
-		<section
-			class="-ml-0.5 flex h-2 w-full flex-col rounded-lg bg-gray-900 p-1 shadow-md"
-		></section>
+		<section class="ml-1 flex h-2 w-full flex-col rounded-lg bg-gray-900 p-1 shadow-md"></section>
 		<section class="flex h-full items-center gap-2">
 			<div class="hidden items-center gap-2 md:flex">
 				{#each links as { linkName, linkPath }}

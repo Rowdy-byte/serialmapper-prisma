@@ -194,7 +194,7 @@ export const actions = {
         return {
             status: 200,
             success: true,
-            message: 'Batch added to inbound successfully.',
+            message: 'Batch added successfully.',
             inboundProducts
         };
     },

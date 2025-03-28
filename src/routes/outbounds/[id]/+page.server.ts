@@ -89,53 +89,53 @@ export const actions = {
         const serial = formData.get("serial") as string;
         const outboundNumber = formData.get("outboundNumber") as string; // Using outboundNumber for lookup
 
-        try {
-            const outboundProduct = await db.$transaction(async (tx) => {
-                // Find the outbound record by its unique outboundNumber
-                const outboundRecord = await tx.outbound.findUnique({
-                    where: { outboundNumber }
-                });
-                if (!outboundRecord) {
-                    throw new Error(`Outbound with number ${outboundNumber} not found.`);
+
+        const outboundProduct = await db.$transaction(async (tx) => {
+            // Find the outbound record by its unique outboundNumber
+            const outboundRecord = await tx.outbound.findUnique({
+                where: { outboundNumber }
+            });
+            if (!outboundRecord) {
+                throw new Error(`Outbound with number ${outboundNumber} not found.`);
+            }
+
+            // Find the inbound product by its serial number
+            const inboundProduct = await tx.inboundProduct.findFirst({
+                where: { serialnumber: serial }
+            });
+            if (!inboundProduct) {
+                throw new Error(`Inbound product with serial ${serial} not found.`);
+            }
+            if (inboundProduct.status !== "IN") {
+                throw new Error(`Inbound product with serial ${serial} is already assigned.`);
+            }
+
+            // Create a new outbound product, ensuring that only the allowed fields are passed
+            const newOutboundProduct = await tx.outboundProduct.create({
+                data: {
+                    product: inboundProduct.product,
+                    serialnumber: inboundProduct.serialnumber,
+                    value: inboundProduct.value ?? "", // Supply a default if value is null
+                    outbound: { connect: { id: outboundRecord.id } },
+                    originInbound: { connect: { id: inboundProduct.inboundId } }
                 }
-
-                // Find the inbound product by its serial number
-                const inboundProduct = await tx.inboundProduct.findFirst({
-                    where: { serialnumber: serial }
-                });
-                if (!inboundProduct) {
-                    throw new Error(`Inbound product with serial ${serial} not found.`);
-                }
-                if (inboundProduct.status !== "IN") {
-                    throw new Error(`Inbound product with serial ${serial} is already assigned.`);
-                }
-
-                // Create a new outbound product, ensuring that only the allowed fields are passed
-                const newOutboundProduct = await tx.outboundProduct.create({
-                    data: {
-                        product: inboundProduct.product,
-                        serialnumber: inboundProduct.serialnumber,
-                        value: inboundProduct.value ?? "", // Supply a default if value is null
-                        outbound: { connect: { id: outboundRecord.id } },
-                        originInbound: { connect: { id: inboundProduct.inboundId } }
-                    }
-                });
-
-                // Update the inbound product's status to "OUT"
-                await tx.inboundProduct.update({
-                    where: { id: inboundProduct.id },
-                    data: { status: "OUT" }
-                });
-
-                return newOutboundProduct;
             });
 
-            return { success: true, outboundProduct };
-        } catch (error: Error | unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-            console.error("Error in moveInboundProductToOutbound:", error);
-            return { success: false, error: errorMessage };
-        }
+            // Update the inbound product's status to "OUT"
+            await tx.inboundProduct.update({
+                where: { id: inboundProduct.id },
+                data: { status: "OUT" }
+            });
+
+            return newOutboundProduct;
+        });
+
+        return {
+            movedSingleSuccess: true,
+            message: "Product moved successfully!",
+            outboundProduct
+        };
+
     },
 
     async moveBatchToOutbound({ request }: { request: Request }) {
@@ -196,7 +196,8 @@ export const actions = {
                 });
 
                 return {
-                    success: true,
+                    movedBatchSuccess: true,
+                    message: "Batch moved successfully.",
                     createdCount: validInbound.length,
                     skipped: alreadyAssigned.map(p => p.serialnumber),
                     notFound: notFoundSerials

@@ -7,7 +7,7 @@
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
-	import ChartPie from '$lib/components/charts/ChartPie.svelte';
+	import ChartPie from '$lib/components/charts/ChartPieInboundProducts.svelte';
 	import ChartPieStatus from '$lib/components/charts/ChartPieStatus.svelte';
 
 	let { data, form }: PageProps = $props();

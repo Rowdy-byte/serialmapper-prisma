@@ -7,6 +7,10 @@
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
+	import ChartPie from '$lib/components/charts/ChartPieInboundProducts.svelte';
+	import ChartPieStatus from '$lib/components/charts/ChartPieStatus.svelte';
+	import ChartBarOutboundProducts from '$lib/components/charts/ChartPieOutboundProducts.svelte';
+	import ChartPieOutboundProducts from '$lib/components/charts/ChartPieOutboundProducts.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -23,14 +27,11 @@
 
 	let productValue = $state(0);
 	let productRevenue = $state(0);
-	let productStatusIn = $state();
-	let productStatusOut = $state();
-	let productsCount = $state<number>(0);
-	let serialnumbersCount = $state<number>(0);
 
 	let timeSaved = $state(0);
 	let timeSavedPerSerial = $state(0);
 	let euroPerMinute = $state(0);
+
 	let inboundProductIds = $state<number[]>([]);
 
 	let filteredOutboundProducts = $state(
@@ -84,10 +85,6 @@
 		}
 	}
 
-	// function scanBarcodetoSingleTextarea() {}
-
-	// function scanBarcodetoBatchTextarea() {}
-
 	function handleScanQr() {
 		alert('Buy Pro!');
 	}
@@ -124,79 +121,45 @@
 				});
 				window.location.reload();
 				break;
-
-			// case form?.duplicateSuccess === false:
-			// 	toast.error(form?.message, {
-			// 		duration: 4000,
-			// 		style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-			// 	});
-			// 	break;
-
-			// case form?.addProductTooutboundSuccess:
-			// 	toast.success(form?.message, {
-			// 		duration: 4000,
-			// 		style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-			// 	});
-			// 	window.location.reload();
-			// 	break;
-
-			// case form?.addBatchToOutboundSuccess:
-			// 	toast.success(form?.message, {
-			// 		duration: 4000,
-			// 		style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-			// 	});
-			// 	window.location.reload();
-			// 	break;
-
-			// case form?.addBatchToOutboundSuccess === false:
-			// 	toast.error(form?.message, {
-			// 		duration: 4000,
-			// 		style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-			// 	});
-			// 	break;
+			case form?.movedBatchSuccess:
+				toast.success(form?.message, {
+					duration: 4000,
+					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+				});
+				window.location.reload();
+				break;
+			case form?.movedSingleSuccess:
+				toast.success(form?.message, {
+					duration: 4000,
+					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+				});
+				window.location.reload();
+				break;
 		}
 	});
 
 	$effect(() => {
-		// Filter inbound products for the current inbound
 		const inboundForThis =
 			outboundProducts?.filter((product) => product.outboundId === outbound?.id) || [];
 
-		// PRODUCTS: count distinct products (unique product names)
-		productsCount = new Set(inboundForThis.map((product) => product.product)).size;
-
-		// SERIALS: total number of inbound products
-		serialnumbersCount = inboundForThis.length;
-
-		// Sum the product values
 		productValue = inboundForThis.reduce(
 			(sum, product) => sum + (parseFloat(product.value ?? '0') || 0),
 			0
 		);
 
-		// OLD REV: revenue calculated as 0.1 per inbound product
 		productRevenue = parseFloat((inboundForThis.length * 0.1).toFixed(2));
 
-		// Count statuses
-		productStatusIn = inboundForThis.filter((product) => product.status === 'IN').length;
-		productStatusOut = inboundForThis.filter((product) => product.status === 'OUT').length;
-
-		// Define fixed times (in minutes) for the batch process
 		const oldTime = 30; // old total time in minutes
 		const newTime = 3; // new total time in minutes
 
-		// Total time saved remains constant for the batch
 		timeSaved = oldTime - newTime; // 27 minutes
 
-		// Time saved per serial in minutes
 		timeSavedPerSerial =
 			inboundForThis.length > 0 ? parseFloat((timeSaved / inboundForThis.length).toFixed(2)) : 0;
 
-		// Euro per minute based on the new process time
 		euroPerMinute =
 			inboundForThis.length > 0 ? parseFloat((productRevenue / newTime).toFixed(2)) : 0;
 
-		// Filter products based on the search query
 		filteredOutboundProducts = inboundForThis.filter(
 			(product) =>
 				searchQuery.trim() === '' ||
@@ -222,13 +185,13 @@
 		</ul>
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-		<section class="grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="order-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md lg:order-4">
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
 			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
-		<section class="flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="order-1 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Options</h1>
 			<div class="flex gap-4">
 				<form action="?/mapSerialnumbersToWorksheet" method="post">
@@ -256,7 +219,7 @@
 				</form>
 			</div>
 		</section>
-		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Outbound</h1>
 			<form class="flex flex-col gap-4" method="post">
 				<select
@@ -289,7 +252,7 @@
 				</button>
 			</form>
 		</section>
-		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="order-4 rounded-lg bg-gray-900 p-4 shadow-md lg:order-3">
 			<h1 class="flex items-center justify-between pb-4 font-bold">
 				Move Inbound Product to Outbound
 			</h1>
@@ -337,7 +300,13 @@
 				</button>
 			</form>
 		</section>
+		<section
+			class="chart-status-section order-5 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
+		>
+			<ChartPieOutboundProducts {filteredOutboundProducts} />
+		</section>
 	</main>
+
 	<section class="mt-4">
 		<section class="mb-4 flex items-center justify-between">
 			<form class="relative py-1">
@@ -355,6 +324,7 @@
 				</div>
 			</form>
 		</section>
+
 		<div class="overflow-x-auto">
 			<table class="min-w-full text-left text-sm">
 				<thead>

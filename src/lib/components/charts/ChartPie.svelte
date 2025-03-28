@@ -74,5 +74,5 @@
 <canvas
 	id="myChart"
 	bind:this={chartCanvas}
-	class="mx-auto max-h-60 w-full rounded-lg bg-gray-900 p-3 shadow-2xl"
+	class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-2xl"
 ></canvas>

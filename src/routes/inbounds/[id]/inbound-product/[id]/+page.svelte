@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { MoveRight, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
+	import InboundProductBarcode from '$lib/components/barcodes/InboundProductBarcode.svelte';
 
 	const { params, url } = page;
 	const urlArray = url.pathname.split('/');
@@ -106,7 +107,16 @@
 			{/if}
 		{/each}
 	</section>
-
+	<section class=" max-w-sm justify-center rounded-lg bg-gray-900 shadow-md">
+		{#each inboundProducts as inboundProduct}
+			{#if inboundProduct.id === Number(params.id)}
+				<section class=" rounded-lg bg-gray-900 p-4 shadow-md">
+					<h1 class="pb-4 font-bold">Product Sticker</h1>
+					<InboundProductBarcode {inboundProduct} {inbound} />
+				</section>
+			{/if}
+		{/each}
+	</section>
 	<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="flex w-full items-center justify-between font-bold">Delete product from Inbound</h1>
 		<form method="post" class="flex gap-2">
@@ -118,4 +128,5 @@
 			>
 		</form>
 	</section>
+	<section></section>
 </main>

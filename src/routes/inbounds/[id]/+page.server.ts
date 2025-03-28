@@ -5,6 +5,11 @@ import { CreateInboundSchema } from "$lib/zod/zod-schemas";
 import { AddSingleProductSchema, AddMultipleProductSchema } from "$lib/zod/zod-schemas";
 import { error } from "@sveltejs/kit";
 
+import { customAlphabet } from 'nanoid';
+
+// Barcode generator: 12 tekens, alleen cijfers en hoofdletters
+const generateBarcode = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 12)
+
 export const load: PageServerLoad = async ({ params }) => {
 
     const client = await db.inbound.findUnique({
@@ -93,22 +98,22 @@ export const actions = {
 
     },
 
-    async addInboundProductToInbound({ request }: { params: { id: string }, request: Request }) {
+    async addInboundProductToInbound({ params, request }: { params: { id: string }, request: Request }) {
 
-        await new Promise((fulfil) => setTimeout(fulfil, 2000));
+        await new Promise((fulfil: (value: unknown) => void) => setTimeout(fulfil, 2000));
 
         const formData = Object.fromEntries(await request.formData());
 
         const safeParse = AddSingleProductSchema.safeParse({
             ...formData,
-            inboundId: formData.inboundId
+            inboundId: params.id
         });
 
         if (!safeParse.success) {
             return fail(400, { issues: safeParse.error.issues });
         }
 
-        const { product, serialnumber, inboundId, value } = safeParse.data as { product: string; serialnumber: string; value: string; inboundId: string };
+        const { product, serialnumber, value } = safeParse.data as { product: string; serialnumber: string; value: string; inboundId: string };
 
         const existingProduct = await db.inboundProduct.findFirst({
             where: { serialnumber: serialnumber as string },
@@ -122,14 +127,18 @@ export const actions = {
             };
         }
 
+        // Generate barcode
+        const barcode = generateBarcode();
+
         const inboundProduct = await db.inboundProduct.create({
             data: {
                 serialnumber,
                 product: product as string,
                 value: value,  // value is already a string from the form data
+                barcode,  // Save the barcode
                 inbound: {
                     connect: {
-                        id: Number(inboundId)
+                        id: Number(params.id)
                     }
                 }
             }
@@ -144,11 +153,9 @@ export const actions = {
     },
 
     async addBatchInboundProductToInbound({ params, request }: { params: { id: string }, request: Request }) {
-
         await new Promise((fulfil) => setTimeout(fulfil, 2000));
 
         const inboundId = Number(params.id);
-
         const formData = await request.formData();
 
         const batch = (formData.get('batch') as string)
@@ -156,6 +163,7 @@ export const actions = {
             .map(serialnumber => serialnumber.trim())
             .filter(serialnumber => serialnumber.length > 0);
 
+        // Validate data using Zod schema
         const safeParse = AddMultipleProductSchema.safeParse({
             ...Object.fromEntries(formData),
             inboundId: formData.get('inboundId')
@@ -165,6 +173,7 @@ export const actions = {
             return fail(400, { issues: safeParse.error.issues });
         }
 
+        // Check for duplicate serial numbers in the database
         const existingSerialNumbers = new Set(
             (await db.inboundProduct.findMany({
                 where: { serialnumber: { in: batch } },
@@ -178,15 +187,17 @@ export const actions = {
             return {
                 status: 400,
                 success: false,
-                message: 'Duplicate serialnumbers detected.'
+                message: 'Duplicate serial numbers detected.'
             };
         }
 
+        // **Generate barcodes for each inbound product**
         const inboundProducts = await db.inboundProduct.createMany({
             data: uniqueSerialNumbers.map(serialnumber => ({
                 product: safeParse.data.product as string,
                 serialnumber,
                 value: safeParse.data.value as string,
+                barcode: generateBarcode(), // ✅ Each product gets a unique barcode
                 inboundId: inboundId
             }))
         });

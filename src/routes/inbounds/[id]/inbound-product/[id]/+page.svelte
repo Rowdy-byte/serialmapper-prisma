@@ -45,7 +45,7 @@
 	});
 </script>
 
-<section class="text-md mb-2 rounded-lg bg-gray-900 p-4 shadow-md">
+<section class="text-md mb-4 rounded-lg bg-gray-900 p-4 shadow-md">
 	<ul class="flex items-center gap-2">
 		<li>
 			<a href={`/inbounds/${inboundId}`} class="font-bold text-gray-500 hover:text-blue-500">
@@ -69,7 +69,7 @@
 		</li>
 	</ul>
 </section>
-<main class="flex flex-col gap-12">
+<main class="flex flex-col gap-4">
 	<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="pb-4 font-bold">Inbound Product</h1>
 		{#each inboundProducts as inboundProduct}
@@ -128,5 +128,5 @@
 			>
 		</form>
 	</section>
-	<section></section>
+	<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md"></section>
 </main>

@@ -41,7 +41,7 @@
 	let inboundProductIds = $state<number[]>([]);
 
 	function printSelectedLabels() {
-		const selectedProducts = filteredInboundProducts.filter((product) =>
+		const selectedProducts = (filteredInboundProducts || []).filter((product) =>
 			inboundProductIds.includes(product.id)
 		);
 
@@ -219,13 +219,17 @@
 	});
 
 	$effect(() => {
+		const lowerCaseQuery = searchQuery.trim().toLowerCase();
+
 		filteredInboundProducts = inboundProducts?.filter(
 			(product) =>
 				product.inboundId === inbound?.id &&
-				(searchQuery.trim() === '' ||
-					product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					product.status?.toLowerCase().includes(searchQuery.toLowerCase()))
+				(lowerCaseQuery === '' ||
+					Object.values({
+						serialnumber: product.serialnumber,
+						product: product.product,
+						status: product.status
+					}).some((value) => value?.toLowerCase().includes(lowerCaseQuery)))
 		);
 	});
 

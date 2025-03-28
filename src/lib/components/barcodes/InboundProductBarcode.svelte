@@ -64,7 +64,7 @@
 	<p class="text-xs font-bold text-black">{inboundProduct.product}</p>
 	<p class="text-xs text-black">Serial: {inboundProduct.serialnumber}</p>
 	<p>Inbound: {inbound.inboundNumber}</p>
-	<svg class="h-auto w-[200px]" bind:this={svgElement}></svg>
+	<svg class="flex h-auto w-[200px]" bind:this={svgElement}></svg>
 </div>
 <button
 	onclick={printSticker}

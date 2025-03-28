@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { MoveRight, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
+	import InboundProductBarcode from '$lib/components/barcodes/InboundProductBarcode.svelte';
 
 	const { params, url } = page;
 	const urlArray = url.pathname.split('/');
@@ -104,6 +105,13 @@
 					>
 				</form>
 			{/if}
+			<div class="py-4">
+				{#if inboundProduct.id === Number(params.id)}<InboundProductBarcode
+						value={inboundProduct?.barcode}
+						format="CODE128"
+					/>
+				{/if}
+			</div>
 		{/each}
 	</section>
 
@@ -118,4 +126,5 @@
 			>
 		</form>
 	</section>
+	<section></section>
 </main>

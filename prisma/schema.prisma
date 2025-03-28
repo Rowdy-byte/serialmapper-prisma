@@ -43,6 +43,7 @@ model InboundProduct {
   serialnumber String
   value        String?
   status       ProductStatus @default(IN)
+  barcode      String?       @unique
   createdAt    DateTime      @default(now())
   inboundId    Int
   inbound      Inbound       @relation(fields: [inboundId], references: [id], onDelete: Cascade)

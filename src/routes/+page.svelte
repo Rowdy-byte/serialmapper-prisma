@@ -6,7 +6,6 @@
 	import ChartBarInboundsOutbounds from '$lib/components/charts/ChartBarInboundsOutbounds.svelte';
 
 	const { data }: PageProps = $props();
-	console.log('data', data);
 
 	const {
 		clients: rawClients,

@@ -33,20 +33,23 @@
 		doc.setFont('helvetica', 'bold');
 		doc.text(`Product: ${inboundProduct.product}`, 5, 10);
 		doc.text(`Serial: ${inboundProduct.serialnumber}`, 5, 20);
-		doc.text(`Value: €${inboundProduct.value}`, 5, 30);
+		doc.text(`Inbound: ${inbound.inboundNumber}`, 5, 30);
 
 		const barcodeCanvas = document.createElement('canvas');
 		JsBarcode(barcodeCanvas, inboundProduct.barcode, {
 			format: 'CODE128',
-			displayValue: false, // Hide text under barcode
+			displayValue: true,
+			lineColor: '#000',
 			width: 1.2,
-			height: 40
+			height: 40,
+			margin: 5
 		});
 
 		const barcodeImage = barcodeCanvas.toDataURL('image/png');
-		doc.addImage(barcodeImage, 'PNG', 5, 35, 80, 20);
+		doc.addImage(barcodeImage, 'PNG', 5, 40, 80, 20);
 
-		doc.save(`sticker-${inboundProduct.serialnumber}.pdf`);
+		doc.save(`${inbound.inboundNumber}_${inboundProduct.serialnumber}.pdf`);
+
 		toast.success('Sticker printed successfully!');
 	}
 

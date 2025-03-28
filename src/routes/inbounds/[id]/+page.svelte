@@ -23,6 +23,10 @@
 	const products = data.products;
 	const inboundProducts = data.inboundProducts;
 
+	const inboundProduct =
+		data.inboundProducts?.map((product) => (product.inboundId === inbound?.id ? product : null)) ||
+		[];
+
 	let searchQuery = $state('');
 
 	let productValue = $state(0);
@@ -37,8 +41,9 @@
 	let inboundProductIds = $state<number[]>([]);
 
 	function printSelectedLabels() {
-		const selectedProducts =
-			filteredInboundProducts?.filter((product) => inboundProductIds.includes(product.id)) || [];
+		const selectedProducts = filteredInboundProducts.filter((product) =>
+			inboundProductIds.includes(product.id)
+		);
 
 		if (selectedProducts.length === 0) {
 			toast.error('Select at least one product to print labels.');
@@ -52,36 +57,43 @@
 		});
 
 		let yOffset = 10;
+		const labelHeight = 50; // Adjust to ensure proper spacing between labels
 
-		selectedProducts.forEach((product, index) => {
+		selectedProducts.forEach((inboundProduct, index) => {
+			// Apply the same font settings
 			doc.setFont('helvetica', 'bold');
 			doc.setFontSize(10);
 
-			doc.text(`Product: ${product.product}`, 5, yOffset + 5);
-			doc.text(`Serial: ${product.serialnumber}`, 5, yOffset + 12);
-			doc.text(`Inboundnumber: ${inbound?.inboundNumber}`, 5, yOffset + 19);
+			// Text formatting
+			doc.text(`Product: ${inboundProduct.product}`, 5, yOffset);
+			doc.text(`Serial: ${inboundProduct.serialnumber}`, 5, yOffset + 10);
+			doc.text(`Inbound: ${inbound?.inboundNumber || ''}`, 5, yOffset + 20);
 
+			// Generate barcode
 			const barcodeCanvas = document.createElement('canvas');
-
-			JsBarcode(barcodeCanvas, product.barcode || product.serialnumber || '', {
+			JsBarcode(barcodeCanvas, inboundProduct.barcode || inboundProduct.serialnumber || '', {
 				format: 'CODE128',
 				displayValue: false,
 				width: 1.2,
-				height: 15
+				height: 40
 			});
 
+			// Add barcode image
 			const barcodeImage = barcodeCanvas.toDataURL('image/png');
-			doc.addImage(barcodeImage, 'PNG', 5, yOffset + 22, 50, 10);
+			doc.addImage(barcodeImage, 'PNG', 5, yOffset + 25, 80, 20);
 
-			yOffset += 35;
+			// Move to the next label position
+			yOffset += labelHeight;
 
+			// If the labels reach the page limit, create a new page
 			if (yOffset > 270 && index !== selectedProducts.length - 1) {
 				doc.addPage();
 				yOffset = 10;
 			}
 		});
 
-		doc.save(`bulk_labels_${data.inbound?.inboundNumber}.pdf`);
+		// Save the bulk labels PDF
+		doc.save(`bulk_stickers_${inbound?.inboundNumber}.pdf`);
 	}
 
 	let filteredInboundProducts = $state(

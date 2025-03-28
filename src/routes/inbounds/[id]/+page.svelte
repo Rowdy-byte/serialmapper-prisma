@@ -7,7 +7,7 @@
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
-	import ChartPie from '$lib/components/charts/ChartPieInboundProducts.svelte';
+	import ChartPieInboundProducts from '$lib/components/charts/ChartPieInboundProducts.svelte';
 	import ChartPieStatus from '$lib/components/charts/ChartPieStatus.svelte';
 
 	let { data, form }: PageProps = $props();
@@ -382,7 +382,7 @@
 		<section
 			class="chart-status-section order-6 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
 		>
-			<ChartPie {filteredInboundProducts} />
+			<ChartPieInboundProducts {filteredInboundProducts} />
 		</section>
 		<section
 			class="chart-status-section order-7 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"

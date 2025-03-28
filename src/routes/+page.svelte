@@ -17,9 +17,8 @@
 	}));
 </script>
 
-<h1 class="text-xl font-bold">Dashboard</h1>
-
-<div class="absolute top-1/2 left-1/2 container -translate-x-1/2 -translate-y-1/2 transform">
+<h1 class="p-4 text-4xl font-bold">Dashboard</h1>
+<div class="absolute top-1/2 left-1/2 container -translate-x-1/2 -translate-y-1/2 transform p-4">
 	<main class="grid max-w-6xl grid-cols-1 gap-4">
 		<section class="flex flex-col rounded-lg bg-gray-900 p-4">
 			<ChartBarClient {clients} />

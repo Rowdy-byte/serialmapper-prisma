@@ -51,9 +51,11 @@
 </script>
 
 <div class="container mx-auto py-4">
-	<h1 class="py-4 text-lg font-bold">Client Details</h1>
+	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
+		<h1 class="py-4 text-lg font-bold">Client Details</h1>
+	</section>
 
-	<main class="flex flex-col gap-12">
+	<main class="flex flex-col gap-4">
 		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Edit Client</h1>
 			<form class="flex flex-col gap-4" method="post">
@@ -75,7 +77,7 @@
 		</section>
 		<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="flex w-full items-center justify-between font-bold">Delete Client</h1>
-			<form method="post" class="flex gap-2">
+			<form method="post" class="flex">
 				<button
 					formaction="?/deleteClient"
 					onclick={handleDeleteClient}
@@ -86,5 +88,6 @@
 				</button>
 			</form>
 		</section>
+		<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md"></section>
 	</main>
 </div>

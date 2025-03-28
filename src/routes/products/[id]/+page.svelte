@@ -50,7 +50,9 @@
 </script>
 
 <div class="container mx-auto py-4">
-	<h1 class="py-4 text-lg font-bold">Product Details</h1>
+	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
+		<h1 class="py-4 text-lg font-bold">Product Details</h1>
+	</section>
 
 	<main class="flex flex-col gap-4">
 		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
@@ -102,5 +104,6 @@
 				</button>
 			</form>
 		</section>
+		<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md"></section>
 	</main>
 </div>

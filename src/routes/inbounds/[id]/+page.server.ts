@@ -27,6 +27,7 @@ export const load: PageServerLoad = async ({ params }) => {
     }
 
     const products = await db.product.findMany();
+    const inbounds = await db.inbound.findMany();
     const inboundProducts = await db.inboundProduct.findMany()
     const clients = await db.client.findMany();
 
@@ -35,7 +36,8 @@ export const load: PageServerLoad = async ({ params }) => {
         clients,
         inbound,
         products,
-        inboundProducts
+        inboundProducts,
+        inbounds,
     }
 }
 

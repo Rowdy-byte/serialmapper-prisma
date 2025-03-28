@@ -3,6 +3,7 @@ import db from '$lib/server/db';
 
 export const load: PageServerLoad = async () => {
     const inbounds = await db.inbound.findMany()
+    const outbounds = await db.outbound.findMany()
     const clients = await db.client.findMany()
     const products = await db.product.findMany()
     const inboundProducts = await db.inboundProduct.findMany()
@@ -11,6 +12,8 @@ export const load: PageServerLoad = async () => {
         inbounds,
         clients,
         products,
-        inboundProducts
+        inboundProducts,
+        outbounds
+
     }
 };

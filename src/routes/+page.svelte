@@ -43,7 +43,9 @@
 		})) || [];
 </script>
 
-<div class="absolute top-1/2 left-1/2 container -translate-x-1/2 -translate-y-1/2 transform p-4">
+<div
+	class="absolute top-1/2 left-1/2 container mx-auto -translate-x-1/2 -translate-y-1/2 transform p-4"
+>
 	<main class="mx-auto grid max-w-4xl grid-cols-1 gap-4 xl:grid-cols-2">
 		<section class=" flex max-w-2xl flex-col rounded-lg bg-gray-900 p-4">
 			<ChartBarClient {clients} />

@@ -3,7 +3,7 @@
 
 	// Expecting clients as an array of objects from Prisma
 	// Each client is assumed to have a 'createdAt' property
-	const { inboundProducts } = $props<{ inboundProducts: { createdAt: string }[] }>();
+	const { inbounds, outbounds } = $props<{ inbounds: { createdAt: string }[] }>();
 
 	let chart: Chart<'bar', number[], string> | null = $state(null);
 	let chartCanvas: HTMLCanvasElement | null = $state(null);
@@ -25,13 +25,20 @@
 	];
 
 	// Initialize an array for 12 months with zeros
-	const inboundProductCountsPerMonth = new Array(12).fill(0);
+	const inboundCounts = new Array(12).fill(0);
+	const outboundCounts = new Array(12).fill(0);
 
 	// Process each client object to increment the count for its corresponding month
-	inboundProducts.forEach((inboundProduct: { createdAt: string }) => {
+	inbounds.forEach((inboundProduct: { createdAt: string }) => {
 		const date = new Date(inboundProduct.createdAt);
 		const month = date.getMonth(); // 0 for January, 11 for December
-		inboundProductCountsPerMonth[month]++;
+		inboundCounts[month]++;
+	});
+
+	outbounds.forEach((outboundProduct: { createdAt: string }) => {
+		const date = new Date(outboundProduct.createdAt);
+		const month = date.getMonth(); // 0 for January, 11 for December
+		outboundCounts[month]++;
 	});
 
 	$effect.pre(() => {
@@ -42,10 +49,16 @@
 					labels: monthLabels,
 					datasets: [
 						{
-							label: 'Number of Inbound Products',
-							data: inboundProductCountsPerMonth,
-							borderColor: 'rgba(249, 115, 22, 1)',
+							label: 'Number of Inbounds',
+							data: inboundCounts,
+
 							backgroundColor: 'rgba(249, 115, 22, 1)'
+						},
+						{
+							label: 'Number of Outbounds',
+							data: outboundCounts,
+
+							backgroundColor: 'rgba(59, 130, 246, 1)'
 						}
 					]
 				},

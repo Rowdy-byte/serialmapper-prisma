@@ -1,12 +1,20 @@
 <script lang="ts">
-	import Chart from 'chart.js/auto';
 	import type { PageProps } from './$types';
 	import ChartBarClient from '$lib/components/charts/ChartBarClient.svelte';
 	import ChartBarProducts from '$lib/components/charts/ChartBarProducts.svelte';
+	import ChartBarInboundProducts from '$lib/components/charts/ChartBarInboundProducts.svelte';
+	import ChartBarInboundsOutbounds from '$lib/components/charts/ChartBarInboundsOutbounds.svelte';
 
 	const { data }: PageProps = $props();
+	console.log('data', data);
 
-	const { clients: rawClients, inbounds, products: rawProducts, inboundProducts } = data;
+	const {
+		clients: rawClients,
+		inbounds: rawInbounds,
+		products: rawProducts,
+		inboundProducts: rawInboundProducts,
+		outbounds: rawOutbounds
+	} = data;
 	const clients = rawClients.map((client) => ({
 		...client,
 		createdAt: client.createdAt.toISOString()
@@ -15,18 +23,34 @@
 		...product,
 		createdAt: product.createdAt.toISOString()
 	}));
+	const inboundProducts = rawInboundProducts.map((inboundProduct) => ({
+		...inboundProduct,
+		createdAt: inboundProduct.createdAt.toISOString()
+	}));
+	const inbounds = rawInbounds.map((inbound) => ({
+		...inbound,
+		createdAt: inbound.createdAt.toISOString()
+	}));
+	const outbounds =
+		rawOutbounds?.map((outbound: any) => ({
+			...outbound,
+			createdAt: outbound.createdAt.toISOString()
+		})) || [];
 </script>
 
-<h1 class="p-4 text-4xl font-bold">Dashboard</h1>
 <div class="absolute top-1/2 left-1/2 container -translate-x-1/2 -translate-y-1/2 transform p-4">
-	<main class="grid max-w-6xl grid-cols-1 gap-4">
-		<section class="flex flex-col rounded-lg bg-gray-900 p-4">
+	<main class="mx-auto grid max-w-4xl grid-cols-1 gap-4 xl:grid-cols-2">
+		<section class=" flex max-w-xl flex-col rounded-lg bg-gray-900 p-4">
 			<ChartBarClient {clients} />
 		</section>
-		<section class="flex flex-col rounded-lg bg-gray-900 p-4">
+		<section class=" flex max-w-xl flex-col rounded-lg bg-gray-900 p-4">
 			<ChartBarProducts {products} />
 		</section>
-		<section></section>
-		<section></section>
+		<section class=" flex max-w-xl flex-col rounded-lg bg-gray-900 p-4">
+			<ChartBarInboundProducts {inboundProducts} />
+		</section>
+		<section class=" flex max-w-xl flex-col rounded-lg bg-gray-900 p-4">
+			<ChartBarInboundsOutbounds {inbounds} {outbounds} />
+		</section>
 	</main>
 </div>

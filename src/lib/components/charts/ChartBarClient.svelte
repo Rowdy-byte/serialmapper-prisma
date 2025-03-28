@@ -50,6 +50,7 @@
 					]
 				},
 				options: {
+					responsive: true,
 					scales: {
 						y: {
 							beginAtZero: true
@@ -61,4 +62,5 @@
 	});
 </script>
 
-<canvas bind:this={chartCanvas}></canvas>
+<canvas bind:this={chartCanvas} class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-2xl"
+></canvas>

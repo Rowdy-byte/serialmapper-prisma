@@ -234,5 +234,38 @@ export const actions = {
             success: true,
             message: 'Inbound deleted successfully!'
         }
+    },
+
+    async deleteInboundProducts({ request }: { request: Request }) {
+        const formData = await request.formData();
+        const rawProductIds = formData.get("productIds");
+
+        if (!rawProductIds) {
+            return fail(400, { message: "No products selected" });
+        }
+
+        // Parse the JSON string into an array
+        const productIds = JSON.parse(rawProductIds as string);
+
+        if (!Array.isArray(productIds) || productIds.length === 0) {
+            return fail(400, { message: "Invalid product selection" });
+        }
+
+        try {
+            await db.inboundProduct.deleteMany({
+                where: { id: { in: productIds } }
+            });
+
+            return {
+                status: 200,
+                success: true,
+                message: "Selected inbound products deleted successfully."
+            };
+        } catch (error) {
+            console.error("Error deleting inbound products:", error);
+            return fail(500, { message: "Failed to delete selected inbound products" });
+        }
     }
+
+
 }

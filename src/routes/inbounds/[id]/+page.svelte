@@ -49,7 +49,7 @@
 			return;
 		}
 
-		const serialNumbers = inboundProducts.map((product) => product.serialnumber).join(',');
+		const serialNumbers = inboundProducts.map((product) => product.serialnumber).join(' ');
 		try {
 			const qrCodeData = await QRCode.toDataURL(serialNumbers, {
 				color: {
@@ -191,6 +191,23 @@
 		return (oldMinutes * 60) / serials - (newMinutes * 60) / serials;
 	}
 
+	function toggleSelectAll() {
+		if (inboundProductIds.length === filteredInboundProducts?.length) {
+			inboundProductIds = [];
+		} else {
+			inboundProductIds =
+				filteredInboundProducts?.map((product) => product.id ?? 0).filter((id) => id !== 0) || [];
+		}
+	}
+
+	function toggleSelection(id: number) {
+		if (inboundProductIds.includes(id)) {
+			inboundProductIds = inboundProductIds.filter((productId) => productId !== id);
+		} else {
+			inboundProductIds = [...inboundProductIds, id];
+		}
+	}
+
 	if (form?.issues) {
 		for (const issue of form.issues) {
 			toast.error(issue.message, {
@@ -299,7 +316,7 @@
 				product.value?.toString().includes(searchQuery.toLowerCase())
 		);
 
-		inboundProductIds = inboundForThis.map((product) => product.inboundId);
+		// inboundProductIds = inboundForThis.map((product) => product.inboundId);
 	});
 </script>
 
@@ -505,21 +522,32 @@
 					<Search size="18" />
 				</div>
 			</form>
-			<div class="flex gap-4">
+			<div class="flex gap-2">
 				<button
 					onclick={copySelectedSerialsToClipboard}
 					data-tooltip="Copy selected serialnumbers to clipboard"
 					title="Copy selected serialnumbers to clipboard"
 					class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-					><Copy size="24" strokeWidth="1px" /></button
+					><Copy size="24" strokeWidth="2px" /></button
 				>
 				<button
 					onclick={printSelectedLabels}
 					data-tooltip="Print selected labels"
 					title="Copy selected serialnumbers to clipboard"
 					class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-					><Printer size="24" strokeWidth="1px" /></button
+					><Printer size="24" strokeWidth="2px" /></button
 				>
+				<form action="?/deleteInboundProducts" use:enhance method="post">
+					<input type="hidden" name="productIds" value={JSON.stringify(inboundProductIds)} />
+					<button
+						type="submit"
+						disabled={inboundProductIds.length === 0}
+						class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					>
+						<Trash2 size="24" strokeWidth="2px" />
+					</button>
+				</form>
+
 				<form action="?/mapSerialnumbersToWorksheet" method="post" use:enhance>
 					<input hidden type="text" name="inboundId" value={inbound?.id} /><button
 						data-tooltip="Map selected serialnumbers to worksheet"
@@ -538,7 +566,14 @@
 			<table class="min-w-full text-left text-sm">
 				<thead>
 					<tr class="text-gray-500">
-						<th class="border border-gray-500 p-2"></th>
+						<th class="border border-gray-500 p-2">
+							<input
+								type="checkbox"
+								onchange={toggleSelectAll}
+								checked={inboundProductIds.length === (filteredInboundProducts?.length || 0)}
+								class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
+							/>
+						</th>
 						<th class="border border-gray-500 p-2">Product</th>
 						<th class="border border-gray-500 p-2">Serialnumber</th>
 						<th class="border border-gray-500 p-2">Value €</th>
@@ -553,8 +588,8 @@
 								<td class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2">
 									<input
 										type="checkbox"
-										bind:group={inboundProductIds}
-										value={inboundProduct.id}
+										onchange={() => toggleSelection(inboundProduct.id)}
+										checked={inboundProductIds.includes(inboundProduct.id)}
 										class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
 									/>
 									{i + 1}

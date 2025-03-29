@@ -11,6 +11,7 @@
 	import ChartPieStatus from '$lib/components/charts/ChartPieStatus.svelte';
 	import jsPDF from 'jspdf';
 	import JsBarcode from 'jsbarcode';
+	import QRCode from 'qrcode';
 
 	let { data, form }: PageProps = $props();
 
@@ -39,6 +40,29 @@
 	let timeSavedPerSerial = $state(0);
 
 	let inboundProductIds = $state<number[]>([]);
+
+	let qrCodeImage = $state(null);
+
+	async function generateQRCodeForInbound() {
+		if (!inboundProducts || inboundProducts.length === 0) {
+			toast.error('No serial numbers found for this inbound.');
+			return;
+		}
+
+		const serialNumbers = inboundProducts.map((product) => product.serialnumber).join(',');
+		try {
+			const qrCodeData = await QRCode.toDataURL(serialNumbers, {
+				color: {
+					dark: '#030712', // Oranje (Foreground)
+					light: '#f8fafc' // Donkergrijs (Background)
+				}
+			});
+			qrCodeImage = qrCodeData; // Update de variabele voor weergave
+		} catch (error) {
+			console.error('Error generating QR code:', error);
+			toast.error('Error generating QR code');
+		}
+	}
 
 	function printSelectedLabels() {
 		const selectedProducts = (filteredInboundProducts || []).filter((product) =>
@@ -287,12 +311,19 @@
 	>
 		<ul class="text-gray-500">
 			<li class="text-center">
-				<a href="/inbounds" class="transition-all">
+				<a href="/inbounds" class="font-bold transition-all">
 					<span class="hover:text-blue-500"> Inbound </span>: {inbound?.inboundNumber}
 				</a>
 			</li>
 		</ul>
-		<div>
+
+		<div class="flex items-center gap-4">
+			<button
+				onclick={generateQRCodeForInbound}
+				class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+			>
+				<QrCode />
+			</button>
 			<form use:enhance method="post" action="?/deleteInbound">
 				<button
 					onclick={handleDeleteInbound}
@@ -304,6 +335,19 @@
 					<Trash2 />
 				</button>
 			</form>
+			<div class="flex items-center gap-4">
+				<section>
+					{#if qrCodeImage}
+						<section class="">
+							<img
+								src={qrCodeImage}
+								alt="QR Code for Inbound Products"
+								class="mx-auto w-20 rounded-lg"
+							/>
+						</section>
+					{/if}
+				</section>
+			</div>
 		</div>
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -362,9 +406,7 @@
 		</section>
 		<section class="order-4 rounded-lg bg-gray-900 p-4 shadow-md lg:order-3">
 			<section class="rounded-lg bg-gray-900 shadow-md">
-				<h1 class="flex items-center justify-between pb-4 font-bold">
-					Add Single Product to Inbound
-				</h1>
+				<h1 class="flex items-center justify-between pb-4 font-bold">Add Product to Inbound</h1>
 
 				<form
 					class="flex flex-col gap-4"
@@ -394,7 +436,7 @@
 					<textarea
 						disabled={isAddingInboundProduct}
 						name="serialnumber"
-						placeholder="Serialnumber"
+						placeholder="Enter One Serialnumber"
 						class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
 					></textarea>
 					<button
@@ -403,13 +445,13 @@
 						onclick={handleAddSingle}
 						type="submit"
 					>
-						Add Single
+						Add One
 					</button>
 					<section class="flex flex-col gap-4 pt-8">
 						<textarea
 							disabled={isAddingBatchInboundProduct}
 							name="batch"
-							placeholder="Batch Serialnumbers"
+							placeholder="Past or Enter Batch Serialnumbers"
 							class="rounded-lg bg-gray-950 p-3 text-sm text-gray-500"
 						></textarea>
 						<div class="flex justify-center gap-4">
@@ -491,6 +533,7 @@
 				</form>
 			</div>
 		</section>
+
 		<section class="order-5 overflow-x-auto">
 			<table class="min-w-full text-left text-sm">
 				<thead>

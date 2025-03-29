@@ -533,13 +533,15 @@
 				<button
 					onclick={printSelectedLabels}
 					data-tooltip="Print selected labels"
-					title="Copy selected serialnumbers to clipboard"
+					title="Print selected labels"
 					class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 					><Printer size="24" strokeWidth="2px" /></button
 				>
 				<form action="?/deleteInboundProducts" use:enhance method="post">
 					<input type="hidden" name="productIds" value={JSON.stringify(inboundProductIds)} />
 					<button
+						data-tooltip="Delete selected products"
+						title="Delete selected products"
 						type="submit"
 						disabled={inboundProductIds.length === 0}
 						class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
@@ -551,7 +553,7 @@
 				<form action="?/mapSerialnumbersToWorksheet" method="post" use:enhance>
 					<input hidden type="text" name="inboundId" value={inbound?.id} /><button
 						data-tooltip="Map selected serialnumbers to worksheet"
-						title="Copy selected serialnumbers to clipboard"
+						title="Map selected serialnumbers to worksheet"
 						class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 						onclick={handleMapSerialToWorksheet}
 						type="button"

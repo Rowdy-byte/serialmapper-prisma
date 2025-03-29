@@ -21,14 +21,14 @@
 				labels: ['IN', 'OUT'],
 				datasets: [
 					{
-						label: 'Product Status Distribution',
+						label: 'Product Status',
 						data: [inStatus, outStatus],
 						backgroundColor: [
-							'rgba(249, 115, 22,1)',
-							'rgba(59, 130, 246, 1)',
-							'rgba(34, 197, 94, 1)'
+							'rgba(249, 115, 22, 0.5)',
+							'rgba(59, 130, 246, 0.5)',
+							'rgba(34, 197, 94, 0.5)'
 						],
-						borderColor: [],
+						borderColor: ['rgba(249, 115, 22,1)', 'rgba(59, 130, 246, 1)', 'rgba(34, 197, 94, 1)'],
 						borderWidth: 1
 					}
 				]

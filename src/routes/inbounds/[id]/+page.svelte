@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { Copy, Eye, Printer, QrCode, Search, Sheet, Trash2 } from '@lucide/svelte';
+	import { Copy, Eye, Printer, QrCode, ScanQrCode, Search, Sheet, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
@@ -468,7 +468,7 @@
 						<textarea
 							disabled={isAddingBatchInboundProduct}
 							name="batch"
-							placeholder="Past or Enter Batch Serialnumbers"
+							placeholder="Paste or Enter Batch Serialnumbers"
 							class="rounded-lg bg-gray-950 p-3 text-sm text-gray-500"
 						></textarea>
 						<div class="flex justify-center gap-4">
@@ -483,12 +483,12 @@
 							</button>
 							<button
 								type="button"
-								data-tooltip="Scan Barcode to Single"
+								data-tooltip="Scan qrcode"
 								title="Scan Barcode to Single"
 								onclick={handleScanQr}
 								class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 							>
-								<QrCode />
+								<ScanQrCode />
 							</button>
 						</div>
 					</section>

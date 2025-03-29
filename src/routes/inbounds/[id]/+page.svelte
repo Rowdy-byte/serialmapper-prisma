@@ -41,7 +41,7 @@
 
 	let inboundProductIds = $state<number[]>([]);
 
-	let qrCodeImage = $state(null);
+	let qrCodeImage = $state<string | null>(null);
 
 	async function generateQRCodeForInbound() {
 		if (!inboundProducts || inboundProducts.length === 0) {
@@ -334,10 +334,10 @@
 			</li>
 		</ul>
 
-		<div class="flex items-center gap-4">
+		<div class="flex items-center gap-2">
 			<button
 				onclick={generateQRCodeForInbound}
-				class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				class="flex w-full rounded-full bg-gray-950 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 			>
 				<QrCode />
 			</button>
@@ -346,8 +346,7 @@
 					onclick={handleDeleteInbound}
 					data-tooltip="Delete Inbound"
 					title="Delete Inbound"
-					class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit"
+					class="flex w-full rounded-full bg-gray-950 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 				>
 					<Trash2 />
 				</button>
@@ -414,7 +413,7 @@
 					onclick={handleUpdateInbound}
 					data-tooltip="Update Inbound"
 					title="Update Inbound"
-					class=" rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+					class=" rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 					type="submit"
 				>
 					Update Inbound
@@ -458,7 +457,7 @@
 					></textarea>
 					<button
 						disabled={isAddingInboundProduct}
-						class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+						class="w-full rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 						onclick={handleAddSingle}
 						type="submit"
 					>
@@ -476,7 +475,7 @@
 								disabled={isAddingBatchInboundProduct}
 								formaction="?/addBatchInboundProductToInbound"
 								onclick={handleAddBatch}
-								class="w-full rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+								class="w-full rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 								type="submit"
 							>
 								Add Batch
@@ -486,7 +485,7 @@
 								data-tooltip="Scan qrcode"
 								title="Scan Barcode to Single"
 								onclick={handleScanQr}
-								class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+								class="flex h-11 w-11 items-center justify-center rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 							>
 								<ScanQrCode />
 							</button>
@@ -586,7 +585,7 @@
 				<tbody>
 					{#if filteredInboundProducts}
 						{#each filteredInboundProducts as inboundProduct, i}
-							<tr class="hover:bg-orange-500/20">
+							<tr class="hover:bg-gray-500/20">
 								<td class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2">
 									<input
 										type="checkbox"

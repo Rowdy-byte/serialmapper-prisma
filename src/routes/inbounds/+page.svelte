@@ -5,6 +5,7 @@
 	import toast from 'svelte-french-toast';
 	import { invalidate } from '$app/navigation';
 	import BackToTop from '$lib/components/BackToTop.svelte';
+	import { enhance } from '$app/forms';
 
 	let { data, form }: PageProps = $props();
 
@@ -62,7 +63,7 @@
 		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Create Inbound</h1>
 
-			<form class="flex flex-col gap-4" action="?/createInbound" method="post">
+			<form class="flex flex-col gap-4" action="?/createInbound" method="post" use:enhance>
 				<select
 					disabled={form?.success}
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"

@@ -316,7 +316,7 @@
 
 		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
-			<form class="flex flex-col gap-4" method="post">
+			<form class="flex flex-col gap-4" method="post" use:enhance>
 				<select
 					disabled={isUpdatingInbound}
 					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"
@@ -366,7 +366,12 @@
 					Add Single Product to Inbound
 				</h1>
 
-				<form class="flex flex-col gap-4" action="?/addInboundProductToInbound" method="post">
+				<form
+					class="flex flex-col gap-4"
+					action="?/addInboundProductToInbound"
+					use:enhance
+					method="post"
+				>
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<select
 						disabled={isAddingInboundProduct}
@@ -473,7 +478,7 @@
 					class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 					><Printer size="24" strokeWidth="1px" /></button
 				>
-				<form action="?/mapSerialnumbersToWorksheet" method="post">
+				<form action="?/mapSerialnumbersToWorksheet" method="post" use:enhance>
 					<input hidden type="text" name="inboundId" value={inbound?.id} /><button
 						data-tooltip="Map selected serialnumbers to worksheet"
 						title="Copy selected serialnumbers to clipboard"

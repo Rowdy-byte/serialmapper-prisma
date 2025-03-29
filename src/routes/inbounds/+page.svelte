@@ -124,7 +124,7 @@
 				</thead>
 				<tbody>
 					{#each filterdInbounds as inbound}
-						<tr in:fly={{ y: 20 }} out:slide class="hover:bg-orange-800/20">
+						<tr in:fly={{ y: 20 }} out:slide class="hover:bg-gray-500/20">
 							<td class="border border-gray-500 p-2">{inbound.inboundNumber}</td>
 							<td class="border border-gray-500 p-2">{inbound.clientName}</td>
 							<td class="hidden border border-gray-500 p-2 md:table-cell">{inbound.description}</td>

@@ -335,12 +335,6 @@
 		</ul>
 
 		<div class="flex items-center gap-2">
-			<button
-				onclick={generateQRCodeForInbound}
-				class="flex w-full rounded-full bg-gray-950 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-			>
-				<QrCode />
-			</button>
 			<form use:enhance method="post" action="?/deleteInbound">
 				<button
 					onclick={handleDeleteInbound}
@@ -351,19 +345,7 @@
 					<Trash2 />
 				</button>
 			</form>
-			<div class="flex items-center gap-4">
-				<section>
-					{#if qrCodeImage}
-						<section class="">
-							<img
-								src={qrCodeImage}
-								alt="QR Code for Inbound Products"
-								class="mx-auto w-20 rounded-lg"
-							/>
-						</section>
-					{/if}
-				</section>
-			</div>
+			<div class="flex items-center gap-4"></div>
 		</div>
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -504,6 +486,21 @@
 		>
 			<ChartPieStatus {productStatusIn} {productStatusOut} />
 		</section>
+		<section
+			class="order-8 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
+		>
+			{#if qrCodeImage}
+				<section
+					class="order-8 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
+				>
+					<img
+						src={qrCodeImage}
+						alt="QR Code for Inbound Products"
+						class="mx-auto w-32 rounded-lg"
+					/>
+				</section>
+			{/if}
+		</section>
 	</main>
 	<section class="mt-4">
 		<section class="mb-4 flex items-center justify-between">
@@ -526,14 +523,14 @@
 					onclick={copySelectedSerialsToClipboard}
 					data-tooltip="Copy selected serialnumbers to clipboard"
 					title="Copy selected serialnumbers to clipboard"
-					class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 					><Copy size="24" strokeWidth="2px" /></button
 				>
 				<button
 					onclick={printSelectedLabels}
 					data-tooltip="Print selected labels"
 					title="Print selected labels"
-					class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 					><Printer size="24" strokeWidth="2px" /></button
 				>
 				<form action="?/deleteInboundProducts" use:enhance method="post">
@@ -543,23 +540,32 @@
 						title="Delete selected products"
 						type="submit"
 						disabled={inboundProductIds.length === 0}
-						class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+						class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 					>
 						<Trash2 size="24" strokeWidth="2px" />
 					</button>
 				</form>
 
 				<form action="?/mapSerialnumbersToWorksheet" method="post" use:enhance>
-					<input hidden type="text" name="inboundId" value={inbound?.id} /><button
+					<input hidden type="text" name="inboundId" value={inbound?.id} />
+					<button
 						data-tooltip="Map selected serialnumbers to worksheet"
 						title="Map selected serialnumbers to worksheet"
-						class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+						class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 						onclick={handleMapSerialToWorksheet}
 						type="button"
 					>
 						<Sheet />
 					</button>
 				</form>
+				<button
+					data-tooltip="Generate QR"
+					title="Generate QR Code for Inbound Products"
+					onclick={generateQRCodeForInbound}
+					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+				>
+					<QrCode />
+				</button>
 			</div>
 		</section>
 

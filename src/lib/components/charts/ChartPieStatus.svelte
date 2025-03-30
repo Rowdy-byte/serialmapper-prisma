@@ -6,7 +6,14 @@
 	let chartStatus: Chart<'pie', (number | object)[], string> | null = $state(null);
 	let chartStatusCanvas: HTMLCanvasElement | undefined = $state();
 
-	function initStatusChart() {
+	$effect.pre(() => {
+		if (chartStatusCanvas) {
+			const existingChart = Chart.getChart(chartStatusCanvas);
+			if (existingChart) {
+				existingChart.destroy();
+			}
+		}
+
 		if (!chartStatusCanvas) return;
 		const ctx = chartStatusCanvas.getContext('2d');
 		if (!ctx) return;
@@ -49,15 +56,11 @@
 				}
 			}
 		});
-	}
-
-	$effect.pre(() => {
-		initStatusChart();
 	});
 </script>
 
 <canvas
-	id="statusChart"
 	bind:this={chartStatusCanvas}
+	id="chartStatus"
 	class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-lg"
 ></canvas>

@@ -6,7 +6,7 @@
 	const { clients } = $props<{ clients: { createdAt: string }[] }>();
 
 	let chart: Chart<'bar', number[], string> | null = $state(null);
-	let chartCanvas: HTMLCanvasElement | null = $state(null);
+	let chartBarClientCanvas: HTMLCanvasElement | null = $state(null);
 
 	// Month labels for the x-axis
 	const monthLabels = [
@@ -35,8 +35,14 @@
 	});
 
 	$effect.pre(() => {
-		if (chartCanvas) {
-			chart = new Chart(chartCanvas, {
+		if (chartBarClientCanvas) {
+			const existingChart = Chart.getChart(chartBarClientCanvas);
+			if (existingChart) {
+				existingChart.destroy();
+			}
+		}
+		if (chartBarClientCanvas) {
+			chart = new Chart(chartBarClientCanvas, {
 				type: 'bar',
 				data: {
 					labels: monthLabels,
@@ -62,5 +68,8 @@
 	});
 </script>
 
-<canvas bind:this={chartCanvas} class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-2xl"
+<canvas
+	bind:this={chartBarClientCanvas}
+	id="chartBarClient"
+	class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-2xl"
 ></canvas>

@@ -6,7 +6,14 @@
 	let chart: Chart<'pie', number[], string> | null = $state(null);
 	let chartCanvas: HTMLCanvasElement | undefined = $state();
 
-	export function initChart() {
+	$effect.pre(() => {
+		if (chartCanvas) {
+			const existingChart = Chart.getChart(chartCanvas);
+			if (existingChart) {
+				existingChart.destroy();
+			}
+		}
+
 		if (!chartCanvas) return;
 		const ctx = chartCanvas.getContext('2d');
 		if (!ctx) return;
@@ -64,15 +71,11 @@
 				}
 			}
 		});
-	}
-
-	$effect.pre(() => {
-		initChart();
 	});
 </script>
 
 <canvas
-	id="myChart"
 	bind:this={chartCanvas}
+	id="chartPieOutboundProducts"
 	class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-2xl"
 ></canvas>

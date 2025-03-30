@@ -6,7 +6,7 @@
 	const { inbounds, outbounds } = $props();
 
 	let chart: Chart<'bar', number[], string> | null = $state(null);
-	let chartCanvas: HTMLCanvasElement | null = $state(null);
+	let chartBarInboundsOutbounds: HTMLCanvasElement | null = $state(null);
 
 	// Month labels for the x-axis
 	const monthLabels = [
@@ -42,8 +42,14 @@
 	});
 
 	$effect.pre(() => {
-		if (chartCanvas) {
-			chart = new Chart(chartCanvas, {
+		if (chartBarInboundsOutbounds) {
+			const existingChart = Chart.getChart(chartBarInboundsOutbounds);
+			if (existingChart) {
+				existingChart.destroy();
+			}
+		}
+		if (chartBarInboundsOutbounds) {
+			chart = new Chart(chartBarInboundsOutbounds, {
 				type: 'bar',
 				data: {
 					labels: monthLabels,
@@ -76,6 +82,7 @@
 </script>
 
 <canvas
-	bind:this={chartCanvas}
+	bind:this={chartBarInboundsOutbounds}
+	id="chartBarInboundsOutbounds"
 	class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-2xl xl:max-h-96"
 ></canvas>

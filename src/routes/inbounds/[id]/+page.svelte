@@ -2,7 +2,17 @@
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import { Copy, Eye, Printer, QrCode, ScanQrCode, Search, Sheet, Trash2 } from '@lucide/svelte';
+	import {
+		Copy,
+		Eye,
+		Printer,
+		QrCode,
+		ScanQrCode,
+		Search,
+		Sheet,
+		Trash2,
+		Upload
+	} from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/BackToTop.svelte';
@@ -471,6 +481,15 @@
 							>
 								<ScanQrCode />
 							</button>
+						</div>
+						<div class="">
+							<input type="file" name="excel" accept=".xlsx" required />
+							<button
+								type="submit"
+								formaction="?/uploadExcelInboundProducts"
+								class="flex h-11 w-11 items-center justify-center rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+								><Upload /></button
+							>
 						</div>
 					</section>
 				</form>

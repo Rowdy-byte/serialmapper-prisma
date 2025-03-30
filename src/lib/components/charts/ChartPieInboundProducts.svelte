@@ -4,11 +4,18 @@
 	let { filteredInboundProducts } = $props();
 
 	let chart: Chart<'pie', number[], string> | null = $state(null);
-	let chartCanvas: HTMLCanvasElement | undefined = $state();
+	let chartPieInboundProducts: HTMLCanvasElement | undefined = $state();
 
-	export function initChart() {
-		if (!chartCanvas) return;
-		const ctx = chartCanvas.getContext('2d');
+	$effect.pre(() => {
+		if (chartPieInboundProducts) {
+			const existingChart = Chart.getChart(chartPieInboundProducts);
+			if (existingChart) {
+				existingChart.destroy();
+			}
+		}
+
+		if (!chartPieInboundProducts) return;
+		const ctx = chartPieInboundProducts.getContext('2d');
 		if (!ctx) return;
 
 		// Aggregeer het aantal per product uit de inbound producten
@@ -64,15 +71,11 @@
 				}
 			}
 		});
-	}
-
-	$effect.pre(() => {
-		initChart();
 	});
 </script>
 
 <canvas
-	id="myChart"
-	bind:this={chartCanvas}
+	bind:this={chartPieInboundProducts}
+	id="chartPieInboundProducts"
 	class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-2xl"
 ></canvas>

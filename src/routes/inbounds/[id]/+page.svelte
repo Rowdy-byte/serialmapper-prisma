@@ -22,7 +22,6 @@
 	import jsPDF from 'jspdf';
 	import JsBarcode from 'jsbarcode';
 	import QRCode from 'qrcode';
-	import Modal from '$lib/components/Modal.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -46,6 +45,9 @@
 	let euroPerMinute = $state(0);
 	let timeSavedPerSerial = $state(0);
 	let inboundProductIds = $state<number[]>([]);
+
+	let limit = $state(100);
+	let limitedInboundProducts = $state<typeof inboundProducts>([]);
 
 	let qrCodeImage = $state<string | null>(null);
 
@@ -219,11 +221,15 @@
 	}
 
 	function toggleSelectAll() {
-		if (inboundProductIds.length === filteredInboundProducts?.length) {
+		if (
+			limitedInboundProducts &&
+			limitedInboundProducts.length > 0 &&
+			limitedInboundProducts.every((p) => inboundProductIds.includes(p.id))
+		) {
 			inboundProductIds = [];
 		} else {
 			inboundProductIds =
-				filteredInboundProducts?.map((product) => product.id ?? 0).filter((id) => id !== 0) || [];
+				limitedInboundProducts?.map((product) => product.id ?? 0).filter((id) => id !== 0) || [];
 		}
 	}
 
@@ -345,15 +351,13 @@
 
 		// inboundProductIds = inboundForThis.map((product) => product.inboundId);
 	});
+
+	$effect(() => {
+		limitedInboundProducts = filteredInboundProducts?.slice(0, limit) || [];
+	});
 </script>
 
 <BackToTop scrollTo="scroll to top" />
-<Modal
-	show={showModal}
-	message="Are you sure you want to update this inbound?"
-	onConfirm={confirmSubmit}
-	onCancel={cancelSubmit}
-/>
 
 <div class="container mx-auto py-4">
 	<section
@@ -514,9 +518,9 @@
 								<ScanQrCode />
 							</button>
 						</div>
-						<div class="flex items-center justify-between">
+						<div class="flex items-center justify-between gap-4">
 							<input
-								class="rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+								class="file-input file-input-neutral rounded-full"
 								type="file"
 								name="excel"
 								accept=".xlsx"
@@ -561,21 +565,7 @@
 		</section>
 	</main>
 	<section class="mt-4">
-		<section class="mb-4 flex items-center justify-between">
-			<form class="relative py-1">
-				<input
-					bind:value={searchQuery}
-					type="text"
-					name="search"
-					placeholder="Search Products"
-					class="w-full rounded-full bg-gray-950 py-2 pr-4 pl-10 text-sm"
-				/>
-				<div
-					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
-				>
-					<Search size="18" />
-				</div>
-			</form>
+		<section class="mb-4 flex flex-col items-center justify-between gap-2 sm:flex-row">
 			<div class="flex gap-2">
 				<button
 					onclick={copySelectedSerialsToClipboard}
@@ -625,6 +615,32 @@
 					<QrCode />
 				</button>
 			</div>
+			<div class="mb-4 flex flex-col items-center justify-center gap-4">
+				<label for="limit" class="text-sm text-gray-400">Show Amount:</label>
+				<input
+					type="number"
+					id="limit"
+					min="1"
+					max={filteredInboundProducts?.length || 1}
+					bind:value={limit}
+					class="w-24 rounded bg-gray-950 px-2 py-1 text-sm text-gray-200"
+				/>
+			</div>
+
+			<form class="relative py-1">
+				<input
+					bind:value={searchQuery}
+					type="text"
+					name="search"
+					placeholder="Search Products"
+					class="w-full rounded-full bg-gray-950 py-2 pr-4 pl-10 text-sm"
+				/>
+				<div
+					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
+				>
+					<Search size="18" />
+				</div>
+			</form>
 		</section>
 
 		<section class="order-5 overflow-x-auto">
@@ -635,20 +651,21 @@
 							<input
 								type="checkbox"
 								onchange={toggleSelectAll}
-								checked={inboundProductIds.length === (filteredInboundProducts?.length || 0)}
+								checked={(limitedInboundProducts ?? []).length > 0 &&
+									limitedInboundProducts?.every((p) => inboundProductIds.includes(p.id))}
 								class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
 							/>
 						</th>
 						<th class="border border-gray-500 p-2">Product</th>
 						<th class="border border-gray-500 p-2">Serialnumber</th>
-						<th class="border border-gray-500 p-2">Value €</th>
+						<th class="hidden border border-gray-500 p-2 md:table-cell">Value €</th>
 						<th class="border border-gray-500 p-2">Status</th>
 						<th class="border border-gray-500 p-2">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#if filteredInboundProducts}
-						{#each filteredInboundProducts as inboundProduct, i}
+					{#if limitedInboundProducts && limitedInboundProducts.length > 0}
+						{#each limitedInboundProducts as inboundProduct, i}
 							<tr class="hover:bg-gray-500/20">
 								<td class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2">
 									<input
@@ -661,7 +678,9 @@
 								</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
 								<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
-								<td class="border border-gray-500 p-2">{inboundProduct.value}</td>
+								<td class="hidden border border-gray-500 p-2 md:table-cell"
+									>{inboundProduct.value}</td
+								>
 								<td class="border border-gray-500 p-2">{inboundProduct.status}</td>
 								<td class="border border-gray-500 p-2">
 									<a

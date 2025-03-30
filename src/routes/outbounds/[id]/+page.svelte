@@ -186,7 +186,7 @@
 			</li>
 		</ul>
 		<div>
-			<form use:enhance method="post" action="?/deleteInbound">
+			<form use:enhance method="post" action="?/deleteOutbound">
 				<button
 					onclick={handleDeleteOutbound}
 					data-tooltip="Delete Inbound"

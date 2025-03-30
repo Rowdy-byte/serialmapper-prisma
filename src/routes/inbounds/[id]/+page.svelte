@@ -22,6 +22,8 @@
 	import jsPDF from 'jspdf';
 	import JsBarcode from 'jsbarcode';
 	import QRCode from 'qrcode';
+	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
+	import ChartSkeleton from '$lib/components/charts/ChartSkeleton.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -317,29 +319,22 @@
 			0
 		);
 
-		// OLD REV: revenue calculated as 0.1 per inbound product
 		productRevenue = parseFloat((inboundForThis.length * 0.1).toFixed(2));
 
-		// Count statuses
 		productStatusIn = inboundForThis.filter((product) => product.status === 'IN').length;
 		productStatusOut = inboundForThis.filter((product) => product.status === 'OUT').length;
 
-		// Define fixed times (in minutes) for the batch process
-		const oldTime = 30; // old total time in minutes
-		const newTime = 3; // new total time in minutes
+		const oldTime = 30;
+		const newTime = 3;
 
-		// Total time saved remains constant for the batch
-		timeSaved = oldTime - newTime; // 27 minutes
+		timeSaved = oldTime - newTime;
 
-		// Time saved per serial in minutes
 		timeSavedPerSerial =
 			inboundForThis.length > 0 ? parseFloat((timeSaved / inboundForThis.length).toFixed(2)) : 0;
 
-		// Euro per minute based on the new process time
 		euroPerMinute =
 			inboundForThis.length > 0 ? parseFloat((productRevenue / newTime).toFixed(2)) : 0;
 
-		// Filter products based on the search query
 		filteredInboundProducts = inboundForThis.filter(
 			(product) =>
 				searchQuery.trim() === '' ||
@@ -348,8 +343,6 @@
 				product.status?.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				product.value?.toString().includes(searchQuery.toLowerCase())
 		);
-
-		// inboundProductIds = inboundForThis.map((product) => product.inboundId);
 	});
 
 	$effect(() => {
@@ -392,7 +385,6 @@
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
 			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
-
 		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
 			<form
@@ -433,16 +425,13 @@
 						class="checkbox checkbox-xs chat-bubble-neutral"
 					/>
 				</fieldset>
-				<button
+				<PrimaryBtn
 					disabled={isUpdatingInbound}
-					formaction="?/updateInbound"
-					data-tooltip="Update Inbound"
-					title="Update Inbound"
-					class=" rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit"
+					formaction={'?/updateInbound'}
+					onclick={handleUpdateInbound}
 				>
 					Update Inbound
-				</button>
+				</PrimaryBtn>
 			</form>
 		</section>
 		<section class="order-4 rounded-lg bg-gray-900 p-4 shadow-md lg:order-3">
@@ -541,12 +530,20 @@
 		<section
 			class="chart-status-section order-6 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
 		>
-			<ChartPieInboundProducts {filteredInboundProducts} />
+			{#if filteredInboundProducts && filteredInboundProducts.length > 0}
+				<ChartPieInboundProducts {filteredInboundProducts} />
+			{:else}
+				<ChartSkeleton />
+			{/if}
 		</section>
 		<section
 			class="chart-status-section order-7 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
 		>
-			<ChartPieStatus {productStatusIn} {productStatusOut} />
+			{#if productStatusIn && productStatusOut}
+				<ChartPieStatus {productStatusIn} {productStatusOut} />
+			{:else}
+				<ChartSkeleton />
+			{/if}
 		</section>
 		<section
 			class="order-8 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"

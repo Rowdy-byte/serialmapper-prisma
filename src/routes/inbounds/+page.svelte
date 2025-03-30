@@ -6,7 +6,7 @@
 	import { invalidate } from '$app/navigation';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import { enhance } from '$app/forms';
-	import Modal from '$lib/components/Modal.svelte';
+	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -71,12 +71,6 @@
 </script>
 
 <BackToTop scrollTo="scroll to top" />
-<Modal
-	{show}
-	message="Are you sure you want to update this inbound?"
-	onConfirm={confirmSubmit}
-	onCancel={cancelSubmit}
-/>
 
 <div class="container mx-auto py-4">
 	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
@@ -108,14 +102,9 @@
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					required
 				/>
-				<button
-					disabled={form?.success}
-					onclick={handleCreateInbound}
-					type="submit"
-					class="rounded-full bg-orange-500 p-3 text-sm font-bold hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				<PrimaryBtn disabled={form?.success ?? false} onclick={handleCreateInbound}
+					>Create Inbound</PrimaryBtn
 				>
-					Create Inbound
-				</button>
 			</form>
 		</section>
 

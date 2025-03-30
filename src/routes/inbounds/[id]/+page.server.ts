@@ -7,6 +7,8 @@ import { error } from "@sveltejs/kit";
 
 import { customAlphabet } from 'nanoid';
 
+import * as XLSX from 'xlsx';
+
 // Barcode generator: 12 tekens, alleen cijfers en hoofdletters
 const generateBarcode = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 12)
 
@@ -265,7 +267,96 @@ export const actions = {
             console.error("Error deleting inbound products:", error);
             return fail(500, { message: "Failed to delete selected inbound products" });
         }
+    },
+
+    uploadExcelInboundProducts: async ({ params, request }) => {
+        const formData = await request.formData();
+        const file = formData.get('excel') as File;
+
+        if (!file) {
+            return fail(400, { message: 'No Excel file provided' });
+        }
+
+        const arrayBuffer = await file.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as string[][];
+
+        // Skip header row
+        const [header, ...data] = rows;
+
+        const requiredColumns = ['product', 'serialnumber', 'value'];
+        const headerIndex: Record<string, number> = {};
+
+        for (const column of requiredColumns) {
+            const idx = header.findIndex(h => h.toLowerCase().includes(column));
+            if (idx === -1) return fail(400, { message: `Missing column: ${column}` });
+            headerIndex[column] = idx;
+        }
+
+        const seenSerials = new Set<string>();
+        const validRows: {
+            product: string;
+            serialnumber: string;
+            value: string;
+            barcode: string;
+            inboundId: number;
+        }[] = [];
+
+        for (const row of data) {
+            const product = row[headerIndex['product']]?.trim();
+            const serialnumber = row[headerIndex['serialnumber']]?.trim();
+            const value = row[headerIndex['value']]?.trim();
+
+            if (!product || !serialnumber || !value) continue;
+            if (seenSerials.has(serialnumber)) continue;
+
+            seenSerials.add(serialnumber);
+
+            validRows.push({
+                product,
+                serialnumber,
+                value,
+                barcode: generateBarcode(),
+                inboundId: Number(params.id)
+            });
+        }
+
+        // Check welke serials al in de DB zitten
+        const existingSerials = new Set(
+            (await db.inboundProduct.findMany({
+                where: {
+                    serialnumber: {
+                        in: Array.from(seenSerials)
+                    }
+                },
+                select: { serialnumber: true }
+            })).map(r => r.serialnumber)
+        );
+
+        const uniqueRows = validRows.filter(row => !existingSerials.has(row.serialnumber));
+
+        if (uniqueRows.length === 0) {
+            return fail(400, {
+                message: 'No new products to import. All serials already exist.'
+            });
+        }
+
+        await db.inboundProduct.createMany({
+            data: uniqueRows
+        });
+
+        return {
+            status: 200,
+            success: true,
+            message: `Imported ${uniqueRows.length} products. Skipped ${validRows.length - uniqueRows.length} duplicate(s).`,
+            created: uniqueRows.map(r => r.serialnumber),
+            duplicates: Array.from(existingSerials)
+        };
     }
+
 
 
 }

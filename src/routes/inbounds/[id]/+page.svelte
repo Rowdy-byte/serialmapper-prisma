@@ -22,6 +22,7 @@
 	import jsPDF from 'jspdf';
 	import JsBarcode from 'jsbarcode';
 	import QRCode from 'qrcode';
+	import Modal from '$lib/components/Modal.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -34,10 +35,6 @@
 	const products = data.products;
 	const inboundProducts = data.inboundProducts;
 
-	const inboundProduct =
-		data.inboundProducts?.map((product) => (product.inboundId === inbound?.id ? product : null)) ||
-		[];
-
 	let searchQuery = $state('');
 
 	let productValue = $state(0);
@@ -49,9 +46,30 @@
 	let euroPerMinute = $state(0);
 	let timeSavedPerSerial = $state(0);
 
+	let showModal = $state(false);
+	let formEl = $state<HTMLFormElement | null>(null);
+
 	let inboundProductIds = $state<number[]>([]);
 
 	let qrCodeImage = $state<string | null>(null);
+
+	function handleSubmit(e: Event) {
+		e.preventDefault();
+		showModal = true;
+	}
+
+	async function confirmSubmit() {
+		showModal = false;
+		if (formEl) formEl.submit();
+	}
+
+	function cancelSubmit() {
+		showModal = false;
+	}
+
+	const inboundProduct =
+		data.inboundProducts?.map((product) => (product.inboundId === inbound?.id ? product : null)) ||
+		[];
 
 	async function generateQRCodeForInbound() {
 		if (!inboundProducts || inboundProducts.length === 0) {
@@ -368,7 +386,20 @@
 
 		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
-			<form class="flex flex-col gap-4" method="post" use:enhance>
+			<form
+				class="flex flex-col gap-4"
+				method="post"
+				action="?/updateInbound"
+				bind:this={formEl}
+				onsubmit={handleSubmit}
+				use:enhance
+			>
+				<Modal
+					show={showModal}
+					message="Are you sure you want to update this inbound?"
+					onConfirm={confirmSubmit}
+					onCancel={cancelSubmit}
+				/>
 				<select
 					disabled={isUpdatingInbound}
 					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"
@@ -402,7 +433,6 @@
 				<button
 					disabled={isUpdatingInbound}
 					formaction="?/updateInbound"
-					onclick={handleUpdateInbound}
 					data-tooltip="Update Inbound"
 					title="Update Inbound"
 					class=" rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
@@ -419,7 +449,10 @@
 				<form
 					class="flex flex-col gap-4"
 					action="?/addInboundProductToInbound"
+					onsubmit={handleSubmit}
+					bind:this={formEl}
 					use:enhance
+					enctype="multipart/form-data"
 					method="post"
 				>
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
@@ -482,10 +515,17 @@
 								<ScanQrCode />
 							</button>
 						</div>
-						<div class="">
-							<input type="file" name="excel" accept=".xlsx" required />
+						<div class="flex items-center justify-between">
+							<input
+								class="rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+								type="file"
+								name="excel"
+								accept=".xlsx"
+								required
+							/>
 							<button
 								type="submit"
+								disabled={isAddingBatchInboundProduct}
 								formaction="?/uploadExcelInboundProducts"
 								class="flex h-11 w-11 items-center justify-center rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 								><Upload /></button

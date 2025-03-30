@@ -615,7 +615,7 @@
 					<QrCode />
 				</button>
 			</div>
-			<div class="mb-4 flex flex-col items-center justify-center gap-4">
+			<div class="mb-4 flex flex-col items-center justify-center gap-1">
 				<label for="limit" class="text-sm text-gray-400">Show Amount:</label>
 				<input
 					type="number"
@@ -627,7 +627,7 @@
 				/>
 			</div>
 
-			<form class="relative py-1">
+			<form class="relative">
 				<input
 					bind:value={searchQuery}
 					type="text"

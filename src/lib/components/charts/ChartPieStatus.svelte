@@ -31,7 +31,7 @@
 						label: 'Product Status',
 						data: [inStatus, outStatus],
 						backgroundColor: [
-							'rgba(249, 115, 22, 1)',
+							'rgba(5, 150, 105, 1)',
 							'rgba(59, 130, 246, 1)',
 							'rgba(34, 197, 94,1)'
 						],

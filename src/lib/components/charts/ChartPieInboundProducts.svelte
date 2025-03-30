@@ -40,7 +40,7 @@
 						label: 'Products',
 						data: dataValues,
 						backgroundColor: [
-							'rgba(249, 115, 22,1)',
+							'rgba(192, 38, 211,1)',
 							'rgba(59, 130, 246, 1)',
 							'rgba(34, 197, 94, 1)',
 							'rgba(75, 192, 192, 1)',

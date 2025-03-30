@@ -45,13 +45,12 @@
 	let timeSaved = $state(0);
 	let euroPerMinute = $state(0);
 	let timeSavedPerSerial = $state(0);
-
-	let showModal = $state(false);
-	let formEl = $state<HTMLFormElement | null>(null);
-
 	let inboundProductIds = $state<number[]>([]);
 
 	let qrCodeImage = $state<string | null>(null);
+
+	let showModal = $state(false);
+	let formEl = $state<HTMLFormElement | null>(null);
 
 	function handleSubmit(e: Event) {
 		e.preventDefault();
@@ -349,6 +348,12 @@
 </script>
 
 <BackToTop scrollTo="scroll to top" />
+<Modal
+	show={showModal}
+	message="Are you sure you want to update this inbound?"
+	onConfirm={confirmSubmit}
+	onCancel={cancelSubmit}
+/>
 
 <div class="container mx-auto py-4">
 	<section
@@ -394,12 +399,6 @@
 				onsubmit={handleSubmit}
 				use:enhance
 			>
-				<Modal
-					show={showModal}
-					message="Are you sure you want to update this inbound?"
-					onConfirm={confirmSubmit}
-					onCancel={cancelSubmit}
-				/>
 				<select
 					disabled={isUpdatingInbound}
 					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"

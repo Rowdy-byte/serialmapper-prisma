@@ -6,6 +6,7 @@
 	import { invalidate } from '$app/navigation';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import { enhance } from '$app/forms';
+	import Modal from '$lib/components/Modal.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -50,9 +51,32 @@
 			});
 		}
 	}
+
+	let show = $state(false);
+	let formEl = $state<HTMLFormElement | null>(null);
+
+	function handleSubmit(e: Event) {
+		e.preventDefault();
+		show = true;
+	}
+
+	async function confirmSubmit() {
+		show = false;
+		if (formEl) formEl.submit();
+	}
+
+	function cancelSubmit() {
+		show = false;
+	}
 </script>
 
 <BackToTop scrollTo="scroll to top" />
+<Modal
+	{show}
+	message="Are you sure you want to update this inbound?"
+	onConfirm={confirmSubmit}
+	onCancel={cancelSubmit}
+/>
 
 <div class="container mx-auto py-4">
 	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">

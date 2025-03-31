@@ -1,5 +1,5 @@
 import type { PageServerLoad } from "./$types";
-import { fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 import db from "$lib/server/db";
 import { CreateInboundSchema } from "$lib/zod/zod-schemas";
 import { AddSingleProductSchema, AddMultipleProductSchema } from "$lib/zod/zod-schemas";
@@ -231,11 +231,7 @@ export const actions = {
             }
         }
 
-        return {
-            status: 200,
-            success: true,
-            message: 'Inbound deleted successfully!'
-        }
+        throw redirect(302, '/inbounds');
     },
 
     async deleteInboundProducts({ request }: { request: Request }) {

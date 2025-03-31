@@ -368,11 +368,11 @@
 		</ul>
 
 		<div class="flex items-center gap-2">
-			<form method="post" action="?/deleteInbound">
+			<form method="post" onsubmit={handleDeleteInbound} action="?/deleteInbound">
 				<SecondaryBtn
-					onclick={handleDeleteInbound}
 					dataTooltip={'Delete Inbound'}
 					tooltipTitle={'Delete Inbound'}
+					type={'submit'}
 				>
 					<Trash2 />
 				</SecondaryBtn>
@@ -570,7 +570,7 @@
 					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 					><Printer size="24" strokeWidth="2px" /></button
 				>
-				<form action="?/deleteInboundProducts" method="post">
+				<form action="?/deleteInboundProducts" method="post" use:enhance>
 					<input type="hidden" name="productIds" value={JSON.stringify(inboundProductIds)} />
 					<button
 						data-tooltip="Delete selected products"

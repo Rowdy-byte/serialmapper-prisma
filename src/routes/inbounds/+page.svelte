@@ -12,9 +12,8 @@
 
 	let searchQuery = $state('');
 	const clients = data.clients;
-	const inbounds = data.inbounds;
 
-	let filterdInbounds = $state(inbounds);
+	let filterdInbounds = $state(data.inbounds);
 
 	function handleCreateInbound(event: Event) {
 		if (!confirm('Are you sure you want to create this inbound?')) {
@@ -39,7 +38,7 @@
 	}
 
 	$effect(() => {
-		filterdInbounds = inbounds.filter((inbound) => {
+		filterdInbounds = data.inbounds.filter((inbound) => {
 			if (searchQuery.trim()) {
 				const query = searchQuery.toLowerCase();
 
@@ -159,7 +158,7 @@
 					{/each}
 				</tbody>
 			</table>
-			{#if inbounds.length === 0}
+			{#if data.inbounds.length === 0}
 				<p class="mt-2 rounded-full bg-gray-500 p-1 px-2 text-sm">No inbounds found.</p>
 			{/if}
 		</section>

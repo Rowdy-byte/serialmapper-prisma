@@ -74,7 +74,10 @@
 					return async ({ result, update }) => {
 						if (result.type === 'success') {
 							await invalidateAll();
-							toast.success('Inbound Created Successfully');
+							toast.success('Inbound Created Successfully', {
+								duration: 3000,
+								style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+							});
 						} else {
 							await applyAction(result);
 						}

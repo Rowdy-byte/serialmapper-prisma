@@ -11,7 +11,7 @@
 	}: {
 		children: Snippet;
 		disabled: boolean;
-		onclick: MouseEventHandler<HTMLButtonElement>;
+		onclick?: MouseEventHandler<HTMLButtonElement>;
 		formaction?: string;
 		type?: 'button' | 'submit' | 'reset' | null | undefined;
 	} = $props();

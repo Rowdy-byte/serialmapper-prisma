@@ -16,20 +16,6 @@
 
 	let filterdInbounds = $state(inbounds);
 
-	$effect(() => {
-		filterdInbounds = inbounds.filter((inbound) => {
-			if (searchQuery.trim()) {
-				return (
-					inbound.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					(inbound.description &&
-						inbound.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-					inbound.inboundNumber.toString().toLowerCase().includes(searchQuery.toLowerCase())
-				);
-			}
-			return true;
-		});
-	});
-
 	function handleCreateInbound(event: Event) {
 		if (!confirm('Are you sure you want to create this inbound?')) {
 			event.preventDefault();
@@ -52,22 +38,22 @@
 		}
 	}
 
-	let show = $state(false);
-	let formEl = $state<HTMLFormElement | null>(null);
+	$effect(() => {
+		filterdInbounds = inbounds.filter((inbound) => {
+			if (searchQuery.trim()) {
+				const query = searchQuery.toLowerCase();
 
-	function handleSubmit(e: Event) {
-		e.preventDefault();
-		show = true;
-	}
+				const matchesClientName = inbound.clientName.toLowerCase().includes(query);
+				const matchesDescription = inbound.description?.toLowerCase().includes(query);
+				const matchesNumber = inbound.inboundNumber.toString().toLowerCase().includes(query);
+				const matchesT1 = query === 't1' && inbound.isSubscribed;
+				const matchesExa = query === 'exa' && !inbound.isSubscribed;
 
-	async function confirmSubmit() {
-		show = false;
-		if (formEl) formEl.submit();
-	}
-
-	function cancelSubmit() {
-		show = false;
-	}
+				return matchesClientName || matchesDescription || matchesNumber || matchesT1 || matchesExa;
+			}
+			return true;
+		});
+	});
 </script>
 
 <BackToTop scrollTo="scroll to top" />
@@ -81,7 +67,12 @@
 		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Create Inbound</h1>
 
-			<form class="flex flex-col gap-4" action="?/createInbound" method="post" use:enhance>
+			<form
+				class="flex flex-col gap-4"
+				action="?/createInbound"
+				onsubmit={handleCreateInbound}
+				method="post"
+			>
 				<select
 					disabled={form?.success}
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
@@ -102,9 +93,7 @@
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					required
 				/>
-				<PrimaryBtn disabled={form?.success ?? false} onclick={handleCreateInbound} type={'submit'}>
-					Create Inbound
-				</PrimaryBtn>
+				<PrimaryBtn disabled={form?.success ?? false} type={'submit'}>Create Inbound</PrimaryBtn>
 			</form>
 		</section>
 

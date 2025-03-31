@@ -3,7 +3,7 @@
 	import { Eye, Search } from '@lucide/svelte';
 	import { fly, slide } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
+	import { invalidateAll } from '$app/navigation';
 	import BackToTop from '$lib/components/navigation/BackToTop.svelte';
 	import { applyAction, enhance } from '$app/forms';
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
@@ -19,23 +19,24 @@
 		if (!confirm('Are you sure you want to create this inbound?')) {
 			event.preventDefault();
 		}
-		invalidate('inbounds');
 	}
 
-	if (form?.success) {
-		toast.success(form?.message, {
-			duration: 3000,
-			style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-		});
-	}
-	if (form?.issues) {
-		for (const issue of form.issues) {
-			toast.error(issue.message, {
-				duration: 3000,
-				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-			});
+	// if (form?.success) {
+	// 	toast.success(form?.message, {
+	// 		duration: 3000,
+	// 		style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+	// 	});
+	// }
+	$effect(() => {
+		if (form?.issues) {
+			for (const issue of form.issues) {
+				toast.error(issue.message, {
+					duration: 3000,
+					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
+				});
+			}
 		}
-	}
+	});
 
 	$effect(() => {
 		filterdInbounds = data.inbounds.filter((inbound) => {
@@ -72,13 +73,18 @@
 				onsubmit={handleCreateInbound}
 				method="post"
 				use:enhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'success') {
+							console.log(result);
+							toast.success('Inbound Created Successfully', {
+								duration: 3000,
+								style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+							});
 							await invalidateAll();
-							toast.success('Inbound Created Successfully');
 						} else {
 							await applyAction(result);
 						}
+						await update();
 					};
 				}}
 			>

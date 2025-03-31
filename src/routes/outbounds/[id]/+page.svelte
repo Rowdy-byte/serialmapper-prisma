@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
-	import { enhance } from '$app/forms';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
+	import { applyAction, enhance } from '$app/forms';
 	import type { PageProps } from './$types';
 	import toast from 'svelte-french-toast';
 	import { Copy, Eye, Printer, QrCode, Search, Sheet, Trash2 } from '@lucide/svelte';
@@ -12,6 +12,10 @@
 	import jsPDF from 'jspdf';
 	import JsBarcode from 'jsbarcode';
 	import QRCode from 'qrcode';
+	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
+	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
+	import { toastStyleErr } from '$lib/components/toast/toastStyle';
+	import { toastStyleSucc } from '$lib/components/toast/toastStyle';
 
 	let { data, form }: PageProps = $props();
 
@@ -312,16 +316,14 @@
 			</li>
 		</ul>
 		<div>
-			<form use:enhance method="post" action="?/deleteOutbound">
-				<button
-					onclick={handleDeleteOutbound}
-					data-tooltip="Delete Inbound"
-					title="Delete Inbound"
-					class="flex h-11 w-11 items-center justify-center rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit"
+			<form onsubmit={handleDeleteOutbound} action="?/deleteOutbound" use:enhance>
+				<SecondaryBtn
+					dataTooltip={'Delete Outbound'}
+					tooltipTitle={'Delete Outbound'}
+					type={'submit'}
 				>
 					<Trash2 />
-				</button>
+				</SecondaryBtn>
 			</form>
 		</div>
 	</section>
@@ -335,7 +337,43 @@
 
 		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Outbound</h1>
-			<form class="flex flex-col gap-4" method="post">
+			<form
+				class="flex flex-col gap-4"
+				action="?/updateOutbound"
+				method="post"
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						console.log(result);
+						if (result.type === 'failure') {
+							if (
+								result.data?.issues &&
+								Array.isArray(result.data.issues) &&
+								result.data.issues.length > 0
+							) {
+								toast.error(
+									result.data.issues.map((issue: { message: string }) => issue.message).join(', '),
+									toastStyleErr
+								);
+							} else if (
+								result.data?.issues &&
+								typeof result.data.issues === 'object' &&
+								'message' in result.data.issues
+							) {
+								toast.error(result.data.issues.message as string, toastStyleErr);
+							} else {
+								toast.error('An error occurred');
+							}
+						}
+						if (result.type === 'success') {
+							console.log(result);
+							toast.success('Inbound Updated Successfully', toastStyleSucc);
+							await invalidateAll();
+						} else {
+							await applyAction(result);
+						}
+					};
+				}}
+			>
 				<select
 					disabled={isUpdatingOutbound}
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
@@ -355,15 +393,9 @@
 					value={outbound?.description}
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				/>
-				<button
-					disabled={isUpdatingOutbound}
-					formaction="?/updateOutbound"
-					onclick={handleUpdateOutbound}
-					class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit"
+				<PrimaryBtn disabled={isUpdatingOutbound} type={'submit'} onclick={handleUpdateOutbound}
+					>Update</PrimaryBtn
 				>
-					Update
-				</button>
 			</form>
 		</section>
 		<section class="order-4 rounded-lg bg-gray-900 p-4 shadow-md lg:order-3">
@@ -505,7 +537,7 @@
 			<table class="min-w-full text-left text-sm">
 				<thead>
 					<tr class="text-gray-500">
-						<th>
+						<th class="border border-gray-500 p-2">
 							<input
 								type="checkbox"
 								onchange={toggleSelectAll}
@@ -524,11 +556,13 @@
 					{#if limitedOutboundProducts && limitedOutboundProducts.length > 0}
 						{#each limitedOutboundProducts as outboundProduct, i (outboundProduct.id)}
 							<tr class="hover:bg-slate-600">
-								<td
-									class="border border-gray-500 p-2 {i === filteredOutboundProducts.length - 1
-										? 'rounded-bl-lg'
-										: ''}"
-								>
+								<td class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2">
+									<input
+										type="checkbox"
+										onchange={() => toggleSelection(outboundProduct.id)}
+										checked={outboundProductIds.includes(outboundProduct.id)}
+										class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
+									/>
 									{i + 1}
 								</td>
 								<td class="border border-gray-500 p-2">{outboundProduct.product}</td>

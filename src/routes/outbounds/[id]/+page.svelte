@@ -3,14 +3,15 @@
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
 	import toast from 'svelte-french-toast';
-	import { Eye, Search, Sheet, Trash2 } from '@lucide/svelte';
+	import { Copy, Eye, Printer, QrCode, Search, Sheet, Trash2 } from '@lucide/svelte';
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/navigation/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
-	import ChartPie from '$lib/components/charts/ChartPieInboundProducts.svelte';
 	import ChartPieStatus from '$lib/components/charts/ChartPieStatus.svelte';
-	import ChartBarOutboundProducts from '$lib/components/charts/ChartPieOutboundProducts.svelte';
 	import ChartPieOutboundProducts from '$lib/components/charts/ChartPieOutboundProducts.svelte';
+	import jsPDF from 'jspdf';
+	import JsBarcode from 'jsbarcode';
+	import QRCode from 'qrcode';
 
 	let { data, form }: PageProps = $props();
 
@@ -18,10 +19,10 @@
 	let isAddingOutboundProduct = $state(false);
 	let isAddingBatchOutboundProduct = $state(false);
 
-	const clients = data.clients;
-	const outbound = data.outbound;
-	const products = data.products;
-	const outboundProducts = data.outboundProducts;
+	const clients = $state(data.clients);
+	const outbound = $state(data.outbound);
+	const products = $state(data.products);
+	const outboundProducts = $state(data.outboundProducts);
 
 	let searchQuery = $state('');
 
@@ -31,14 +32,114 @@
 	let timeSaved = $state(0);
 	let timeSavedPerSerial = $state(0);
 	let euroPerMinute = $state(0);
+	let outboundProductIds = $state<number[]>([]);
 
-	let inboundProductIds = $state<number[]>([]);
+	let limit = $state(100);
+	let limitedOutboundProducts = $state<typeof outboundProducts>([]);
+
+	let qrCodeImage = $state<string | null>(null);
 
 	let filteredOutboundProducts = $state(
 		outboundProducts?.filter(
 			(product: { outboundId: number }) => product.outboundId === Number(outbound?.id)
 		)
 	);
+
+	async function generateQRCodeForInbound() {
+		if (!outboundProducts || outboundProducts.length === 0) {
+			toast.error('No serial numbers found for this inbound.');
+			return;
+		}
+
+		const serialNumbers = outboundProducts.map((product) => product.serialnumber).join(' ');
+		try {
+			const qrCodeData = await QRCode.toDataURL(serialNumbers, {
+				color: {
+					dark: '#030712', // Oranje (Foreground)
+					light: '#f8fafc' // Donkergrijs (Background)
+				}
+			});
+			qrCodeImage = qrCodeData; // Update de variabele voor weergave
+		} catch (error) {
+			console.error('Error generating QR code:', error);
+			toast.error('Error generating QR code');
+		}
+	}
+
+	function printSelectedLabels() {
+		const selectedProducts = (filteredOutboundProducts || []).filter((product) =>
+			outboundProductIds.includes(product.id)
+		);
+
+		if (selectedProducts.length === 0) {
+			toast.error('Select at least one product to print labels.');
+			return;
+		}
+
+		const doc = new jsPDF({
+			orientation: 'portrait',
+			unit: 'mm',
+			format: 'a4'
+		});
+
+		let yOffset = 10;
+		const labelHeight = 50; // Adjust to ensure proper spacing between labels
+
+		selectedProducts.forEach(
+			(
+				outboundProduct: { product: string; serialnumber: string; barcode?: string },
+				index: number
+			) => {
+				// Apply the same font settings
+				doc.setFont('helvetica', 'bold');
+				doc.setFontSize(10);
+
+				// Text formatting
+				doc.text(`Product: ${outboundProduct.product}`, 5, yOffset);
+				doc.text(`Serial: ${outboundProduct.serialnumber}`, 5, yOffset + 10);
+				doc.text(`Inbound: ${outbound?.outboundNumber || ''}`, 5, yOffset + 20);
+
+				// Generate barcode
+				const barcodeCanvas = document.createElement('canvas');
+				JsBarcode(barcodeCanvas, outboundProduct.barcode || outboundProduct.serialnumber || '', {
+					format: 'CODE128',
+					displayValue: false,
+					width: 1.2,
+					height: 40
+				});
+
+				const barcodeImage = barcodeCanvas.toDataURL('image/png');
+				doc.addImage(barcodeImage, 'PNG', 5, yOffset + 25, 80, 20);
+
+				yOffset += labelHeight;
+
+				if (yOffset > 270 && index !== selectedProducts.length - 1) {
+					doc.addPage();
+					yOffset = 10;
+				}
+			}
+		);
+
+		doc.save(`bulk_stickers_${outbound?.outboundNumber}.pdf`);
+	}
+
+	function copySelectedSerialsToClipboard() {
+		const selectedSerials = (filteredOutboundProducts || [])
+			.filter((product) => outboundProductIds.includes(product.id))
+			.map((product) => product.serialnumber)
+			.join('\n');
+
+		navigator.clipboard
+			.writeText(selectedSerials)
+			.then(() => {
+				toast.success('Copy successfull!');
+			})
+			.catch((err) => {
+				toast.error('Copy error!');
+				console.error('Clipboard copy error:', err);
+			});
+		window.location.reload();
+	}
 
 	$effect(() => {
 		filteredOutboundProducts = outboundProducts?.filter(
@@ -112,6 +213,27 @@
 		}
 	}
 
+	function toggleSelectAll() {
+		if (
+			limitedOutboundProducts &&
+			limitedOutboundProducts.length > 0 &&
+			limitedOutboundProducts.every((p) => outboundProductIds.includes(p.id))
+		) {
+			outboundProductIds = [];
+		} else {
+			outboundProductIds =
+				limitedOutboundProducts?.map((product) => product.id ?? 0).filter((id) => id !== 0) || [];
+		}
+	}
+
+	function toggleSelection(id: number) {
+		if (outboundProductIds.includes(id)) {
+			outboundProductIds = outboundProductIds.filter((productId) => productId !== id);
+		} else {
+			outboundProductIds = [...outboundProductIds, id];
+		}
+	}
+
 	$effect(() => {
 		switch (true) {
 			case form?.outboundUpdateSuccess:
@@ -168,7 +290,11 @@
 				product.status?.toLowerCase().includes(searchQuery.toLowerCase())
 		);
 
-		inboundProductIds = inboundForThis.map((product) => product.outboundId);
+		outboundProductIds = inboundForThis.map((product) => product.outboundId);
+	});
+
+	$effect(() => {
+		limitedOutboundProducts = filteredOutboundProducts?.slice(0, limit) || [];
 	});
 </script>
 
@@ -296,8 +422,70 @@
 	</main>
 
 	<section class="mt-4">
-		<section class="mb-4 flex items-center justify-between">
-			<form class="relative py-1">
+		<section class="mb-4 flex flex-col items-center justify-between gap-2 sm:flex-row">
+			<div class="flex gap-2">
+				<button
+					onclick={copySelectedSerialsToClipboard}
+					data-tooltip="Copy selected serialnumbers to clipboard"
+					title="Copy selected serialnumbers to clipboard"
+					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					><Copy size="24" strokeWidth="2px" /></button
+				>
+				<button
+					onclick={printSelectedLabels}
+					data-tooltip="Print selected labels"
+					title="Print selected labels"
+					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					><Printer size="24" strokeWidth="2px" /></button
+				>
+				<form action="?/deleteInboundProducts" method="post" use:enhance>
+					<input type="hidden" name="productIds" value={JSON.stringify(outboundProductIds)} />
+					<button
+						data-tooltip="Delete selected products"
+						title="Delete selected products"
+						type="submit"
+						disabled={outboundProductIds.length === 0}
+						class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all
+						"
+					>
+						<Trash2 size="24" strokeWidth="2px" />
+					</button>
+				</form>
+
+				<form action="?/mapSerialnumbersToWorksheet" method="post">
+					<input hidden type="text" name="inboundId" value={outbound?.id} />
+					<button
+						data-tooltip="Map selected serialnumbers to worksheet"
+						title="Map selected serialnumbers to worksheet"
+						class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+						onclick={handleMapSerialToWorksheet}
+						type="button"
+					>
+						<Sheet />
+					</button>
+				</form>
+				<button
+					data-tooltip="Generate QR"
+					title="Generate QR Code for Inbound Products"
+					onclick={generateQRCodeForInbound}
+					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+				>
+					<QrCode />
+				</button>
+			</div>
+			<div class="mb-4 flex flex-col items-center justify-center gap-1">
+				<label for="limit" class="text-sm text-gray-400">Show Amount:</label>
+				<input
+					type="number"
+					id="limit"
+					min="1"
+					max={filteredOutboundProducts?.length || 1}
+					bind:value={limit}
+					class="w-24 rounded bg-gray-950 px-2 py-1 text-sm text-gray-200"
+				/>
+			</div>
+
+			<form class="relative">
 				<input
 					bind:value={searchQuery}
 					type="text"
@@ -311,25 +499,21 @@
 					<Search size="18" />
 				</div>
 			</form>
-			<form action="?/mapSerialnumbersToWorksheet" method="post">
-				<input hidden type="text" name="inboundId" value={outbound?.id} />
-				<button
-					class="flex w-full rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-					data-tooltip="Map Serialnumbers to Worksheet"
-					title="Map Serialnumbers to Worksheet"
-					onclick={handleMapSerialToWorksheet}
-					type="button"
-				>
-					<Sheet />
-				</button>
-			</form>
 		</section>
 
 		<div class="overflow-x-auto">
 			<table class="min-w-full text-left text-sm">
 				<thead>
 					<tr class="text-gray-500">
-						<th class="rounded-tl-lg border border-gray-500 p-2"></th>
+						<th>
+							<input
+								type="checkbox"
+								onchange={toggleSelectAll}
+								checked={(limitedOutboundProducts ?? []).length > 0 &&
+									limitedOutboundProducts?.every((p) => outboundProductIds.includes(p.id))}
+								class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
+							/>
+						</th>
 						<th class="border border-gray-500 p-2">Product</th>
 						<th class="border border-gray-500 p-2">Serialnumber</th>
 						<th class="border border-gray-500 p-2">Value</th>
@@ -337,8 +521,8 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#if filteredOutboundProducts}
-						{#each filteredOutboundProducts as outboundProduct, i (outboundProduct.id)}
+					{#if limitedOutboundProducts && limitedOutboundProducts.length > 0}
+						{#each limitedOutboundProducts as outboundProduct, i (outboundProduct.id)}
 							<tr class="hover:bg-slate-600">
 								<td
 									class="border border-gray-500 p-2 {i === filteredOutboundProducts.length - 1

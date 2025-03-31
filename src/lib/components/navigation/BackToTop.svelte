@@ -26,7 +26,7 @@
 	<button
 		title={scrollTo}
 		onclick={scrollToTop}
-		class="custom-gray fixed right-6 bottom-12 rounded-full bg-gray-900 p-2 text-blue-500
+		class="custom-gray fixed right-6 bottom-12 z-50 rounded-full bg-gray-900 p-2 text-blue-500
 		shadow-lg hover:text-blue-800"
 		aria-label="Scroll to top"
 	>

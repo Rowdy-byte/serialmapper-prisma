@@ -331,7 +331,9 @@
 		timeSaved = oldTime - newTime;
 
 		timeSavedPerSerial =
-			inboundForThis.length > 0 ? parseFloat((timeSaved / inboundForThis.length).toFixed(2)) : 0;
+			inboundForThis.length > 0
+				? parseFloat(calculateTimeSavedPerSerial(30, 3, inboundForThis.length).toFixed(2))
+				: 0;
 
 		euroPerMinute =
 			inboundForThis.length > 0 ? parseFloat((productRevenue / newTime).toFixed(2)) : 0;
@@ -366,7 +368,7 @@
 		</ul>
 
 		<div class="flex items-center gap-2">
-			<form use:enhance method="post" action="?/deleteInbound">
+			<form method="post" action="?/deleteInbound">
 				<SecondaryBtn
 					onclick={handleDeleteInbound}
 					dataTooltip={'Delete Inbound'}
@@ -434,10 +436,9 @@
 					class="flex flex-col gap-4"
 					action="?/addInboundProductToInbound"
 					onsubmit={handleSubmit}
-					bind:this={formEl}
-					use:enhance
 					enctype="multipart/form-data"
 					method="post"
+					use:enhance
 				>
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<select
@@ -505,7 +506,6 @@
 								type="file"
 								name="excel"
 								accept=".xlsx"
-								required
 							/>
 							<button
 								type="submit"
@@ -570,7 +570,7 @@
 					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 					><Printer size="24" strokeWidth="2px" /></button
 				>
-				<form action="?/deleteInboundProducts" use:enhance method="post">
+				<form action="?/deleteInboundProducts" method="post">
 					<input type="hidden" name="productIds" value={JSON.stringify(inboundProductIds)} />
 					<button
 						data-tooltip="Delete selected products"
@@ -583,7 +583,7 @@
 					</button>
 				</form>
 
-				<form action="?/mapSerialnumbersToWorksheet" method="post" use:enhance>
+				<form action="?/mapSerialnumbersToWorksheet" method="post">
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<button
 						data-tooltip="Map selected serialnumbers to worksheet"

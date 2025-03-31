@@ -1,5 +1,5 @@
 import type { PageServerLoad } from "./$types";
-import { fail, error } from "@sveltejs/kit";
+import { fail, error, redirect } from "@sveltejs/kit";
 import db from "$lib/server/db";
 import { CreateOutboundSchema } from "$lib/zod/zod-schemas";
 
@@ -210,6 +210,30 @@ export const actions = {
             console.error("moveBatchToOutbound error:", err);
             return fail(500, { success: false, message });
         }
-    }
+    },
+
+    async deleteOutboundProducts({ request }: { params: { id: string }, request: Request }) {
+        const formData = await request.formData();
+        const rawProductIds = formData.get("productIds");
+        // const outboundId = Number(params.id);
+
+        if (!rawProductIds) {
+            return fail(400, { message: "No products selected" });
+        }
+
+        // Parse the JSON string into an array
+        const productIds = JSON.parse(rawProductIds as string);
+
+        if (!Array.isArray(productIds) || productIds.length === 0) {
+            return fail(400, { message: "Invalid product selection" });
+        }
+
+        await db.outboundProduct.deleteMany({
+            where: { id: { in: productIds } }
+        });
+
+        // throw redirect(302, `/outbounds/${outboundId}`);
+
+    },
 
 };

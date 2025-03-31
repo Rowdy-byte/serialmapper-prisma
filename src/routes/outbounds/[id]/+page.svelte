@@ -423,27 +423,19 @@
 					placeholder="Enter Serialnumber"
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 				/>
-				<button
-					type="submit"
-					onclick={handleMoveToOutbound}
-					class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				>
+				<PrimaryBtn disabled={isAddingOutboundProduct} type="submit" onclick={handleMoveToOutbound}>
 					Move
-				</button>
+				</PrimaryBtn>
+
 				<textarea
 					disabled={isAddingBatchOutboundProduct}
 					name="batch"
 					placeholder="Batch Serialnumbers"
 					class="rounded-lg bg-gray-950 p-3 text-sm text-gray-500"
 				></textarea>
-				<button
-					type="submit"
-					formaction="?/moveBatchToOutbound"
-					onclick={handleMoveToOutbound}
-					class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
+				<PrimaryBtn disabled={isAddingBatchOutboundProduct} type="submit" onclick={handleAddBatch}
+					>Batch</PrimaryBtn
 				>
-					Move Batch
-				</button>
 			</form>
 		</section>
 		<section
@@ -470,7 +462,7 @@
 					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 					><Printer size="24" strokeWidth="2px" /></button
 				>
-				<form action="?/deleteInboundProducts" method="post" use:enhance>
+				<form action="?/deleteOutboundProducts" method="post" use:enhance>
 					<input type="hidden" name="productIds" value={JSON.stringify(outboundProductIds)} />
 					<button
 						data-tooltip="Delete selected products"

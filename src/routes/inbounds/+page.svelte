@@ -19,7 +19,6 @@
 		if (!confirm('Are you sure you want to create this inbound?')) {
 			event.preventDefault();
 		}
-		invalidate('inbounds');
 	}
 
 	if (form?.success) {
@@ -72,13 +71,14 @@
 				onsubmit={handleCreateInbound}
 				method="post"
 				use:enhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'success') {
 							await invalidateAll();
 							toast.success('Inbound Created Successfully');
 						} else {
 							await applyAction(result);
 						}
+						await update();
 					};
 				}}
 			>

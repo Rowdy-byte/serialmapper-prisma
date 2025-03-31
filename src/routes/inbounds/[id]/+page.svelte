@@ -527,7 +527,7 @@
 			{#if filteredInboundProducts && filteredInboundProducts.length > 0}
 				<ChartPieInboundProducts {filteredInboundProducts} />
 			{:else}
-				<ChartSkeleton />
+				<h1>No Chart Yet...</h1>
 			{/if}
 		</section>
 		<section
@@ -536,7 +536,7 @@
 			{#if productStatusIn && productStatusOut}
 				<ChartPieStatus {productStatusIn} {productStatusOut} />
 			{:else}
-				<ChartSkeleton />
+				<h1>No Chart Yet...</h1>
 			{/if}
 		</section>
 		<section

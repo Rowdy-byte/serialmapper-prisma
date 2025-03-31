@@ -1,5 +1,5 @@
 import type { PageServerLoad } from "./$types";
-import { fail, error, redirect } from "@sveltejs/kit";
+import { fail, error } from "@sveltejs/kit";
 import db from "$lib/server/db";
 import { CreateOutboundSchema } from "$lib/zod/zod-schemas";
 

@@ -426,13 +426,21 @@
 				<PrimaryBtn disabled={isAddingOutboundProduct} type="submit" onclick={handleMoveToOutbound}>
 					Move
 				</PrimaryBtn>
-
+			</form>
+		</section>
+		<section class="order-5 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-3">
+			<h1 class="flex items-center justify-between pb-4 font-bold">
+				Move Batch of Products to Outbound
+			</h1>
+			<form action="?/moveBatchToOutbound" method="post" class="flex flex-col gap-4">
+				<input type="hidden" name="outboundNumber" value={outbound?.outboundNumber} />
 				<textarea
 					disabled={isAddingBatchOutboundProduct}
 					name="batch"
 					placeholder="Batch Serialnumbers"
 					class="rounded-lg bg-gray-950 p-3 text-sm text-gray-500"
 				></textarea>
+				<p class="text-xs text-gray-500">Outbound #: {outbound?.outboundNumber}</p>
 				<PrimaryBtn disabled={isAddingBatchOutboundProduct} type="submit" onclick={handleAddBatch}
 					>Batch</PrimaryBtn
 				>

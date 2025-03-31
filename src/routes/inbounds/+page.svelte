@@ -7,6 +7,8 @@
 	import BackToTop from '$lib/components/navigation/BackToTop.svelte';
 	import { applyAction, enhance } from '$app/forms';
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
+	import { toastStyleErr } from '$lib/components/toast/toastStyle';
+	import { toastStyleSucc } from '$lib/components/toast/toastStyle';
 
 	let { data, form }: PageProps = $props();
 
@@ -20,23 +22,6 @@
 			event.preventDefault();
 		}
 	}
-
-	// if (form?.success) {
-	// 	toast.success(form?.message, {
-	// 		duration: 3000,
-	// 		style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-	// 	});
-	// }
-	$effect(() => {
-		if (form?.issues) {
-			for (const issue of form.issues) {
-				toast.error(issue.message, {
-					duration: 3000,
-					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-			}
-		}
-	});
 
 	$effect(() => {
 		filterdInbounds = data.inbounds.filter((inbound) => {
@@ -62,11 +47,9 @@
 	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
 		<h1 class="py-4 text-lg font-bold">Inbounds</h1>
 	</section>
-
 	<main class="flex flex-col gap-4">
 		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Create Inbound</h1>
-
 			<form
 				class="flex flex-col gap-4"
 				action="?/createInbound"
@@ -74,12 +57,30 @@
 				method="post"
 				use:enhance={() => {
 					return async ({ result, update }) => {
+						console.log(result);
+						if (result.type === 'failure') {
+							if (
+								result.data?.issues &&
+								Array.isArray(result.data.issues) &&
+								result.data.issues.length > 0
+							) {
+								toast.error(
+									result.data.issues.map((issue: { message: string }) => issue.message).join(', '),
+									toastStyleErr
+								);
+							} else if (
+								result.data?.issues &&
+								typeof result.data.issues === 'object' &&
+								'message' in result.data.issues
+							) {
+								toast.error(result.data.issues.message as string, toastStyleErr);
+							} else {
+								toast.error('An error occurred');
+							}
+						}
 						if (result.type === 'success') {
 							console.log(result);
-							toast.success('Inbound Created Successfully', {
-								duration: 3000,
-								style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-							});
+							toast.success('Inbound Created Successfully', toastStyleSucc);
 							await invalidateAll();
 						} else {
 							await applyAction(result);
@@ -99,7 +100,6 @@
 						<option value={client.name}>{client.name}</option>
 					{/each}
 				</select>
-
 				<input
 					disabled={form?.success}
 					type="text"
@@ -111,7 +111,6 @@
 				<PrimaryBtn disabled={form?.success ?? false} type={'submit'}>Create Inbound</PrimaryBtn>
 			</form>
 		</section>
-
 		<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
 			<form class="relative py-1">
 				<input
@@ -134,7 +133,6 @@
 						<th class="border border-gray-500 p-2">Client</th>
 						<th class="hidden border border-gray-500 p-2 md:table-cell">Description</th>
 						<th class="hidden border border-gray-500 p-2 md:table-cell">Customs</th>
-
 						<th class="hidden border border-gray-500 p-2 md:table-cell">Created</th>
 						<th class="border border-gray-500 p-2">Actions</th>
 					</tr>

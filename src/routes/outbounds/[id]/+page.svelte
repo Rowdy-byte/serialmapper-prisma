@@ -5,7 +5,7 @@
 	import toast from 'svelte-french-toast';
 	import { Eye, Search, Sheet, Trash2 } from '@lucide/svelte';
 	import { utils, writeFileXLSX } from 'xlsx';
-	import BackToTop from '$lib/components/BackToTop.svelte';
+	import BackToTop from '$lib/components/navigation/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
 	import ChartPie from '$lib/components/charts/ChartPieInboundProducts.svelte';
 	import ChartPieStatus from '$lib/components/charts/ChartPieStatus.svelte';

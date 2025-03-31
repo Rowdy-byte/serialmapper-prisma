@@ -15,7 +15,7 @@
 	} from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
-	import BackToTop from '$lib/components/BackToTop.svelte';
+	import BackToTop from '$lib/components/navigation/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
 	import ChartPieInboundProducts from '$lib/components/charts/ChartPieInboundProducts.svelte';
 	import ChartPieStatus from '$lib/components/charts/ChartPieStatus.svelte';
@@ -24,6 +24,7 @@
 	import QRCode from 'qrcode';
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 	import ChartSkeleton from '$lib/components/charts/ChartSkeleton.svelte';
+	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -366,14 +367,13 @@
 
 		<div class="flex items-center gap-2">
 			<form use:enhance method="post" action="?/deleteInbound">
-				<button
+				<SecondaryBtn
 					onclick={handleDeleteInbound}
-					data-tooltip="Delete Inbound"
-					title="Delete Inbound"
-					class="flex w-full rounded-full bg-gray-950 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					dataTooltip={'Delete Inbound'}
+					tooltipTitle={'Delete Inbound'}
 				>
 					<Trash2 />
-				</button>
+				</SecondaryBtn>
 			</form>
 			<div class="flex items-center gap-4"></div>
 		</div>

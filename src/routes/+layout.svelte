@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import Footer from '$lib/components/Footer.svelte';
-	import HamburgerMenu from '$lib/components/HamburgerMenu.svelte';
+	import HamburgerMenu from '$lib/components/navigation/HamburgerMenu.svelte';
 	import { Toaster } from 'svelte-french-toast';
 	import { page } from '$app/state';
 
@@ -23,7 +23,7 @@
 
 <section class="sticky top-0 left-0 z-50 bg-gray-950">
 	<nav class="flex items-center justify-between p-4">
-		<section class="flex h-full items-center rounded-full bg-gray-900 p-4">
+		<section class="flex h-full items-center rounded-full bg-gray-900 p-2">
 			<a class="flex items-center justify-center text-2xl font-black italic" href="/"
 				>SN<span class="text-md text-orange-500">mapper</span>
 			</a>

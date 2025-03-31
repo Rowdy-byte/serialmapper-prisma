@@ -4,7 +4,7 @@
 	import { fly, slide } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
 	import { invalidate } from '$app/navigation';
-	import BackToTop from '$lib/components/BackToTop.svelte';
+	import BackToTop from '$lib/components/navigation/BackToTop.svelte';
 
 	let { data, form }: PageProps = $props();
 

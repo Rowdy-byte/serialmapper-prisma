@@ -4,6 +4,8 @@
 	import { MoveRight, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import InboundProductBarcode from '$lib/components/barcodes/InboundProductBarcode.svelte';
+	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
+	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
 
 	const { params, url } = page;
 	const urlArray = url.pathname.split('/');
@@ -72,13 +74,15 @@
 			</li>
 		</ul>
 		<div>
-			<form method="post" class="flex gap-2">
-				<button
-					formaction="?/deleteInboundProduct"
+			<form method="post" action="?/deleteInboundProduct" class="flex gap-2">
+				<SecondaryBtn
 					onclick={handleDeleteInboundProduct}
-					class=" fo rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit"><Trash2 /></button
+					dataTooltip={'Delete Inbound'}
+					tooltipTitle={'Delete Inbound'}
+					type={'submit'}
 				>
+					<Trash2 />
+				</SecondaryBtn>
 			</form>
 		</div>
 	</section>

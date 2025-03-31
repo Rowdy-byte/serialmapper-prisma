@@ -311,7 +311,7 @@
 		<ul class="text-gray-500">
 			<li class="font-bold">
 				<a href="/outbounds" class="transition-all hover:text-blue-500">
-					Outbound: {outbound?.outboundNumber}
+					Outbound: <span class="">{outbound?.outboundNumber}</span>
 				</a>
 			</li>
 		</ul>
@@ -398,36 +398,7 @@
 				>
 			</form>
 		</section>
-		<section class="order-4 rounded-lg bg-gray-900 p-4 shadow-md lg:order-3">
-			<h1 class="flex items-center justify-between pb-4 font-bold">
-				Move Inbound Product to Outbound
-			</h1>
-			<form
-				class="flex flex-col gap-4"
-				action="?/moveInboundProductToOutbound"
-				method="post"
-				use:enhance
-			>
-				<input
-					id="outboundNumber"
-					type="text"
-					name="outboundNumber"
-					placeholder="Enter Outbound Number"
-					required
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				/>
-				<input
-					id="serial"
-					type="text"
-					name="serial"
-					placeholder="Enter Serialnumber"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				/>
-				<PrimaryBtn disabled={isAddingOutboundProduct} type="submit" onclick={handleMoveToOutbound}>
-					Move
-				</PrimaryBtn>
-			</form>
-		</section>
+
 		<section class="order-5 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-3">
 			<h1 class="flex items-center justify-between pb-4 font-bold">
 				Move Batch of Products to Outbound

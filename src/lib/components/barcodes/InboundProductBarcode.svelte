@@ -3,6 +3,7 @@
 	import JsBarcode from 'jsbarcode';
 	import jsPDF from 'jspdf';
 	import toast from 'svelte-french-toast';
+	import SecondaryBtn from '../SecondaryBtn.svelte';
 
 	let { inboundProduct, inbound } = $props();
 
@@ -66,11 +67,15 @@
 	<p>Inbound: {inbound.inboundNumber}</p>
 	<svg class="flex h-auto w-[200px]" bind:this={svgElement}></svg>
 </div>
-<button
+
+<SecondaryBtn
 	onclick={printSticker}
-	class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-	><Printer /></button
+	dataTooltip={'Print Sticker'}
+	tooltipTitle={'Print Sticker'}
+	type={'button'}
 >
+	<Printer />
+</SecondaryBtn>
 
 <style>
 	svg {

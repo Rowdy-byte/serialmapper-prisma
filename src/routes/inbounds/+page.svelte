@@ -75,6 +75,7 @@
 				use:enhance={() => {
 					return async ({ result, update }) => {
 						if (result.type === 'success') {
+							console.log(result);
 							toast.success('Inbound Created Successfully', {
 								duration: 3000,
 								style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'

@@ -23,7 +23,6 @@ export const actions: Actions = {
         const safeParse = CreateInboundSchema.safeParse(formData);
 
         if (!safeParse.success) {
-            console.log('Error', safeParse.error.issues);
             return fail(400, { issues: safeParse.error.issues });
         }
 

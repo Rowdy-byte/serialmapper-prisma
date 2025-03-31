@@ -387,14 +387,7 @@
 		</section>
 		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
-			<form
-				class="flex flex-col gap-4"
-				method="post"
-				action="?/updateInbound"
-				bind:this={formEl}
-				onsubmit={handleSubmit}
-				use:enhance
-			>
+			<form class="flex flex-col gap-4" method="post" action="?/updateInbound" use:enhance>
 				<select
 					disabled={isUpdatingInbound}
 					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"
@@ -425,11 +418,7 @@
 						class="checkbox checkbox-xs chat-bubble-neutral"
 					/>
 				</fieldset>
-				<PrimaryBtn
-					disabled={isUpdatingInbound}
-					formaction={'?/updateInbound'}
-					onclick={handleUpdateInbound}
-				>
+				<PrimaryBtn disabled={isUpdatingInbound} onclick={handleUpdateInbound} type={'submit'}>
 					Update Inbound
 				</PrimaryBtn>
 			</form>

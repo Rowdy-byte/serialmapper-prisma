@@ -6,12 +6,14 @@
 		children,
 		disabled,
 		onclick,
-		formaction
+		formaction,
+		type
 	}: {
 		children: Snippet;
 		disabled: boolean;
 		onclick: MouseEventHandler<HTMLButtonElement>;
-		formaction: string;
+		formaction?: string;
+		type?: 'button' | 'submit' | 'reset' | null | undefined;
 	} = $props();
 </script>
 
@@ -19,7 +21,7 @@
 	{disabled}
 	{onclick}
 	{formaction}
-	type="submit"
+	{type}
 	class="rounded-full bg-gray-500 p-3 text-sm font-bold hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
 >
 	{@render children()}

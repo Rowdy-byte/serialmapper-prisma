@@ -102,11 +102,7 @@
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					required
 				/>
-				<PrimaryBtn
-					disabled={form?.success ?? false}
-					onclick={handleCreateInbound}
-					formaction={'?/createInbounds'}
-				>
+				<PrimaryBtn disabled={form?.success ?? false} onclick={handleCreateInbound} type={'submit'}>
 					Create Inbound
 				</PrimaryBtn>
 			</form>

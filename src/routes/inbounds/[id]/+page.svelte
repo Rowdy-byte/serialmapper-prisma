@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
 	import {
@@ -161,7 +161,10 @@
 			event.preventDefault();
 			return;
 		}
-		goto('/inbounds');
+		toast.success('Inbound deleted succesfull', {
+			duration: 4000,
+			style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+		});
 	}
 
 	function handleUpdateInbound(event: Event) {
@@ -368,7 +371,7 @@
 		</ul>
 
 		<div class="flex items-center gap-2">
-			<form method="post" onsubmit={handleDeleteInbound} action="?/deleteInbound">
+			<form method="post" onsubmit={handleDeleteInbound} action="?/deleteInbound" use:enhance>
 				<SecondaryBtn
 					dataTooltip={'Delete Inbound'}
 					tooltipTitle={'Delete Inbound'}

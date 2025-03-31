@@ -3,9 +3,9 @@
 	import { Eye, Search } from '@lucide/svelte';
 	import { fly, slide } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import BackToTop from '$lib/components/navigation/BackToTop.svelte';
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 
 	let { data, form }: PageProps = $props();
@@ -72,6 +72,16 @@
 				action="?/createInbound"
 				onsubmit={handleCreateInbound}
 				method="post"
+				use:enhance={() => {
+					return async ({ result }) => {
+						if (result.type === 'success') {
+							await invalidateAll();
+							toast.success('Inbound Created Successfully');
+						} else {
+							await applyAction(result);
+						}
+					};
+				}}
 			>
 				<select
 					disabled={form?.success}

@@ -234,9 +234,10 @@ export const actions = {
         throw redirect(302, '/inbounds');
     },
 
-    async deleteInboundProducts({ request }: { request: Request }) {
+    async deleteInboundProducts({ request, params }: { params: { id: string }, request: Request }) {
         const formData = await request.formData();
         const rawProductIds = formData.get("productIds");
+        const inboundId = Number(params.id);
 
         if (!rawProductIds) {
             return fail(400, { message: "No products selected" });
@@ -249,20 +250,12 @@ export const actions = {
             return fail(400, { message: "Invalid product selection" });
         }
 
-        try {
-            await db.inboundProduct.deleteMany({
-                where: { id: { in: productIds } }
-            });
+        await db.inboundProduct.deleteMany({
+            where: { id: { in: productIds } }
+        });
 
-            return {
-                status: 200,
-                success: true,
-                message: "Selected inbound products deleted successfully."
-            };
-        } catch (error) {
-            console.error("Error deleting inbound products:", error);
-            return fail(500, { message: "Failed to delete selected inbound products" });
-        }
+        throw redirect(302, `/inbounds/${inboundId}`);
+
     },
 
     uploadExcelInboundProducts: async ({ params, request }) => {

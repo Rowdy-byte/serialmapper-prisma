@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
-	import { enhance } from '$app/forms';
+	import { applyAction, enhance } from '$app/forms';
+	import { toastStyleErr } from '$lib/components/toast/toastStyle';
+	import { toastStyleSucc } from '$lib/components/toast/toastStyle';
 	import type { PageProps } from './$types';
 	import {
 		Copy,
@@ -25,6 +26,7 @@
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 	import ChartSkeleton from '$lib/components/charts/ChartSkeleton.svelte';
 	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
+	import { invalidateAll } from '$app/navigation';
 
 	let { data, form }: PageProps = $props();
 
@@ -32,10 +34,10 @@
 	let isAddingInboundProduct = $state(false);
 	let isAddingBatchInboundProduct = $state(false);
 
-	const clients = data.clients;
-	const inbound = data.inbound;
-	const products = data.products;
-	const inboundProducts = data.inboundProducts;
+	const clients = $state(data.clients);
+	const inbound = $state(data.inbound);
+	const products = $state(data.products);
+	const inboundProducts = $state(data.inboundProducts);
 
 	let searchQuery = $state('');
 
@@ -51,25 +53,12 @@
 
 	let limit = $state(100);
 	let limitedInboundProducts = $state<typeof inboundProducts>([]);
+	// let limitedInboundProducts = $state();
+	// $effect(() => {
+	// 	limitedInboundProducts = inboundProducts;
+	// });
 
 	let qrCodeImage = $state<string | null>(null);
-
-	let showModal = $state(false);
-	let formEl = $state<HTMLFormElement | null>(null);
-
-	function handleSubmit(e: Event) {
-		e.preventDefault();
-		showModal = true;
-	}
-
-	async function confirmSubmit() {
-		showModal = false;
-		if (formEl) formEl.submit();
-	}
-
-	function cancelSubmit() {
-		showModal = false;
-	}
 
 	const inboundProduct =
 		data.inboundProducts?.map((product) => (product.inboundId === inbound?.id ? product : null)) ||
@@ -134,21 +123,17 @@
 				height: 40
 			});
 
-			// Add barcode image
 			const barcodeImage = barcodeCanvas.toDataURL('image/png');
 			doc.addImage(barcodeImage, 'PNG', 5, yOffset + 25, 80, 20);
 
-			// Move to the next label position
 			yOffset += labelHeight;
 
-			// If the labels reach the page limit, create a new page
 			if (yOffset > 270 && index !== selectedProducts.length - 1) {
 				doc.addPage();
 				yOffset = 10;
 			}
 		});
 
-		// Save the bulk labels PDF
 		doc.save(`bulk_stickers_${inbound?.inboundNumber}.pdf`);
 	}
 
@@ -246,57 +231,6 @@
 			inboundProductIds = [...inboundProductIds, id];
 		}
 	}
-
-	if (form?.issues) {
-		for (const issue of form.issues) {
-			toast.error(issue.message, {
-				duration: 3000,
-				style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-			});
-		}
-	}
-
-	$effect(() => {
-		switch (true) {
-			case form?.success:
-				toast.success(form?.message, {
-					duration: 4000,
-					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				window.location.reload();
-				break;
-
-			case form?.success === false:
-				toast.error(form?.message, {
-					duration: 4000,
-					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				break;
-
-			case form?.success:
-				toast.success(form?.message, {
-					duration: 4000,
-					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				window.location.reload();
-				break;
-
-			case form?.success:
-				toast.success(form?.message, {
-					duration: 4000,
-					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				window.location.reload();
-				break;
-
-			case form?.success === false:
-				toast.error(form?.message, {
-					duration: 4000,
-					style: 'background-color: #f44336; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				break;
-		}
-	});
 
 	$effect(() => {
 		const lowerCaseQuery = searchQuery.trim().toLowerCase();
@@ -397,6 +331,38 @@
 				method="post"
 				onsubmit={handleUpdateInbound}
 				action="?/updateInbound"
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						console.log(result);
+						if (result.type === 'failure') {
+							if (
+								result.data?.issues &&
+								Array.isArray(result.data.issues) &&
+								result.data.issues.length > 0
+							) {
+								toast.error(
+									result.data.issues.map((issue: { message: string }) => issue.message).join(', '),
+									toastStyleErr
+								);
+							} else if (
+								result.data?.issues &&
+								typeof result.data.issues === 'object' &&
+								'message' in result.data.issues
+							) {
+								toast.error(result.data.issues.message as string, toastStyleErr);
+							} else {
+								toast.error('An error occurred');
+							}
+						}
+						if (result.type === 'success') {
+							console.log(result);
+							toast.success('Inbound Updated Successfully', toastStyleSucc);
+							await invalidateAll();
+						} else {
+							await applyAction(result);
+						}
+					};
+				}}
 			>
 				<select
 					disabled={isUpdatingInbound}
@@ -438,10 +404,43 @@
 				<form
 					class="flex flex-col gap-4"
 					action="?/addInboundProductToInbound"
-					onsubmit={handleSubmit}
 					enctype="multipart/form-data"
 					method="post"
-					use:enhance
+					use:enhance={() => {
+						return async ({ result, update }) => {
+							console.log(result);
+							if (result.type === 'failure') {
+								if (
+									result.data?.issues &&
+									Array.isArray(result.data.issues) &&
+									result.data.issues.length > 0
+								) {
+									toast.error(
+										result.data.issues
+											.map((issue: { message: string }) => issue.message)
+											.join(', '),
+										toastStyleErr
+									);
+								} else if (
+									result.data?.issues &&
+									typeof result.data.issues === 'object' &&
+									'message' in result.data.issues
+								) {
+									toast.error(result.data.issues.message as string, toastStyleErr);
+								} else {
+									toast.error('An error occurred');
+								}
+							}
+							if (result.type === 'success') {
+								console.log(result);
+								toast.success('Added product successfully', toastStyleSucc);
+								await invalidateAll();
+							} else {
+								await applyAction(result);
+							}
+							await update();
+						};
+					}}
 				>
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<select
@@ -580,7 +579,8 @@
 						title="Delete selected products"
 						type="submit"
 						disabled={inboundProductIds.length === 0}
-						class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+						class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all
+						"
 					>
 						<Trash2 size="24" strokeWidth="2px" />
 					</button>

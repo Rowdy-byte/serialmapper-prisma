@@ -24,11 +24,10 @@
 	import JsBarcode from 'jsbarcode';
 	import QRCode from 'qrcode';
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
-	import ChartSkeleton from '$lib/components/charts/ChartSkeleton.svelte';
 	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
 	import { goto, invalidateAll } from '$app/navigation';
 
-	let { data, form }: PageProps = $props();
+	let { data }: PageProps = $props();
 
 	let isUpdatingInbound = $state(false);
 	let isAddingInboundProduct = $state(false);
@@ -79,7 +78,6 @@
 			return;
 		}
 
-		// Alleen serials van juiste inbound
 		const allSerials = inboundProducts
 			.filter((product) => product.inboundId === inbound?.id)
 			.map((product) => product.serialnumber)
@@ -90,7 +88,6 @@
 			return;
 		}
 
-		// Gebruikersinput valideren
 		const validLimit = Math.max(1, Math.min(500, qrCodeLimit || 100));
 		const serialChunks = chunkArray(allSerials, validLimit);
 
@@ -476,7 +473,6 @@
 		<section class="order-4 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-3">
 			<section class="rounded-lg bg-gray-900/0 shadow-md">
 				<h1 class="flex items-center justify-between pb-4 font-bold">Add Product to Inbound</h1>
-
 				<form
 					class="flex flex-col gap-4"
 					action="?/addInboundProductToInbound"

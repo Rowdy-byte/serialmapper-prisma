@@ -4,6 +4,8 @@
 	import jsPDF from 'jspdf';
 	import toast from 'svelte-french-toast';
 	import SecondaryBtn from '../SecondaryBtn.svelte';
+	import { toastStyleErr } from '../toast/toastStyle';
+	import { toastStyleSucc } from '../toast/toastStyle';
 
 	let { inboundProduct, inbound } = $props();
 
@@ -24,7 +26,7 @@
 
 	function printSticker() {
 		if (!inboundProduct) {
-			toast.error('No product data available!');
+			toast.error('No product data available!', toastStyleErr);
 			return;
 		}
 
@@ -41,6 +43,7 @@
 			format: 'CODE128',
 			displayValue: true,
 			lineColor: '#000',
+			background: '#6a7282',
 			width: 1.2,
 			height: 40,
 			margin: 5
@@ -51,7 +54,7 @@
 
 		doc.save(`${inbound.inboundNumber}_${inboundProduct.serialnumber}.pdf`);
 
-		toast.success('Sticker printed successfully!');
+		toast.success('Sticker printed successfully!', toastStyleSucc);
 	}
 
 	$effect(() => {
@@ -60,11 +63,11 @@
 </script>
 
 <div
-	class=" mx-auto mb-4 flex h-[120px] w-[240px] flex-col items-center justify-center rounded-md border border-gray-500 bg-white p-2 shadow-md"
+	class=" mx-auto mb-4 flex h-[120px] w-[240px] flex-col items-center justify-center rounded-md border border-gray-500 bg-gray-100 p-2 shadow-md"
 >
 	<p class="text-xs font-bold text-black">{inboundProduct.product}</p>
 	<p class="text-xs text-black">Serial: {inboundProduct.serialnumber}</p>
-	<p>Inbound: {inbound.inboundNumber}</p>
+	<p class="text-xs text-black">Inbound: {inbound.inboundNumber}</p>
 	<svg class="flex h-auto w-[200px]" bind:this={svgElement}></svg>
 </div>
 <div class="flex w-full items-center justify-center gap-2">

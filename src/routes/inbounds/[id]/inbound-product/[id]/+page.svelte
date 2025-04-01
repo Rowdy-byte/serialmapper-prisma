@@ -100,21 +100,21 @@
 							name="product"
 							value={inboundProduct?.product}
 							placeholder="Product"
-							class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+							class="input input-neutral w-full"
 						/>
 						<input
 							type="text"
 							name="serialnumber"
 							value={inboundProduct?.serialnumber}
 							placeholder="Serialnumber"
-							class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+							class="input input-neutral w-full"
 						/>
 						<input
 							type="text"
 							name="value"
 							value={inboundProduct?.value}
 							placeholder="Value"
-							class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+							class="input input-neutral w-full"
 						/>
 						<PrimaryBtn type={'submit'} onclick={handleUpdateInboundProduct}>Update</PrimaryBtn>
 					</form>

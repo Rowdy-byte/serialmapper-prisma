@@ -64,6 +64,8 @@
 
 	let qrModalRef = $state<HTMLDialogElement | null>(null);
 
+	let selectedSerials = $state<string>('');
+
 	function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 		const result: T[][] = [];
 		for (let i = 0; i < array.length; i += chunkSize) {
@@ -228,8 +230,6 @@
 		utils.book_append_sheet(workbook, worksheet, 'Inbound Products');
 		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
 	}
-
-	let selectedSerials = $state<string>('');
 
 	function copySelectedSerialsToClipboard() {
 		selectedSerials = (filteredInboundProducts || [])

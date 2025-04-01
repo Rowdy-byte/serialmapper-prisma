@@ -525,24 +525,24 @@
 								Add Batch
 							</PrimaryBtn>
 						</div>
-						<div class="flex items-center justify-between gap-4">
-							<input
-								class="file-input file-input-neutral rounded-full"
-								type="file"
-								name="excel"
-								accept=".xlsx"
-							/>
-							<SecondaryBtn
-								disabled={isAddingBatchInboundProduct}
-								type={'button'}
-								formaction="?/uploadExcelInboundProducts"
-								dataTooltip={'Upload with Excel'}
-								tooltipTitle={'Upload with Excel'}
-							>
-								<Upload />
-							</SecondaryBtn>
-						</div>
 					</section>
+					<div class="flex items-center justify-between gap-4"></div>
+				</form>
+				<form action="?/uploadExcelInboundProducts" enctype="multipart/form-data" method="post">
+					<input
+						class="file-input file-input-neutral rounded-full"
+						type="file"
+						name="excel"
+						accept=".xlsx"
+					/>
+					<SecondaryBtn
+						disabled={isAddingBatchInboundProduct}
+						type={'submit'}
+						dataTooltip={'Upload with Excel'}
+						tooltipTitle={'Upload with Excel'}
+					>
+						<Upload />
+					</SecondaryBtn>
 				</form>
 			</section>
 		</section>

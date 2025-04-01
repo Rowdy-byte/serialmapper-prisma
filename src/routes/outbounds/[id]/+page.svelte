@@ -303,7 +303,7 @@
 
 <div class="container mx-auto px-4 py-4">
 	<section
-		class="breadcrums text-md mb-4 flex items-center justify-between rounded-lg bg-gray-900 p-4 shadow-md"
+		class="breadcrums text-md mb-4 flex items-center justify-between rounded-lg bg-gray-900/40 p-4 shadow-md"
 	>
 		<ul class="text-gray-500">
 			<li class="font-bold">
@@ -325,14 +325,16 @@
 		</div>
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-		<section class="order-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md lg:order-4">
+		<section
+			class="order-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-4"
+		>
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
 			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
 
-		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-2">
+		<section class="order-3 flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Outbound</h1>
 			<form
 				class="flex flex-col gap-4"
@@ -373,7 +375,7 @@
 			>
 				<select
 					disabled={isUpdatingOutbound}
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="select select-neutral w-full"
 					name="clientName"
 				>
 					<option value="clientName">{outbound?.clientName}</option>
@@ -388,7 +390,7 @@
 					type="text"
 					name="description"
 					value={outbound?.description}
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="input input-neutral w-full"
 				/>
 				<PrimaryBtn disabled={isUpdatingOutbound} type={'submit'} onclick={handleUpdateOutbound}
 					>Update</PrimaryBtn
@@ -396,7 +398,7 @@
 			</form>
 		</section>
 
-		<section class="order-5 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-3">
+		<section class="order-5 flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-3">
 			<h1 class="flex items-center justify-between pb-4 font-bold">
 				Move Batch of Products to Outbound
 			</h1>
@@ -406,7 +408,7 @@
 					disabled={isAddingBatchOutboundProduct}
 					name="batch"
 					placeholder="Batch Serialnumbers"
-					class="rounded-lg bg-gray-950 p-3 text-sm text-gray-500"
+					class="textarea textarea-neutral h-32 w-full"
 				></textarea>
 				<p class="text-xs text-gray-500">Outbound #: {outbound?.outboundNumber}</p>
 				<PrimaryBtn disabled={isAddingBatchOutboundProduct} type="submit" onclick={handleAddBatch}
@@ -415,7 +417,7 @@
 			</form>
 		</section>
 		<section
-			class="chart-status-section order-5 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
+			class="chart-status-section order-5 flex flex-col items-center justify-center rounded-lg bg-gray-900/40 p-4 shadow-md"
 		>
 			<ChartPieOutboundProducts {filteredOutboundProducts} />
 		</section>
@@ -481,7 +483,7 @@
 					min="1"
 					max={filteredOutboundProducts?.length || 1}
 					bind:value={limit}
-					class="w-24 rounded bg-gray-950 px-2 py-1 text-sm text-gray-200"
+					class="input input-neutral w-20 rounded-full"
 				/>
 			</div>
 
@@ -491,7 +493,7 @@
 					type="text"
 					name="search"
 					placeholder="Search Products"
-					class="w-full rounded-full bg-gray-950 py-2 pr-4 pl-10 text-sm"
+					class="input input-neutral w-full rounded-full pl-10"
 				/>
 				<div
 					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"

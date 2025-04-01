@@ -57,8 +57,9 @@
 	let qrCodeImage = $state<string | null>(null);
 	const QR_CODE_SERIAL_LIMIT = 100;
 	let qrCodeLimit = $state(100); // default to 100
-	let qrCodeImages: string[] = [];
+	let qrCodeImages = $state<string[]>([]);
 	let inboundProductId = $state<number | null>(null);
+	let showQrModal = $state(false);
 
 	const inboundProduct =
 		data.inboundProducts?.map((product) => (product.inboundId === inbound?.id ? product : null)) ||
@@ -78,40 +79,45 @@
 			return;
 		}
 
-		const matchingSerials = inboundProducts
-			.filter((product) => product.inboundId === inbound?.id)
+		// Map to valid serial numbers
+		const allSerials = inboundProducts
 			.map((product) => product.serialnumber)
 			.filter((sn): sn is string => typeof sn === 'string' && sn.trim() !== '');
 
-		if (matchingSerials.length === 0) {
-			toast.error('No serials found for this inbound.');
-			return;
-		}
+		// Split the serial numbers into chunks based on the limit
+		const serialChunks = chunkArray(allSerials, QR_CODE_SERIAL_LIMIT);
 
-		const validLimit = Math.max(1, Math.min(500, qrCodeLimit || 100));
-		const serialChunks = chunkArray(matchingSerials, validLimit);
-
+		// If there are multiple chunks, show a warning or info toast
 		if (serialChunks.length > 1) {
-			toast(`Created ${serialChunks.length} QR codes (max ${validLimit} serials each)`);
+			toast.error(
+				`There are ${allSerials.length} serial numbers. Generating ${serialChunks.length} QR codes.`
+			);
 		}
 
+		// Clear any previously generated QR codes
 		qrCodeImages = [];
 
+		// Generate a QR code for each chunk
 		for (const chunk of serialChunks) {
 			const serialString = chunk.join(', ');
 			try {
-				const qrData = await QRCode.toDataURL(serialString, {
+				const qrCodeData = await QRCode.toDataURL(serialString, {
 					color: {
 						dark: '#030712',
 						light: '#f8fafc'
 					}
 				});
-				qrCodeImages.push(qrData);
+				qrCodeImages.push(qrCodeData);
 			} catch (error) {
-				console.error('QR Error:', error);
+				console.error(
+					'Error generating QR code for chunk:',
+					error instanceof Error ? error.message : error
+				);
 				toast.error('Error generating one of the QR codes');
+				// Optionally break or continue based on your error handling strategy
 			}
 		}
+		showQrModal = true;
 	}
 
 	function printSelectedLabels() {
@@ -567,16 +573,34 @@
 		<section
 			class="order-8 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
 		>
-			{#if qrCodeImage}
-				<section
-					class="order-8 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
+			{#if showQrModal}
+				<div
+					class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
 				>
-					<img
-						src={qrCodeImage}
-						alt="QR Code for Inbound Products"
-						class="mx-auto w-32 rounded-lg"
-					/>
-				</section>
+					<div
+						class="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-gray-900 p-6 shadow-xl"
+					>
+						<h2 class="mb-4 text-lg font-bold text-white">QR Codes</h2>
+
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+							{#each qrCodeImages as qr, i}
+								<div class="flex flex-col items-center gap-2 rounded bg-white/5 p-4">
+									<img src={qr} alt="QR Code {i + 1}" class="w-32" />
+									<span class="text-sm text-gray-300">QR {i + 1}</span>
+								</div>
+							{/each}
+						</div>
+
+						<div class="mt-6 flex justify-end">
+							<button
+								onclick={() => (showQrModal = false)}
+								class="rounded-md bg-gray-700 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-600"
+							>
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
 			{/if}
 		</section>
 	</main>
@@ -640,6 +664,17 @@
 					min="1"
 					max={filteredInboundProducts?.length || 1}
 					bind:value={limit}
+					class="w-24 rounded bg-gray-950 px-2 py-1 text-sm text-gray-200"
+				/>
+			</div>
+			<div class="mb-4 flex flex-col items-center justify-center gap-1">
+				<label for="qrLimit" class="text-sm text-gray-400">Items per QR:</label>
+				<input
+					id="qrLimit"
+					type="number"
+					min="1"
+					max="500"
+					bind:value={qrCodeLimit}
 					class="w-24 rounded bg-gray-950 px-2 py-1 text-sm text-gray-200"
 				/>
 			</div>

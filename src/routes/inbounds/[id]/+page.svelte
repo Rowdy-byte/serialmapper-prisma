@@ -560,7 +560,11 @@
 						}
 						if (result.type === 'success') {
 							console.log(result);
-							toast.success('Inbound Created Successfully', toastStyleSucc);
+							const message =
+								typeof result.data?.message === 'string'
+									? result.data.message
+									: 'Upload successful';
+							toast.success(message, toastStyleSucc);
 							await invalidateAll();
 						} else {
 							await applyAction(result);

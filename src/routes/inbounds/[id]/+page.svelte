@@ -681,7 +681,7 @@
 		<section
 			class="order-5 mb-4 flex flex-col gap-4 overflow-x-auto rounded-lg bg-gray-900/40 p-4 shadow-md"
 		>
-			<table class="min-w-full text-left text-sm">
+			<table class=" table min-w-full text-left text-sm">
 				<thead>
 					<tr class="text-gray-500">
 						<th class="border border-gray-500 p-2">

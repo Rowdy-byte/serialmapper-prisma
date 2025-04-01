@@ -41,7 +41,6 @@
 							class:selected={pathname === linkPath}>{linkName}</a
 						>
 					{/if}
-					<!-- if link is active -->
 					{#if pathname === linkPath}
 						<a
 							class="rounded-md bg-gray-800 p-2 text-blue-500"
@@ -58,7 +57,7 @@
 	</nav>
 </section>
 
-<main class="relative flex min-h-screen flex-grow flex-col bg-gray-950 p-2">
+<main class="relative z-50 flex min-h-screen flex-grow flex-col bg-gray-950 p-2">
 	<Toaster />
 	{@render children()}
 </main>

@@ -62,5 +62,5 @@
 <canvas
 	bind:this={chartStatusCanvas}
 	id="chartStatus"
-	class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-lg"
+	class="mx-auto max-h-60 rounded-lg bg-gray-900/0 p-3 shadow-lg"
 ></canvas>

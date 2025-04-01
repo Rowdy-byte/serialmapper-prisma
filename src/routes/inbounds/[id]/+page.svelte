@@ -62,11 +62,8 @@
 	let qrCodeImages = $state<QrCodeData[]>([]);
 	let qrCodeLimit = $state(100); // gebruikersinput voor aantal items per QR
 	let inboundProductId = $state<number | null>(null);
-	let showQrModal = $state(false);
 
-	const inboundProduct =
-		data.inboundProducts?.map((product) => (product.inboundId === inbound?.id ? product : null)) ||
-		[];
+	let qrModalRef = $state<HTMLDialogElement | null>(null);
 
 	function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 		const result: T[][] = [];
@@ -128,8 +125,12 @@
 			}
 		}
 
-		showQrModal = true;
+		qrModalRef?.showModal();
 	}
+
+	const inboundProduct =
+		data.inboundProducts?.map((product) => (product.inboundId === inbound?.id ? product : null)) ||
+		[];
 
 	function printSelectedLabels() {
 		const selectedProducts = (filteredInboundProducts || []).filter((product) =>
@@ -333,7 +334,7 @@
 
 <div class="container mx-auto py-4">
 	<section
-		class="breadcrums text-md mb-4 flex items-center justify-between rounded-lg bg-gray-900 p-4 shadow-md"
+		class="breadcrums text-md mb-4 flex items-center justify-between rounded-lg bg-gray-900/40 p-4 shadow-md"
 	>
 		<ul class="text-gray-500">
 			<li class="text-center">
@@ -357,13 +358,15 @@
 		</div>
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-		<section class="order-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900 p-4 shadow-md lg:order-4">
+		<section
+			class="order-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-4"
+		>
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
 			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
 			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
-		<section class="order-3 flex flex-col rounded-lg bg-gray-900 p-4 shadow-md lg:order-2">
+		<section class="order-3 flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
 			<form
 				class="flex flex-col gap-4"
@@ -432,8 +435,8 @@
 				<PrimaryBtn disabled={isUpdatingInbound} type={'submit'}>Update Inbound</PrimaryBtn>
 			</form>
 		</section>
-		<section class="order-4 rounded-lg bg-gray-900 p-4 shadow-md lg:order-3">
-			<section class="rounded-lg bg-gray-900 shadow-md">
+		<section class="order-4 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-3">
+			<section class="rounded-lg bg-gray-900/0 shadow-md">
 				<h1 class="flex items-center justify-between pb-4 font-bold">Add Product to Inbound</h1>
 
 				<form
@@ -544,7 +547,7 @@
 			</section>
 		</section>
 		<section
-			class="chart-status-section order-6 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
+			class="chart-status-section order-6 flex flex-col items-center justify-center rounded-lg bg-gray-900/40 p-4 shadow-md"
 		>
 			{#if filteredInboundProducts && filteredInboundProducts.length > 0}
 				<ChartPieInboundProducts {filteredInboundProducts} />
@@ -553,7 +556,7 @@
 			{/if}
 		</section>
 		<section
-			class="chart-status-section order-7 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
+			class="chart-status-section order-7 flex flex-col items-center justify-center rounded-lg bg-gray-900/40 p-4 shadow-md"
 		>
 			{#if productStatusIn && productStatusOut}
 				<ChartPieStatus {productStatusIn} {productStatusOut} />
@@ -562,37 +565,26 @@
 			{/if}
 		</section>
 		<section
-			class="order-8 flex flex-col items-center justify-center rounded-lg bg-gray-900 p-4 shadow-md"
+			class="order-8 flex flex-col items-center justify-center rounded-lg bg-gray-900/40 p-4 shadow-md"
 		>
-			{#if showQrModal}
-				<div
-					class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-				>
-					<div
-						class="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-gray-900 p-6 shadow-xl"
-					>
-						<h2 class="mb-4 text-lg font-bold text-white">QR Codes</h2>
-
-						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-							{#each qrCodeImages as { image, count }, i}
-								<div class="flex flex-col items-center gap-2 rounded bg-white/5 p-4">
-									<img src={image} alt="QR Code {i + 1}" class="w-32" />
-									<span class="text-sm text-gray-300">QR {i + 1} – {count} pcs</span>
-								</div>
-							{/each}
-						</div>
-
-						<div class="mt-6 flex justify-end">
-							<button
-								onclick={() => (showQrModal = false)}
-								class="rounded-md bg-gray-700 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-600"
-							>
-								Close
-							</button>
-						</div>
+			<dialog id="qr_modal" class="modal" bind:this={qrModalRef}>
+				<div class="modal-box bg-gray-900 text-white">
+					<h3 class="mb-4 text-lg font-bold">QR Codes</h3>
+					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+						{#each qrCodeImages as { image, count }, i}
+							<div class="flex flex-col items-center gap-2 rounded bg-white/5 p-4">
+								<img src={image} alt="QR Code {i + 1}" class="w-32" />
+								<span class="text-sm text-gray-300">QR {i + 1} – {count} pcs</span>
+							</div>
+						{/each}
+					</div>
+					<div class="modal-action mt-6">
+						<form method="dialog">
+							<button class="btn">Close</button>
+						</form>
 					</div>
 				</div>
-			{/if}
+			</dialog>
 		</section>
 	</main>
 	<section class="mt-4">
@@ -687,7 +679,7 @@
 		</section>
 
 		<section
-			class="order-5 mb-4 flex flex-col gap-4 overflow-x-auto rounded-lg bg-gray-900 p-4 shadow-md"
+			class="order-5 mb-4 flex flex-col gap-4 overflow-x-auto rounded-lg bg-gray-900/40 p-4 shadow-md"
 		>
 			<table class="min-w-full text-left text-sm">
 				<thead>

@@ -26,7 +26,7 @@
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 	import ChartSkeleton from '$lib/components/charts/ChartSkeleton.svelte';
 	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 
 	let { data, form }: PageProps = $props();
 
@@ -193,7 +193,6 @@
 			event.preventDefault();
 			return;
 		}
-		toast.success('Inbound deleted succesfull', toastStyleSucc);
 	}
 
 	function handleUpdateInbound(event: Event) {
@@ -350,7 +349,40 @@
 		</ul>
 
 		<div class="flex items-center gap-2">
-			<form method="post" onsubmit={handleDeleteInbound} action="?/deleteInbound" use:enhance>
+			<form
+				method="post"
+				onsubmit={handleDeleteInbound}
+				action="?/deleteInbound"
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						if (result.type === 'failure') {
+							if (
+								result.data?.issues &&
+								Array.isArray(result.data.issues) &&
+								result.data.issues.length > 0
+							) {
+								toast.error(
+									result.data.issues.map((issue: { message: string }) => issue.message).join(', '),
+									toastStyleErr
+								);
+							} else if (
+								result.data?.issues &&
+								typeof result.data.issues === 'object' &&
+								'message' in result.data.issues
+							) {
+								toast.error(result.data.issues.message as string, toastStyleErr);
+							} else {
+								toast.error('Inbound Has Products', toastStyleErr);
+							}
+						}
+						if (result.type === 'success') {
+							console.log(result);
+							toast.success('Inbound Deleted Successfully', toastStyleSucc);
+							goto('/inbounds');
+						}
+					};
+				}}
+			>
 				<SecondaryBtn
 					dataTooltip={'Delete Inbound'}
 					tooltipTitle={'Delete Inbound'}
@@ -405,6 +437,7 @@
 							console.log(result);
 							toast.success('Inbound Updated Successfully', toastStyleSucc);
 							await invalidateAll();
+							window.location.reload();
 						} else {
 							await applyAction(result);
 						}

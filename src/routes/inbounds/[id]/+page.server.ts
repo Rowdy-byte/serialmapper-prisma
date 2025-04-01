@@ -1,5 +1,5 @@
 import type { PageServerLoad } from "./$types";
-import { fail, redirect } from "@sveltejs/kit";
+import { fail } from "@sveltejs/kit";
 import db from "$lib/server/db";
 import { CreateInboundSchema } from "$lib/zod/zod-schemas";
 import { AddSingleProductSchema, AddMultipleProductSchema } from "$lib/zod/zod-schemas";
@@ -213,31 +213,39 @@ export const actions = {
     },
 
     async deleteInbound({ params }: { params: { id: string } }) {
+
         const inboundId = Number(params.id);
-        await db.inbound.delete({
-            where: { id: inboundId }
-        });
 
-        // check if the inbound was deleted
-        const inbound = await db.inbound.findUnique({
-            where: { id: inboundId }
-        });
-
-        if (inbound) {
-            return {
-                status: 500,
-                success: false,
-                message: 'Inbound delete not successfully.'
-            }
+        if (isNaN(inboundId)) {
+            return fail(400, { message: 'Invalid inbound ID' });
         }
 
-        throw redirect(302, '/inbounds');
+        const productCount = await db.inboundProduct.count({
+            where: { inboundId }
+        });
+
+        if (productCount > 0) {
+            return fail(400, { message: `Inbound contains ${productCount} product(s).` });
+        }
+
+        try {
+            await db.inbound.delete({
+                where: { id: inboundId }
+            });
+
+            return {
+                success: true,
+                message: 'Inbound deleted successfully'
+            };
+        } catch (err) {
+            console.error('Delete failed:', err);
+            return fail(500, { message: 'Something went wrong during deletion.' });
+        }
     },
 
     async deleteInboundProducts({ request }: { request: Request }) {
         const formData = await request.formData();
         const rawProductIds = formData.get('productIds');
-        // const inboundId = formData.get('inboundId');
 
         if (!rawProductIds) {
             return fail(400, { message: 'No products selected' });

@@ -5,6 +5,7 @@
 	import toast from 'svelte-french-toast';
 	import { invalidate } from '$app/navigation';
 	import BackToTop from '$lib/components/navigation/BackToTop.svelte';
+	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -13,7 +14,6 @@
 	const clients = data.clients;
 	const outbounds = data.outbounds;
 
-	// Maak de lijst reactive zodat hij herberekend wordt bij wijziging van 'search'
 	let filterdoutbounds = $state(outbounds);
 
 	$effect(() => {
@@ -86,14 +86,9 @@
 					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					required
 				/>
-				<button
-					disabled={form?.success}
-					onclick={handleCreateOutbound}
-					type="submit"
-					class="rounded-full bg-orange-500 p-3 text-sm font-bold hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-				>
+				<PrimaryBtn disabled={form?.success} type={'submit'} onclick={handleCreateOutbound}>
 					Create Outbound
-				</button>
+				</PrimaryBtn>
 			</form>
 		</section>
 

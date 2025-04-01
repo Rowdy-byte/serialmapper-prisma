@@ -59,11 +59,11 @@
 		try {
 			const qrCodeData = await QRCode.toDataURL(serialNumbers, {
 				color: {
-					dark: '#030712', // Oranje (Foreground)
-					light: '#f8fafc' // Donkergrijs (Background)
+					dark: '#030712',
+					light: '#f8fafc'
 				}
 			});
-			qrCodeImage = qrCodeData; // Update de variabele voor weergave
+			qrCodeImage = qrCodeData;
 		} catch (error) {
 			console.error('Error generating QR code:', error);
 			toast.error('Error generating QR code');
@@ -87,23 +87,20 @@
 		});
 
 		let yOffset = 10;
-		const labelHeight = 50; // Adjust to ensure proper spacing between labels
+		const labelHeight = 50;
 
 		selectedProducts.forEach(
 			(
 				outboundProduct: { product: string; serialnumber: string; barcode?: string },
 				index: number
 			) => {
-				// Apply the same font settings
 				doc.setFont('helvetica', 'bold');
 				doc.setFontSize(10);
 
-				// Text formatting
 				doc.text(`Product: ${outboundProduct.product}`, 5, yOffset);
 				doc.text(`Serial: ${outboundProduct.serialnumber}`, 5, yOffset + 10);
 				doc.text(`Inbound: ${outbound?.outboundNumber || ''}`, 5, yOffset + 20);
 
-				// Generate barcode
 				const barcodeCanvas = document.createElement('canvas');
 				JsBarcode(barcodeCanvas, outboundProduct.barcode || outboundProduct.serialnumber || '', {
 					format: 'CODE128',
@@ -275,10 +272,10 @@
 
 		productRevenue = parseFloat((inboundForThis.length * 0.1).toFixed(2));
 
-		const oldTime = 30; // old total time in minutes
-		const newTime = 3; // new total time in minutes
+		const oldTime = 30;
+		const newTime = 3;
 
-		timeSaved = oldTime - newTime; // 27 minutes
+		timeSaved = oldTime - newTime;
 
 		timeSavedPerSerial =
 			inboundForThis.length > 0 ? parseFloat((timeSaved / inboundForThis.length).toFixed(2)) : 0;

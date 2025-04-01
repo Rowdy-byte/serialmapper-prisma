@@ -71,5 +71,5 @@
 <canvas
 	bind:this={chartBarProducts}
 	id="chartBarProducts"
-	class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-2xl"
+	class="mx-auto max-h-60 rounded-lg bg-gray-900/40 p-3 shadow-2xl"
 ></canvas>

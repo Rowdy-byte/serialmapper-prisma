@@ -44,11 +44,11 @@
 <BackToTop scrollTo="scroll to top" />
 
 <div class="container mx-auto py-4">
-	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
+	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md">
 		<h1 class="py-4 text-lg font-bold">Inbounds</h1>
 	</section>
 	<main class="flex flex-col gap-4">
-		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="max-w-sm rounded-lg bg-gray-900/40 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Create Inbound</h1>
 			<form
 				class="flex flex-col gap-4"
@@ -91,7 +91,7 @@
 			>
 				<select
 					disabled={form?.success}
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="select select-neutral w-full"
 					name="clientName"
 					required
 				>
@@ -105,21 +105,21 @@
 					type="text"
 					name="description"
 					placeholder="Description"
-					class="input input-primary rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="input input-neutral w-full"
 					required
 				/>
 
 				<PrimaryBtn disabled={form?.success ?? false} type={'submit'}>Create Inbound</PrimaryBtn>
 			</form>
 		</section>
-		<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 pt-6 pb-6 shadow-md">
+		<section class="flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 pt-6 pb-6 shadow-md">
 			<form class="relative py-1">
 				<input
 					bind:value={searchQuery}
 					type="text"
 					name="search"
 					placeholder="Search Inbounds"
-					class="w-full max-w-sm rounded-full border bg-gray-950 py-2 pl-10 text-sm"
+					class="input input-neutral rounded-full pl-10"
 				/>
 				<div
 					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
@@ -167,6 +167,6 @@
 				<p class="mt-2 rounded-full bg-gray-500 p-1 px-2 text-sm">No inbounds found.</p>
 			{/if}
 		</section>
-		<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md"></section>
+		<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md"></section>
 	</main>
 </div>

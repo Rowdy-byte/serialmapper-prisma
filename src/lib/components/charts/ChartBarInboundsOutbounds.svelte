@@ -84,5 +84,5 @@
 <canvas
 	bind:this={chartBarInboundsOutbounds}
 	id="chartBarInboundsOutbounds"
-	class="mx-auto max-h-60 rounded-lg bg-gray-900 p-3 shadow-2xl xl:max-h-96"
+	class="mx-auto max-h-60 rounded-lg bg-gray-900/40 p-3 shadow-2xl xl:max-h-96"
 ></canvas>

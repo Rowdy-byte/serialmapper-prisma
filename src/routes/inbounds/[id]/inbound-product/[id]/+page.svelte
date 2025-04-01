@@ -49,18 +49,18 @@
 
 <div class="container mx-auto py-4">
 	<section
-		class="text-md mb-4 flex items-center justify-between rounded-lg bg-gray-900 p-4 shadow-md"
+		class="text-md mb-4 flex items-center justify-between rounded-lg bg-gray-900/40 p-4 shadow-md"
 	>
 		<ul class="flex items-center gap-2">
 			<li>
 				<a href={`/inbounds/${inboundId}`} class="font-bold text-gray-500 hover:text-blue-500">
 					<span class="hidden font-bold md:inline"
-						><span class="text-orange-500">Inbound:</span>
+						><span class="text-gray-500">Inbound:</span>
 					</span>
 					{inbound?.inboundNumber}</a
 				>
 			</li>
-			<li class="text-orange-500">
+			<li class="text-gray-500">
 				<MoveRight size="24" class="px-1" />
 			</li>
 			<li>
@@ -68,9 +68,7 @@
 					{#each filteredInboundProducts as inboundProduct, i}
 						{#if inboundProduct.id === Number(params.id)}
 							<span class="text-gray-500">
-								<span class="hidden md:inline"
-									><span class="text-orange-500">Product: </span>
-								</span>
+								<span class="hidden md:inline"><span class="text-gray-500">Product: </span> </span>
 								{i + 1}
 							</span>
 						{/if}
@@ -92,7 +90,7 @@
 		</div>
 	</section>
 	<main class="flex flex-col gap-4">
-		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="max-w-sm rounded-lg bg-gray-900/40 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Inbound Product</h1>
 			{#each inboundProducts as inboundProduct}
 				{#if inboundProduct.id === Number(params.id)}
@@ -123,10 +121,10 @@
 				{/if}
 			{/each}
 		</section>
-		<section class=" max-w-sm justify-center rounded-lg bg-gray-900 shadow-md">
+		<section class=" max-w-sm justify-center rounded-lg bg-gray-900/40 shadow-md">
 			{#each inboundProducts as inboundProduct}
 				{#if inboundProduct.id === Number(params.id)}
-					<section class=" items-center rounded-lg bg-gray-900 p-4 shadow-md">
+					<section class=" items-center rounded-lg bg-gray-900/40 p-4 shadow-md">
 						<h1 class="pb-4 text-center font-bold">Sticker</h1>
 						<InboundProductBarcode {inboundProduct} {inbound} />
 					</section>
@@ -134,6 +132,6 @@
 			{/each}
 		</section>
 
-		<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md"></section>
+		<section class="flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md"></section>
 	</main>
 </div>

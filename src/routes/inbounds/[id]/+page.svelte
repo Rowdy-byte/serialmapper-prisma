@@ -565,10 +565,10 @@
 			{/if}
 		</section>
 		<section
-			class="order-8 flex flex-col items-center justify-center rounded-lg bg-gray-900/40 p-4 shadow-md"
+			class="bg-950 order-8 flex flex-col items-center justify-center rounded-lg p-4 shadow-md"
 		>
 			<dialog id="qr_modal" class="modal" bind:this={qrModalRef}>
-				<div class="modal-box bg-gray-900 text-white">
+				<div class="modal-box bg-gray-950 text-white">
 					<h3 class="mb-4 text-lg font-bold">QR Codes</h3>
 					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 						{#each qrCodeImages as { image, count }, i}

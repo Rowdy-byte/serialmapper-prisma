@@ -44,16 +44,16 @@
 
 <div class="container mx-auto p-4">
 	<main class="grid grid-cols-1 gap-6 md:grid-cols-2">
-		<section class="flex flex-col rounded-lg bg-gray-900 p-4 shadow-lg">
+		<section class="flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-lg">
 			<ChartBarClient {clients} />
 		</section>
-		<section class="flex flex-col rounded-lg bg-gray-900 p-4 shadow-lg">
+		<section class="flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-lg">
 			<ChartBarProducts {products} />
 		</section>
-		<section class="flex flex-col rounded-lg bg-gray-900 p-4 shadow-lg">
+		<section class="flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-lg">
 			<ChartBarInboundProducts {inboundProducts} />
 		</section>
-		<section class="flex flex-col rounded-lg bg-gray-900 p-4 shadow-lg">
+		<section class="flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-lg">
 			<ChartBarInboundsOutbounds {inbounds} {outbounds} />
 		</section>
 	</main>

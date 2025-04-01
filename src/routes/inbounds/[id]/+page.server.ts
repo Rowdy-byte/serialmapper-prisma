@@ -234,10 +234,11 @@ export const actions = {
         throw redirect(302, '/inbounds');
     },
 
-    async deleteInboundProducts({ request, params }: { params: { id: string }, request: Request }) {
+    async deleteInboundProducts({ request }: { request: Request }) {
         const formData = await request.formData();
         const rawProductIds = formData.get("productIds");
-        const inboundId = Number(params.id);
+        const inboundId = formData.get("inboundId");
+
 
         if (!rawProductIds) {
             return fail(400, { message: "No products selected" });

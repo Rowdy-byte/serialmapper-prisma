@@ -526,15 +526,58 @@
 							</PrimaryBtn>
 						</div>
 					</section>
-					<div class="flex items-center justify-between gap-4"></div>
 				</form>
-				<form action="?/uploadExcelInboundProducts" enctype="multipart/form-data" method="post">
+			</section>
+		</section>
+		<section class="order-5 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md">
+			<h1 class="flex pb-4 font-bold">Upload from Excel</h1>
+			<form
+				action="?/uploadExcelInboundProducts"
+				enctype="multipart/form-data"
+				method="post"
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						console.log(result);
+						if (result.type === 'failure') {
+							if (
+								result.data?.issues &&
+								Array.isArray(result.data.issues) &&
+								result.data.issues.length > 0
+							) {
+								toast.error(
+									result.data.issues.map((issue: { message: string }) => issue.message).join(', '),
+									toastStyleErr
+								);
+							} else if (
+								result.data?.issues &&
+								typeof result.data.issues === 'object' &&
+								'message' in result.data.issues
+							) {
+								toast.error(result.data.issues.message as string, toastStyleErr);
+							} else {
+								toast.error('An error occurred');
+							}
+						}
+						if (result.type === 'success') {
+							console.log(result);
+							toast.success('Inbound Created Successfully', toastStyleSucc);
+							await invalidateAll();
+						} else {
+							await applyAction(result);
+						}
+						await update();
+					};
+				}}
+			>
+				<div class="">
 					<input
-						class="file-input file-input-neutral rounded-full"
+						class="file-input file-input-neutral mb-4 rounded-full"
 						type="file"
 						name="excel"
 						accept=".xlsx"
 					/>
+				</div>
+				<div>
 					<SecondaryBtn
 						disabled={isAddingBatchInboundProduct}
 						type={'submit'}
@@ -543,8 +586,8 @@
 					>
 						<Upload />
 					</SecondaryBtn>
-				</form>
-			</section>
+				</div>
+			</form>
 		</section>
 		<section
 			class="chart-status-section order-6 flex flex-col items-center justify-center rounded-lg bg-gray-900/40 p-4 shadow-md"
@@ -606,6 +649,7 @@
 				>
 				<form action="?/deleteInboundProducts" method="post" use:enhance>
 					<input type="hidden" name="productIds" value={JSON.stringify(inboundProductIds)} />
+					<input type="hidden" name="inboundId" value={inbound?.id} />
 					<button
 						data-tooltip="Delete selected products"
 						title="Delete selected products"

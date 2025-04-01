@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { Eye } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
+	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 
 	let { data, form }: PageProps = $props();
 
@@ -39,47 +40,32 @@
 </script>
 
 <div class="container mx-auto py-4">
-	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
+	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md">
 		<h1 class="py-4 text-xl font-bold">Products</h1>
 	</section>
 
 	<main class="flex flex-col gap-4">
-		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="max-w-sm rounded-lg bg-gray-900/40 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Create Product</h1>
 			<form class="flex flex-col gap-4" action="?/createProduct" method="post">
-				<input
-					type="text"
-					name="name"
-					placeholder="Name"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				/>
+				<input type="text" name="name" placeholder="Name" class="input input-neutral w-full" />
 				<input
 					type="text"
 					name="description"
 					placeholder="Description"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="input input-neutral w-full"
 				/>
-				<input
-					type="text"
-					name="number"
-					placeholder="Number"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				/>
+				<input type="text" name="number" placeholder="Number" class="input input-neutral w-full" />
 				<input
 					type="text"
 					name="value"
 					placeholder="Value (€)"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="input input-neutral w-full"
 				/>
-				<button
-					onclick={handleCreateProduct}
-					class="rounded-full
-	            bg-orange-500 p-3 text-sm font-bold hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit">Create Product</button
-				>
+				<PrimaryBtn type={'submit'} onclick={handleCreateProduct}>Create Product</PrimaryBtn>
 			</form>
 		</section>
-		<section class="rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="rounded-lg bg-gray-900/40 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Products List</h1>
 			<table class="w-full text-sm">
 				<thead>
@@ -108,6 +94,6 @@
 				</tbody>
 			</table>
 		</section>
-		<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md"></section>
+		<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md"></section>
 	</main>
 </div>

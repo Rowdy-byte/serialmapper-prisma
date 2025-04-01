@@ -1,4 +1,5 @@
 <script lang="ts">
+	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 	import type { PageProps } from './$types';
 	import { Eye } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
@@ -39,53 +40,28 @@
 </script>
 
 <div class="container mx-auto py-4">
-	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
+	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md">
 		<h1 class="py-4 text-lg font-bold">Clients</h1>
 	</section>
 
 	<main class="flex flex-col gap-4">
-		<section class="max-w-sm rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
+		<section class="max-w-sm rounded-lg bg-gray-900/40 p-4 pb-6 shadow-md">
 			<h1 class="pb-4 font-bold">Create New Client</h1>
 			<form class="flex flex-col gap-4" action="" method="post">
-				<input
-					type="text"
-					name="name"
-					placeholder="Name"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				/>
-				<input
-					type="email"
-					name="email"
-					placeholder="Email"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				/>
-				<input
-					type="text"
-					name="phone"
-					placeholder="Phone"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				/>
+				<input type="text" name="name" placeholder="Name" class="input input-neutral w-full" />
+				<input type="email" name="email" placeholder="Email" class="input input-neutral w-full" />
+				<input type="text" name="phone" placeholder="Phone" class="input input-neutral w-full" />
 				<input
 					type="text"
 					name="address"
 					placeholder="Address"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="input input-neutral w-full"
 				/>
-				<input
-					type="text"
-					name="city"
-					placeholder="City"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
-				/>
-				<button
-					onclick={handleCreateClient}
-					class="rounded-full bg-orange-500
-	            p-3 text-sm font-bold hover:cursor-pointer hover:bg-green-800 hover:text-orange-600 hover:shadow-md hover:transition-all"
-					type="submit">Create</button
-				>
+				<input type="text" name="city" placeholder="City" class="input input-neutral w-full" />
+				<PrimaryBtn type={'submit'} onclick={handleCreateClient}>Create Client</PrimaryBtn>
 			</form>
 		</section>
-		<section class="rounded-lg bg-gray-900 p-4 pb-6 shadow-md">
+		<section class="rounded-lg bg-gray-900/40 p-4 pb-6 shadow-md">
 			<h1 class="pb-4 font-bold">Clients List</h1>
 			<table class="w-full border text-sm">
 				<thead>
@@ -122,6 +98,6 @@
 				<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No clients found.</p>
 			{/if}
 		</section>
-		<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md"></section>
+		<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md"></section>
 	</main>
 </div>

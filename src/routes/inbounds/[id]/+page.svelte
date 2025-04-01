@@ -54,8 +54,13 @@
 	let limit = $state(100);
 	let limitedInboundProducts = $state<typeof inboundProducts>([]);
 
+	type QrCodeData = {
+		image: string;
+		count: number;
+	};
+
+	let qrCodeImages = $state<QrCodeData[]>([]);
 	let qrCodeLimit = $state(100); // gebruikersinput voor aantal items per QR
-	let qrCodeImages = $state<string[]>([]);
 	let inboundProductId = $state<number | null>(null);
 	let showQrModal = $state(false);
 
@@ -109,7 +114,10 @@
 						light: '#f8fafc'
 					}
 				});
-				qrCodeImages.push(qrCodeData);
+				qrCodeImages.push({
+					image: qrCodeData,
+					count: chunk.length
+				});
 			} catch (error) {
 				console.error(
 					'Error generating QR code for chunk:',
@@ -585,10 +593,10 @@
 						<h2 class="mb-4 text-lg font-bold text-white">QR Codes</h2>
 
 						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-							{#each qrCodeImages as qr, i}
+							{#each qrCodeImages as { image, count }, i}
 								<div class="flex flex-col items-center gap-2 rounded bg-white/5 p-4">
-									<img src={qr} alt="QR Code {i + 1}" class="w-32" />
-									<span class="text-sm text-gray-300">QR {i + 1}</span>
+									<img src={image} alt="QR Code {i + 1}" class="w-32" />
+									<span class="text-sm text-gray-300">QR {i + 1} – {count} pcs</span>
 								</div>
 							{/each}
 						</div>

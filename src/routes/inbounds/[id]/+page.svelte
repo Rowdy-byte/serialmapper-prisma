@@ -78,7 +78,7 @@
 
 	async function generateQRCodeForInbound() {
 		if (!inboundProducts || inboundProducts.length === 0) {
-			toast.error('No serial numbers found for this inbound.');
+			toast.error('No serial numbers found for this inbound.', toastStyleErr);
 			return;
 		}
 
@@ -89,7 +89,7 @@
 			.filter((sn): sn is string => typeof sn === 'string' && sn.trim() !== '');
 
 		if (allSerials.length === 0) {
-			toast.error('No serials found for this inbound.');
+			toast.error('No serials found for this inbound.', toastStyleErr);
 			return;
 		}
 
@@ -98,8 +98,9 @@
 		const serialChunks = chunkArray(allSerials, validLimit);
 
 		if (serialChunks.length > 1) {
-			toast(
-				`There are ${allSerials.length} serial numbers. Generating ${serialChunks.length} QR codes (max ${validLimit} per QR).`
+			toast.success(
+				`There are ${allSerials.length} serial numbers. Generating ${serialChunks.length} QR codes (max ${validLimit} per QR).`,
+				toastStyleSucc
 			);
 		}
 
@@ -123,7 +124,7 @@
 					'Error generating QR code for chunk:',
 					error instanceof Error ? error.message : error
 				);
-				toast.error('Error generating one of the QR codes');
+				toast.error('Error generating one of the QR codes', toastStyleErr);
 			}
 		}
 
@@ -136,7 +137,7 @@
 		);
 
 		if (selectedProducts.length === 0) {
-			toast.error('Select at least one product to print labels.');
+			toast.error('Select at least one product to print labels.', toastStyleErr);
 			return;
 		}
 
@@ -188,10 +189,7 @@
 			event.preventDefault();
 			return;
 		}
-		toast.success('Inbound deleted succesfull', {
-			duration: 4000,
-			style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-		});
+		toast.success('Inbound deleted succesfull', toastStyleSucc);
 	}
 
 	function handleUpdateInbound(event: Event) {
@@ -240,10 +238,10 @@
 		navigator.clipboard
 			.writeText(selectedSerials)
 			.then(() => {
-				toast.success('Copy successfull!');
+				toast.success('Copy successfull!', toastStyleSucc);
 			})
 			.catch((err) => {
-				toast.error('Copy error!');
+				toast.error('Copy error!', toastStyleErr);
 				console.error('Clipboard copy error:', err);
 			});
 		window.location.reload();
@@ -705,7 +703,9 @@
 			</form>
 		</section>
 
-		<section class="order-5 overflow-x-auto">
+		<section
+			class="order-5 mb-4 flex flex-col gap-4 overflow-x-auto rounded-lg bg-gray-900 p-4 shadow-md"
+		>
 			<table class="min-w-full text-left text-sm">
 				<thead>
 					<tr class="text-gray-500">

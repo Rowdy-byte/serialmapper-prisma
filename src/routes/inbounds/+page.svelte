@@ -105,9 +105,10 @@
 					type="text"
 					name="description"
 					placeholder="Description"
-					class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
+					class="input input-primary rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 					required
 				/>
+
 				<PrimaryBtn disabled={form?.success ?? false} type={'submit'}>Create Inbound</PrimaryBtn>
 			</form>
 		</section>
@@ -166,5 +167,6 @@
 				<p class="mt-2 rounded-full bg-gray-500 p-1 px-2 text-sm">No inbounds found.</p>
 			{/if}
 		</section>
+		<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md"></section>
 	</main>
 </div>

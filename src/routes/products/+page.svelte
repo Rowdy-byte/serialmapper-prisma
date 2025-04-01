@@ -43,7 +43,7 @@
 		<h1 class="py-4 text-xl font-bold">Products</h1>
 	</section>
 
-	<main class="flex flex-col gap-12">
+	<main class="flex flex-col gap-4">
 		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Create Product</h1>
 			<form class="flex flex-col gap-4" action="?/createProduct" method="post">

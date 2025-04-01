@@ -61,7 +61,7 @@
 		<h1 class="py-4 text-lg font-bold">Outbounds</h1>
 	</section>
 
-	<main class="flex flex-col gap-12">
+	<main class="flex flex-col gap-4">
 		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Create Outbound</h1>
 

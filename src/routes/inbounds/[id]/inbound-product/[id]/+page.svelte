@@ -91,7 +91,7 @@
 			<h1 class="pb-4 font-bold">Inbound Product</h1>
 			{#each inboundProducts as inboundProduct}
 				{#if inboundProduct.id === Number(params.id)}
-					<form class="flex flex-col gap-4" method="post">
+					<form class="flex flex-col gap-4" action="?/updateInboundProduct" method="post">
 						<input
 							type="text"
 							name="product"
@@ -113,13 +113,7 @@
 							placeholder="Value"
 							class="rounded-md border border-gray-500 bg-gray-950 p-3 text-sm text-gray-500"
 						/>
-
-						<button
-							formaction="?/updateInboundProduct"
-							onclick={handleUpdateInboundProduct}
-							class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-							type="submit">Update</button
-						>
+						<PrimaryBtn type={'submit'} onclick={handleUpdateInboundProduct}>Update</PrimaryBtn>
 					</form>
 				{/if}
 			{/each}
@@ -127,8 +121,8 @@
 		<section class=" max-w-sm justify-center rounded-lg bg-gray-900 shadow-md">
 			{#each inboundProducts as inboundProduct}
 				{#if inboundProduct.id === Number(params.id)}
-					<section class=" rounded-lg bg-gray-900 p-4 shadow-md">
-						<h1 class="pb-4 font-bold">Product Sticker</h1>
+					<section class=" items-center rounded-lg bg-gray-900 p-4 shadow-md">
+						<h1 class="pb-4 text-center font-bold">Barcode</h1>
 						<InboundProductBarcode {inboundProduct} {inbound} />
 					</section>
 				{/if}

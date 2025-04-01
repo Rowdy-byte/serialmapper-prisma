@@ -10,7 +10,7 @@
 		type
 	}: {
 		children: Snippet;
-		disabled: boolean;
+		disabled?: boolean;
 		onclick?: MouseEventHandler<HTMLButtonElement>;
 		formaction?: string;
 		type?: 'button' | 'submit' | 'reset' | null | undefined;

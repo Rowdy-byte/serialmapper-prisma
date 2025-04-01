@@ -60,22 +60,23 @@
 </script>
 
 <div
-	class=" mb-2 flex h-[120px] w-[240px] flex-col items-center justify-center rounded-md border border-gray-500 bg-white p-2 shadow-md"
+	class=" mx-auto mb-2 flex h-[120px] w-[240px] flex-col items-center justify-center rounded-md border border-gray-500 bg-white p-2 shadow-md"
 >
 	<p class="text-xs font-bold text-black">{inboundProduct.product}</p>
 	<p class="text-xs text-black">Serial: {inboundProduct.serialnumber}</p>
 	<p>Inbound: {inbound.inboundNumber}</p>
 	<svg class="flex h-auto w-[200px]" bind:this={svgElement}></svg>
 </div>
-
-<SecondaryBtn
-	onclick={printSticker}
-	dataTooltip={'Print Sticker'}
-	tooltipTitle={'Print Sticker'}
-	type={'button'}
->
-	<Printer />
-</SecondaryBtn>
+<div class="flex w-full items-center justify-center gap-2">
+	<SecondaryBtn
+		onclick={printSticker}
+		dataTooltip={'Print Sticker'}
+		tooltipTitle={'Print Sticker'}
+		type={'button'}
+	>
+		<Printer />
+	</SecondaryBtn>
+</div>
 
 <style>
 	svg {

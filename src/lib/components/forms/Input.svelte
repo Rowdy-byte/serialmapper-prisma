@@ -21,7 +21,5 @@
 	{name}
 	{checked}
 	bind:value
-	class={type === 'checkbox'
-		? 'checkbox checkbox-xs chat-bubble-neutral'
-		: 'rounded-md bg-gray-950 p-3 text-sm text-gray-500'}
+	class={type === 'checkbox' ? 'checkbox checkbox-xs chat-bubble-neutral' : 'input input-neutral'}
 />

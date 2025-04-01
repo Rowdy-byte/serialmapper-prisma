@@ -7,22 +7,28 @@
 		onclick,
 		dataTooltip,
 		tooltipTitle,
-		type
+		type,
+		disabled,
+		formaction
 	}: {
 		children: Snippet;
 		onclick?: MouseEventHandler<HTMLButtonElement>;
 		dataTooltip: string;
 		tooltipTitle: string;
 		type: 'button' | 'submit' | 'reset' | null | undefined;
+		disabled?: boolean;
+		formaction?: string;
 	} = $props();
 </script>
 
 <button
 	{onclick}
 	{type}
+	{disabled}
+	{formaction}
 	data-tooltip={dataTooltip}
 	title={tooltipTitle}
-	class="flex rounded-full bg-gray-950 p-2 text-sm font-bold text-blue-500 shadow-lg hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+	class="btn btn-soft rounded-full"
 >
 	{@render children()}
 </button>

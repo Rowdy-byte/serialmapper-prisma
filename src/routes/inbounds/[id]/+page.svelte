@@ -403,11 +403,7 @@
 					};
 				}}
 			>
-				<select
-					disabled={isUpdatingInbound}
-					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"
-					name="clientName"
-				>
+				<select disabled={isUpdatingInbound} class="select select-neutral w-full" name="clientName">
 					<option value="clientName">{inbound?.clientName}</option>
 					{#if clients}
 						{#each clients as client}
@@ -420,10 +416,10 @@
 					type="text"
 					name="description"
 					value={inbound?.description}
-					class=" rounded-md bg-gray-950 p-3 text-sm text-gray-500"
+					class="input input-neutral w-full"
 				/>
 
-				<fieldset class=" flex items-center rounded-lg border border-gray-500 bg-gray-950 p-4">
+				<fieldset class=" flex items-center rounded-lg bg-gray-950 p-4">
 					<legend class="text-sm font-bold text-gray-500">Customs</legend>
 					<input
 						type="checkbox"
@@ -484,7 +480,7 @@
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<select
 						disabled={isAddingInboundProduct}
-						class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
+						class="select select-neutral w-full"
 						name="product"
 					>
 						<option value="products">-- Select Product --</option>
@@ -498,48 +494,33 @@
 						type="text"
 						name="value"
 						placeholder="Value €"
-						class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
+						class="input input-neutral w-full"
 					/>
 					<textarea
 						disabled={isAddingInboundProduct}
 						name="serialnumber"
 						placeholder="Enter One Serialnumber"
-						class="rounded-md bg-gray-950 p-3 text-sm text-gray-500"
+						class="textarea textarea-neutral h-24 w-full"
 					></textarea>
-					<button
-						disabled={isAddingInboundProduct}
-						class="w-full rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-						onclick={handleAddSingle}
-						type="submit"
+					<PrimaryBtn disabled={isAddingInboundProduct} type={'submit'} onclick={handleAddSingle}
+						>Add One</PrimaryBtn
 					>
-						Add One
-					</button>
 					<section class="flex flex-col gap-4 pt-8">
 						<textarea
 							disabled={isAddingBatchInboundProduct}
 							name="batch"
 							placeholder="Paste or Enter Batch Serialnumbers"
-							class="rounded-lg bg-gray-950 p-3 text-sm text-gray-500"
+							class="textarea textarea-neutral h-24 w-full"
 						></textarea>
-						<div class="flex justify-center gap-4">
-							<button
+						<div>
+							<PrimaryBtn
 								disabled={isAddingBatchInboundProduct}
+								type={'submit'}
 								formaction="?/addBatchInboundProductToInbound"
 								onclick={handleAddBatch}
-								class="w-full rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-								type="submit"
 							>
 								Add Batch
-							</button>
-							<button
-								type="button"
-								data-tooltip="Scan qrcode"
-								title="Scan Barcode to Single"
-								onclick={handleScanQr}
-								class="flex h-11 w-11 items-center justify-center rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-							>
-								<ScanQrCode />
-							</button>
+							</PrimaryBtn>
 						</div>
 						<div class="flex items-center justify-between gap-4">
 							<input
@@ -548,13 +529,15 @@
 								name="excel"
 								accept=".xlsx"
 							/>
-							<button
-								type="submit"
+							<SecondaryBtn
 								disabled={isAddingBatchInboundProduct}
+								type={'button'}
 								formaction="?/uploadExcelInboundProducts"
-								class="flex h-11 w-11 items-center justify-center rounded-full bg-gray-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:border-gray-400 hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-								><Upload /></button
+								dataTooltip={'Upload with Excel'}
+								tooltipTitle={'Upload with Excel'}
 							>
+								<Upload />
+							</SecondaryBtn>
 						</div>
 					</section>
 				</form>
@@ -672,7 +655,7 @@
 					min="1"
 					max={filteredInboundProducts?.length || 1}
 					bind:value={limit}
-					class="w-24 rounded bg-gray-950 px-2 py-1 text-sm text-gray-200"
+					class="input input-neutral w-24 rounded-full"
 				/>
 			</div>
 			<div class="mb-4 flex flex-col items-center justify-center gap-1">
@@ -683,7 +666,7 @@
 					min="1"
 					max="500"
 					bind:value={qrCodeLimit}
-					class="w-24 rounded bg-gray-950 px-2 py-1 text-sm text-gray-200"
+					class="input input-neutral w-24 rounded-full"
 				/>
 			</div>
 
@@ -693,7 +676,7 @@
 					type="text"
 					name="search"
 					placeholder="Search Products"
-					class="w-full rounded-full bg-gray-950 py-2 pr-4 pl-10 text-sm"
+					class="input input-neutral w-full rounded-full pl-10"
 				/>
 				<div
 					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"

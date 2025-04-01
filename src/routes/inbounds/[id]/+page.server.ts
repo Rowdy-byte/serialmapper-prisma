@@ -3,7 +3,7 @@ import { fail, redirect } from "@sveltejs/kit";
 import db from "$lib/server/db";
 import { CreateInboundSchema } from "$lib/zod/zod-schemas";
 import { AddSingleProductSchema, AddMultipleProductSchema } from "$lib/zod/zod-schemas";
-import { error } from "@sveltejs/kit";
+import { error, json } from "@sveltejs/kit";
 
 import { customAlphabet } from 'nanoid';
 
@@ -236,26 +236,28 @@ export const actions = {
 
     async deleteInboundProducts({ request }: { request: Request }) {
         const formData = await request.formData();
-        const rawProductIds = formData.get("productIds");
-        const inboundId = formData.get("inboundId");
-
+        const rawProductIds = formData.get('productIds');
+        const inboundId = formData.get('inboundId');
 
         if (!rawProductIds) {
-            return fail(400, { message: "No products selected" });
+            return fail(400, { message: 'No products selected' });
         }
 
-        // Parse the JSON string into an array
         const productIds = JSON.parse(rawProductIds as string);
 
         if (!Array.isArray(productIds) || productIds.length === 0) {
-            return fail(400, { message: "Invalid product selection" });
+            return fail(400, { message: 'Invalid product selection' });
         }
 
         await db.inboundProduct.deleteMany({
             where: { id: { in: productIds } }
         });
 
-        throw redirect(302, `/inbounds/${inboundId}`);
+        // ✅ GEEN `json(...)` GEBRUIKEN HIER
+        return {
+            success: true,
+            deletedIds: productIds
+        };
 
     },
 

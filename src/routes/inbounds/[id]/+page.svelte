@@ -230,8 +230,10 @@
 		writeFileXLSX(workbook, `${inbound?.inboundNumber}-products.xlsx`);
 	}
 
+	let selectedSerials = $state<string>('');
+
 	function copySelectedSerialsToClipboard() {
-		const selectedSerials = (filteredInboundProducts || [])
+		selectedSerials = (filteredInboundProducts || [])
 			.filter((product) => inboundProductIds.includes(product.id))
 			.map((product) => product.serialnumber)
 			.join('\n');
@@ -651,7 +653,43 @@
 					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 					><Printer size="24" strokeWidth="2px" /></button
 				>
-				<form action="?/deleteInboundProducts" method="post" use:enhance>
+				<form
+					action="?/deleteInboundProducts"
+					method="post"
+					use:enhance={() => {
+						return async ({ result, update }) => {
+							if (result.type === 'success') {
+								// ✅ update de lokale UI state direct
+								const deletedIds = Array.isArray(result.data?.deletedIds)
+									? result.data.deletedIds
+									: (JSON.parse(
+											typeof result.data?.deletedIds === 'string' ? result.data.deletedIds : '[]'
+										) as number[]);
+
+								// Verwijder lokaal uit state
+								if (inboundProducts) {
+									// Update the state arrays using array methods instead of reassignment
+									inboundProducts.splice(
+										0,
+										inboundProducts.length,
+										...inboundProducts.filter((p) => !deletedIds.includes(p.id))
+									);
+									filteredInboundProducts =
+										filteredInboundProducts?.filter((p) => !deletedIds.includes(p.id)) || [];
+									limitedInboundProducts =
+										limitedInboundProducts?.filter((p) => !deletedIds.includes(p.id)) || [];
+								}
+								inboundProductIds = [];
+
+								toast.success('Deleted selected products', toastStyleSucc);
+							} else {
+								await applyAction(result);
+							}
+
+							await update();
+						};
+					}}
+				>
 					<input type="hidden" name="productIds" value={JSON.stringify(inboundProductIds)} />
 					<input type="hidden" name="inboundId" value={inbound?.id} />
 					<button

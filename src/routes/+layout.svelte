@@ -22,7 +22,7 @@
 </script>
 
 <section class="sticky top-0 left-0 z-50 bg-gray-950">
-	<nav class="flex items-center justify-between p-4">
+	<nav class=" flex items-center justify-between p-4">
 		<section class="flex h-full items-center rounded-full bg-gray-900/40 p-2">
 			<a class="flex items-center justify-center text-2xl font-black italic" href="/"
 				>SN<span class="text-md text-orange-500">mapper</span>
@@ -57,8 +57,11 @@
 	</nav>
 </section>
 
-<main class="relative z-50 flex min-h-screen flex-grow flex-col bg-gray-950 p-2">
-	<Toaster />
+<main class="relative flex min-h-screen flex-grow flex-col bg-gray-950 p-2">
+	<div class="z-50">
+		<Toaster />
+	</div>
+
 	{@render children()}
 </main>
 <Footer />

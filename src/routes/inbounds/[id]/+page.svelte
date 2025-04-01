@@ -54,9 +54,7 @@
 	let limit = $state(100);
 	let limitedInboundProducts = $state<typeof inboundProducts>([]);
 
-	let qrCodeImage = $state<string | null>(null);
-	const QR_CODE_SERIAL_LIMIT = 100;
-	let qrCodeLimit = $state(100); // default to 100
+	let qrCodeLimit = $state(100); // gebruikersinput voor aantal items per QR
 	let qrCodeImages = $state<string[]>([]);
 	let inboundProductId = $state<number | null>(null);
 	let showQrModal = $state(false);
@@ -79,25 +77,29 @@
 			return;
 		}
 
-		// Map to valid serial numbers
+		// Alleen serials van juiste inbound
 		const allSerials = inboundProducts
+			.filter((product) => product.inboundId === inbound?.id)
 			.map((product) => product.serialnumber)
 			.filter((sn): sn is string => typeof sn === 'string' && sn.trim() !== '');
 
-		// Split the serial numbers into chunks based on the limit
-		const serialChunks = chunkArray(allSerials, QR_CODE_SERIAL_LIMIT);
+		if (allSerials.length === 0) {
+			toast.error('No serials found for this inbound.');
+			return;
+		}
 
-		// If there are multiple chunks, show a warning or info toast
+		// Gebruikersinput valideren
+		const validLimit = Math.max(1, Math.min(500, qrCodeLimit || 100));
+		const serialChunks = chunkArray(allSerials, validLimit);
+
 		if (serialChunks.length > 1) {
-			toast.error(
-				`There are ${allSerials.length} serial numbers. Generating ${serialChunks.length} QR codes.`
+			toast(
+				`There are ${allSerials.length} serial numbers. Generating ${serialChunks.length} QR codes (max ${validLimit} per QR).`
 			);
 		}
 
-		// Clear any previously generated QR codes
 		qrCodeImages = [];
 
-		// Generate a QR code for each chunk
 		for (const chunk of serialChunks) {
 			const serialString = chunk.join(', ');
 			try {
@@ -114,9 +116,9 @@
 					error instanceof Error ? error.message : error
 				);
 				toast.error('Error generating one of the QR codes');
-				// Optionally break or continue based on your error handling strategy
 			}
 		}
+
 		showQrModal = true;
 	}
 

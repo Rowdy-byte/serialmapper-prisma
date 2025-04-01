@@ -53,16 +53,24 @@
 
 	let limit = $state(100);
 	let limitedInboundProducts = $state<typeof inboundProducts>([]);
-	// let limitedInboundProducts = $state();
-	// $effect(() => {
-	// 	limitedInboundProducts = inboundProducts;
-	// });
 
 	let qrCodeImage = $state<string | null>(null);
+	const QR_CODE_SERIAL_LIMIT = 100;
+	let qrCodeLimit = $state(100); // default to 100
+	let qrCodeImages: string[] = [];
+	let inboundProductId = $state<number | null>(null);
 
 	const inboundProduct =
 		data.inboundProducts?.map((product) => (product.inboundId === inbound?.id ? product : null)) ||
 		[];
+
+	function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+		const result: T[][] = [];
+		for (let i = 0; i < array.length; i += chunkSize) {
+			result.push(array.slice(i, i + chunkSize));
+		}
+		return result;
+	}
 
 	async function generateQRCodeForInbound() {
 		if (!inboundProducts || inboundProducts.length === 0) {
@@ -70,18 +78,39 @@
 			return;
 		}
 
-		const serialNumbers = inboundProducts.map((product) => product.serialnumber).join(' ');
-		try {
-			const qrCodeData = await QRCode.toDataURL(serialNumbers, {
-				color: {
-					dark: '#030712', // Oranje (Foreground)
-					light: '#f8fafc' // Donkergrijs (Background)
-				}
-			});
-			qrCodeImage = qrCodeData; // Update de variabele voor weergave
-		} catch (error) {
-			console.error('Error generating QR code:', error);
-			toast.error('Error generating QR code');
+		const matchingSerials = inboundProducts
+			.filter((product) => product.inboundId === inbound?.id)
+			.map((product) => product.serialnumber)
+			.filter((sn): sn is string => typeof sn === 'string' && sn.trim() !== '');
+
+		if (matchingSerials.length === 0) {
+			toast.error('No serials found for this inbound.');
+			return;
+		}
+
+		const validLimit = Math.max(1, Math.min(500, qrCodeLimit || 100));
+		const serialChunks = chunkArray(matchingSerials, validLimit);
+
+		if (serialChunks.length > 1) {
+			toast(`Created ${serialChunks.length} QR codes (max ${validLimit} serials each)`);
+		}
+
+		qrCodeImages = [];
+
+		for (const chunk of serialChunks) {
+			const serialString = chunk.join(', ');
+			try {
+				const qrData = await QRCode.toDataURL(serialString, {
+					color: {
+						dark: '#030712',
+						light: '#f8fafc'
+					}
+				});
+				qrCodeImages.push(qrData);
+			} catch (error) {
+				console.error('QR Error:', error);
+				toast.error('Error generating one of the QR codes');
+			}
 		}
 	}
 
@@ -102,19 +131,16 @@
 		});
 
 		let yOffset = 10;
-		const labelHeight = 50; // Adjust to ensure proper spacing between labels
+		const labelHeight = 50;
 
 		selectedProducts.forEach((inboundProduct, index) => {
-			// Apply the same font settings
 			doc.setFont('helvetica', 'bold');
 			doc.setFontSize(10);
 
-			// Text formatting
 			doc.text(`Product: ${inboundProduct.product}`, 5, yOffset);
 			doc.text(`Serial: ${inboundProduct.serialnumber}`, 5, yOffset + 10);
 			doc.text(`Inbound: ${inbound?.inboundNumber || ''}`, 5, yOffset + 20);
 
-			// Generate barcode
 			const barcodeCanvas = document.createElement('canvas');
 			JsBarcode(barcodeCanvas, inboundProduct.barcode || inboundProduct.serialnumber || '', {
 				format: 'CODE128',
@@ -251,7 +277,6 @@
 		const inboundForThis =
 			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || [];
 
-		// Sum the product values
 		productValue = inboundForThis.reduce(
 			(sum, product) => sum + (parseFloat(product.value ?? '0') || 0),
 			0

@@ -3,7 +3,7 @@ import { fail, redirect } from "@sveltejs/kit";
 import db from "$lib/server/db";
 import { CreateInboundSchema } from "$lib/zod/zod-schemas";
 import { AddSingleProductSchema, AddMultipleProductSchema } from "$lib/zod/zod-schemas";
-import { error, json } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 
 import { customAlphabet } from 'nanoid';
 
@@ -237,7 +237,7 @@ export const actions = {
     async deleteInboundProducts({ request }: { request: Request }) {
         const formData = await request.formData();
         const rawProductIds = formData.get('productIds');
-        const inboundId = formData.get('inboundId');
+        // const inboundId = formData.get('inboundId');
 
         if (!rawProductIds) {
             return fail(400, { message: 'No products selected' });
@@ -253,7 +253,6 @@ export const actions = {
             where: { id: { in: productIds } }
         });
 
-        // ✅ GEEN `json(...)` GEBRUIKEN HIER
         return {
             success: true,
             deletedIds: productIds
@@ -271,43 +270,35 @@ export const actions = {
 
         const arrayBuffer = await file.arrayBuffer();
         const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as string[][];
 
-        // Skip header row
         const [header, ...data] = rows;
 
-        const requiredColumns = ['product', 'serialnumber', 'value'];
-        const headerIndex: Record<string, number> = {};
+        const headerIndex = {
+            product: header.findIndex((h) => h.toLowerCase().includes('product')),
+            serialnumber: header.findIndex((h) => h.toLowerCase().includes('serial')),
+            value: header.findIndex((h) => h.toLowerCase().includes('value'))
+        };
 
-        for (const column of requiredColumns) {
-            const idx = header.findIndex(h => h.toLowerCase().includes(column));
-            if (idx === -1) return fail(400, { message: `Missing column: ${column}` });
-            headerIndex[column] = idx;
+        if (Object.values(headerIndex).some((i) => i === -1)) {
+            return fail(400, { message: 'Missing required column(s)' });
         }
 
-        const seenSerials = new Set<string>();
-        const validRows: {
-            product: string;
-            serialnumber: string;
-            value: string;
-            barcode: string;
-            inboundId: number;
-        }[] = [];
+        const seen = new Set<string>();
+        const rowsToInsert = [];
 
         for (const row of data) {
-            const product = row[headerIndex['product']]?.trim();
-            const serialnumber = row[headerIndex['serialnumber']]?.trim();
-            const value = row[headerIndex['value']]?.trim();
+            const product = row[headerIndex.product]?.trim();
+            const serialnumber = row[headerIndex.serialnumber]?.trim();
+            const value = row[headerIndex.value]?.trim();
 
             if (!product || !serialnumber || !value) continue;
-            if (seenSerials.has(serialnumber)) continue;
+            if (seen.has(serialnumber)) continue;
 
-            seenSerials.add(serialnumber);
+            seen.add(serialnumber);
 
-            validRows.push({
+            rowsToInsert.push({
                 product,
                 serialnumber,
                 value,
@@ -316,36 +307,38 @@ export const actions = {
             });
         }
 
-        // Check welke serials al in de DB zitten
         const existingSerials = new Set(
-            (await db.inboundProduct.findMany({
-                where: {
-                    serialnumber: {
-                        in: Array.from(seenSerials)
-                    }
-                },
-                select: { serialnumber: true }
-            })).map(r => r.serialnumber)
+            (
+                await db.inboundProduct.findMany({
+                    where: { serialnumber: { in: Array.from(seen) } },
+                    select: { serialnumber: true }
+                })
+            ).map((r) => r.serialnumber)
         );
 
-        const uniqueRows = validRows.filter(row => !existingSerials.has(row.serialnumber));
+        const uniqueRows = rowsToInsert.filter((r) => !existingSerials.has(r.serialnumber));
 
         if (uniqueRows.length === 0) {
-            return fail(400, {
-                message: 'No new products to import. All serials already exist.'
-            });
+            return fail(400, { message: 'No new products to import' });
         }
 
         await db.inboundProduct.createMany({
-            data: uniqueRows
+            data: uniqueRows,
+            skipDuplicates: true
+        });
+
+        // 👉 stuur hier de toegevoegde producten mee terug!
+        const newProducts = await db.inboundProduct.findMany({
+            where: {
+                inboundId: Number(params.id),
+                serialnumber: { in: uniqueRows.map((r) => r.serialnumber) }
+            }
         });
 
         return {
-            status: 200,
             success: true,
-            message: `Imported ${uniqueRows.length} products. Skipped ${validRows.length - uniqueRows.length} duplicate(s).`,
-            created: uniqueRows.map(r => r.serialnumber),
-            duplicates: Array.from(existingSerials)
+            message: `Imported ${uniqueRows.length} products.`,
+            newProducts // 🔥 belangrijk!
         };
     }
 

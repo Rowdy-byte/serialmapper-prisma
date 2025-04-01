@@ -37,7 +37,7 @@
 	const clients = $state(data.clients);
 	const inbound = $state(data.inbound);
 	const products = $state(data.products);
-	const inboundProducts = $state(data.inboundProducts);
+	let inboundProducts = $state(data.inboundProducts);
 
 	let searchQuery = $state('');
 
@@ -181,9 +181,12 @@
 		doc.save(`bulk_stickers_${inbound?.inboundNumber}.pdf`);
 	}
 
-	let filteredInboundProducts = $state(
-		inboundProducts?.filter((product) => product.inboundId === inbound?.id)
-	);
+	let filteredInboundProducts = $state<typeof inboundProducts>([]);
+
+	$effect(() => {
+		filteredInboundProducts =
+			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || [];
+	});
 
 	function handleDeleteInbound(event: Event) {
 		if (!confirm('Are you sure you want to delete this inbound?')) {
@@ -566,6 +569,18 @@
 								typeof result.data?.message === 'string'
 									? result.data.message
 									: 'Upload successful';
+
+							// Update the local state with new data if available
+							if (result.data?.newProducts && Array.isArray(result.data.newProducts)) {
+								inboundProducts = [...(inboundProducts || []), ...result.data.newProducts];
+								// Force refresh the filtered products
+								filteredInboundProducts = inboundProducts.filter(
+									(product) => product.inboundId === inbound?.id
+								);
+								// Update the limited display
+								limitedInboundProducts = filteredInboundProducts.slice(0, limit);
+							}
+
 							toast.success(message, toastStyleSucc);
 							await invalidateAll();
 						} else {

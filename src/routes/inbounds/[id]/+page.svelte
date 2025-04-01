@@ -344,7 +344,6 @@
 				</a>
 			</li>
 		</ul>
-
 		<div class="flex items-center gap-2">
 			<form
 				method="post"
@@ -392,15 +391,7 @@
 		</div>
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-		<section
-			class="order-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-4"
-		>
-			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
-			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
-			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
-			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
-		</section>
-		<section class="order-3 flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-2">
+		<section class="order-1 flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
 			<form
 				class="flex flex-col gap-4"
@@ -470,7 +461,8 @@
 				<PrimaryBtn disabled={isUpdatingInbound} type={'submit'}>Update Inbound</PrimaryBtn>
 			</form>
 		</section>
-		<section class="order-4 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-3">
+
+		<section class="order-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-3">
 			<section class="rounded-lg bg-gray-900/0 shadow-md">
 				<h1 class="flex items-center justify-between pb-4 font-bold">Add Product to Inbound</h1>
 				<form
@@ -563,7 +555,7 @@
 				</form>
 			</section>
 		</section>
-		<section class="order-5 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md">
+		<section class="order-3 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md">
 			<h1 class="flex pb-4 font-bold">Upload from Excel</h1>
 			<form
 				action="?/uploadExcelInboundProducts"
@@ -640,6 +632,14 @@
 			</form>
 		</section>
 		<section
+			class="order-4 grid grid-cols-2 gap-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-4"
+		>
+			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
+			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
+			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
+			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
+		</section>
+		<section
 			class="chart-status-section order-6 flex flex-col items-center justify-center rounded-lg bg-gray-900/40 p-4 shadow-md"
 		>
 			{#if filteredInboundProducts && filteredInboundProducts.length > 0}
@@ -680,192 +680,188 @@
 			</dialog>
 		</section>
 	</main>
-	<section class="mt-4">
-		<section class="mb-4 flex flex-col items-center justify-between gap-2 sm:flex-row">
-			<div class="flex gap-2">
-				<button
-					onclick={copySelectedSerialsToClipboard}
-					data-tooltip="Copy selected serialnumbers to clipboard"
-					title="Copy selected serialnumbers to clipboard"
-					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-					><Copy size="24" strokeWidth="2px" /></button
-				>
-				<button
-					onclick={printSelectedLabels}
-					data-tooltip="Print selected labels"
-					title="Print selected labels"
-					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-					><Printer size="24" strokeWidth="2px" /></button
-				>
-				<form
-					action="?/deleteInboundProducts"
-					method="post"
-					use:enhance={() => {
-						return async ({ result, update }) => {
-							if (result.type === 'success') {
-								// ✅ update de lokale UI state direct
-								const deletedIds = Array.isArray(result.data?.deletedIds)
-									? result.data.deletedIds
-									: (JSON.parse(
-											typeof result.data?.deletedIds === 'string' ? result.data.deletedIds : '[]'
-										) as number[]);
 
-								// Verwijder lokaal uit state
-								if (inboundProducts) {
-									// Update the state arrays using array methods instead of reassignment
-									inboundProducts.splice(
-										0,
-										inboundProducts.length,
-										...inboundProducts.filter((p) => !deletedIds.includes(p.id))
-									);
-									filteredInboundProducts =
-										filteredInboundProducts?.filter((p) => !deletedIds.includes(p.id)) || [];
-									limitedInboundProducts =
-										limitedInboundProducts?.filter((p) => !deletedIds.includes(p.id)) || [];
-								}
-								inboundProductIds = [];
+	<section class="mb-4 flex flex-col items-center justify-between gap-2 sm:flex-row">
+		<div class="flex gap-2">
+			<button
+				onclick={copySelectedSerialsToClipboard}
+				data-tooltip="Copy selected serialnumbers to clipboard"
+				title="Copy selected serialnumbers to clipboard"
+				class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+				><Copy size="24" strokeWidth="2px" /></button
+			>
+			<button
+				onclick={printSelectedLabels}
+				data-tooltip="Print selected labels"
+				title="Print selected labels"
+				class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+				><Printer size="24" strokeWidth="2px" /></button
+			>
+			<form
+				action="?/deleteInboundProducts"
+				method="post"
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						if (result.type === 'success') {
+							// ✅ update de lokale UI state direct
+							const deletedIds = Array.isArray(result.data?.deletedIds)
+								? result.data.deletedIds
+								: (JSON.parse(
+										typeof result.data?.deletedIds === 'string' ? result.data.deletedIds : '[]'
+									) as number[]);
 
-								toast.success('Deleted selected products', toastStyleSucc);
-							} else {
-								await applyAction(result);
+							// Verwijder lokaal uit state
+							if (inboundProducts) {
+								// Update the state arrays using array methods instead of reassignment
+								inboundProducts.splice(
+									0,
+									inboundProducts.length,
+									...inboundProducts.filter((p) => !deletedIds.includes(p.id))
+								);
+								filteredInboundProducts =
+									filteredInboundProducts?.filter((p) => !deletedIds.includes(p.id)) || [];
+								limitedInboundProducts =
+									limitedInboundProducts?.filter((p) => !deletedIds.includes(p.id)) || [];
 							}
+							inboundProductIds = [];
 
-							await update();
-						};
-					}}
-				>
-					<input type="hidden" name="productIds" value={JSON.stringify(inboundProductIds)} />
-					<input type="hidden" name="inboundId" value={inbound?.id} />
-					<button
-						data-tooltip="Delete selected products"
-						title="Delete selected products"
-						type="submit"
-						disabled={inboundProductIds.length === 0}
-						class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all
-						"
-					>
-						<Trash2 size="24" strokeWidth="2px" />
-					</button>
-				</form>
+							toast.success('Deleted selected products', toastStyleSucc);
+						} else {
+							await applyAction(result);
+						}
 
-				<form action="?/mapSerialnumbersToWorksheet" method="post">
-					<input hidden type="text" name="inboundId" value={inbound?.id} />
-					<button
-						data-tooltip="Map selected serialnumbers to worksheet"
-						title="Map selected serialnumbers to worksheet"
-						class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-						onclick={handleMapSerialToWorksheet}
-						type="button"
-					>
-						<Sheet />
-					</button>
-				</form>
+						await update();
+					};
+				}}
+			>
+				<input type="hidden" name="productIds" value={JSON.stringify(inboundProductIds)} />
+				<input type="hidden" name="inboundId" value={inbound?.id} />
 				<button
-					data-tooltip="Generate QR"
-					title="Generate QR Code for Inbound Products"
-					onclick={generateQRCodeForInbound}
-					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					data-tooltip="Delete selected products"
+					title="Delete selected products"
+					type="submit"
+					disabled={inboundProductIds.length === 0}
+					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all
+						"
 				>
-					<QrCode />
+					<Trash2 size="24" strokeWidth="2px" />
 				</button>
-			</div>
-			<div class="mb-4 flex flex-col items-center justify-center gap-1">
-				<label for="limit" class="text-sm text-gray-400">Show Amount:</label>
-				<input
-					type="number"
-					id="limit"
-					min="1"
-					max={filteredInboundProducts?.length || 1}
-					bind:value={limit}
-					class="input input-neutral w-24 rounded-full"
-				/>
-			</div>
-			<div class="mb-4 flex flex-col items-center justify-center gap-1">
-				<label for="qrLimit" class="text-sm text-gray-400">Items per QR:</label>
-				<input
-					id="qrLimit"
-					type="number"
-					min="1"
-					max="500"
-					bind:value={qrCodeLimit}
-					class="input input-neutral w-24 rounded-full"
-				/>
-			</div>
-
-			<form class="relative">
-				<input
-					bind:value={searchQuery}
-					type="text"
-					name="search"
-					placeholder="Search Products"
-					class="input input-neutral w-full rounded-full pl-10"
-				/>
-				<div
-					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
-				>
-					<Search size="18" />
-				</div>
 			</form>
-		</section>
 
-		<section
-			class="order-5 mb-4 flex flex-col gap-4 overflow-x-auto rounded-lg bg-gray-900/40 p-4 shadow-md"
-		>
-			<table class=" table min-w-full text-left text-sm">
-				<thead>
-					<tr class="text-gray-500">
-						<th class="border border-gray-500 p-2">
-							<input
-								type="checkbox"
-								onchange={toggleSelectAll}
-								checked={(limitedInboundProducts ?? []).length > 0 &&
-									limitedInboundProducts?.every((p) => inboundProductIds.includes(p.id))}
-								class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
-							/>
-						</th>
-						<th class="border border-gray-500 p-2">Product</th>
-						<th class="border border-gray-500 p-2">Serialnumber</th>
-						<th class="hidden border border-gray-500 p-2 md:table-cell">Value €</th>
-						<th class="border border-gray-500 p-2">Status</th>
-						<th class="border border-gray-500 p-2">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#if limitedInboundProducts && limitedInboundProducts.length > 0}
-						{#each limitedInboundProducts as inboundProduct, i}
-							<tr class="hover:bg-gray-500/20">
-								<td class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2">
-									<input
-										type="checkbox"
-										onchange={() => toggleSelection(inboundProduct.id)}
-										checked={inboundProductIds.includes(inboundProduct.id)}
-										class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
-									/>
-									{i + 1}
-								</td>
-								<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
-								<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
-								<td class="hidden border border-gray-500 p-2 md:table-cell"
-									>{inboundProduct.value}</td
-								>
-								<td class="border border-gray-500 p-2">{inboundProduct.status}</td>
-								<td class="border border-gray-500 p-2">
-									<a
-										class="text-blue-500 underline"
-										href={`/inbounds/${inbound?.id}/inbound-product/${inboundProduct.id}`}
-										title="View Product Details"
-									>
-										<Eye size="16" />
-									</a>
-								</td>
-							</tr>
-						{/each}
-					{/if}
-				</tbody>
-			</table>
-		</section>
-		{#if filteredInboundProducts?.length === 0}
-			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
-		{/if}
+			<form action="?/mapSerialnumbersToWorksheet" method="post">
+				<input hidden type="text" name="inboundId" value={inbound?.id} />
+				<button
+					data-tooltip="Map selected serialnumbers to worksheet"
+					title="Map selected serialnumbers to worksheet"
+					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					onclick={handleMapSerialToWorksheet}
+					type="button"
+				>
+					<Sheet />
+				</button>
+			</form>
+			<button
+				data-tooltip="Generate QR"
+				title="Generate QR Code for Inbound Products"
+				onclick={generateQRCodeForInbound}
+				class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+			>
+				<QrCode />
+			</button>
+		</div>
+		<div class="mb-4 flex flex-col items-center justify-center gap-1">
+			<label for="limit" class="text-sm text-gray-400">Show Amount:</label>
+			<input
+				type="number"
+				id="limit"
+				min="1"
+				max={filteredInboundProducts?.length || 1}
+				bind:value={limit}
+				class="input input-neutral w-24 rounded-full"
+			/>
+		</div>
+		<div class="mb-4 flex flex-col items-center justify-center gap-1">
+			<label for="qrLimit" class="text-sm text-gray-400">Items per QR:</label>
+			<input
+				id="qrLimit"
+				type="number"
+				min="1"
+				max="500"
+				bind:value={qrCodeLimit}
+				class="input input-neutral w-24 rounded-full"
+			/>
+		</div>
+
+		<form class="relative">
+			<input
+				bind:value={searchQuery}
+				type="text"
+				name="search"
+				placeholder="Search Products"
+				class="input input-neutral w-full rounded-full pl-10"
+			/>
+			<div
+				class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
+			>
+				<Search size="18" />
+			</div>
+		</form>
 	</section>
+
+	<section class="mb-4 flex flex-col gap-4 overflow-x-auto rounded-lg bg-gray-900/40 p-4 shadow-md">
+		<table class=" table min-w-full text-left text-sm">
+			<thead>
+				<tr class="text-gray-500">
+					<th class="border border-gray-500 p-2">
+						<input
+							type="checkbox"
+							onchange={toggleSelectAll}
+							checked={(limitedInboundProducts ?? []).length > 0 &&
+								limitedInboundProducts?.every((p) => inboundProductIds.includes(p.id))}
+							class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
+						/>
+					</th>
+					<th class="border border-gray-500 p-2">Product</th>
+					<th class="border border-gray-500 p-2">Serialnumber</th>
+					<th class="hidden border border-gray-500 p-2 md:table-cell">Value €</th>
+					<th class="border border-gray-500 p-2">Status</th>
+					<th class="border border-gray-500 p-2">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#if limitedInboundProducts && limitedInboundProducts.length > 0}
+					{#each limitedInboundProducts as inboundProduct, i}
+						<tr class="hover:bg-gray-500/20">
+							<td class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2">
+								<input
+									type="checkbox"
+									onchange={() => toggleSelection(inboundProduct.id)}
+									checked={inboundProductIds.includes(inboundProduct.id)}
+									class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
+								/>
+								{i + 1}
+							</td>
+							<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
+							<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
+							<td class="hidden border border-gray-500 p-2 md:table-cell">{inboundProduct.value}</td
+							>
+							<td class="border border-gray-500 p-2">{inboundProduct.status}</td>
+							<td class="border border-gray-500 p-2">
+								<a
+									class="text-blue-500 underline"
+									href={`/inbounds/${inbound?.id}/inbound-product/${inboundProduct.id}`}
+									title="View Product Details"
+								>
+									<Eye size="16" />
+								</a>
+							</td>
+						</tr>
+					{/each}
+				{/if}
+			</tbody>
+		</table>
+	</section>
+	{#if filteredInboundProducts?.length === 0}
+		<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
+	{/if}
 </div>

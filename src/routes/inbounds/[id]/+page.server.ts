@@ -335,7 +335,6 @@ export const actions = {
             skipDuplicates: true
         });
 
-        // 👉 stuur hier de toegevoegde producten mee terug!
         const newProducts = await db.inboundProduct.findMany({
             where: {
                 inboundId: Number(params.id),
@@ -346,7 +345,7 @@ export const actions = {
         return {
             success: true,
             message: `Imported ${uniqueRows.length} products.`,
-            newProducts // 🔥 belangrijk!
+            newProducts
         };
     }
 

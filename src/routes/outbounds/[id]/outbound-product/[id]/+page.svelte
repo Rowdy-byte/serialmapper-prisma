@@ -4,6 +4,7 @@
 	import { MoveRight, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
+	import OutboundProductBarcode from '$lib/components/barcodes/OutboundProductBarcode.svelte';
 
 	const { params, url } = page;
 	const urlArray = url.pathname.split('/');
@@ -126,6 +127,16 @@
 							type="submit">Update</button
 						>
 					</form>
+				{/if}
+			{/each}
+		</section>
+		<section class=" max-w-sm justify-center rounded-lg bg-gray-900/40 shadow-md">
+			{#each outboundProducts as outboundProduct}
+				{#if outboundProduct.id === Number(params.id)}
+					<section class=" items-center rounded-lg bg-gray-900/40 p-4 shadow-md">
+						<h1 class="pb-4 text-center font-bold">Sticker</h1>
+						<OutboundProductBarcode {outboundProduct} {outbound} />
+					</section>
 				{/if}
 			{/each}
 		</section>

@@ -3,9 +3,9 @@
 	import { page } from '$app/state';
 	import { MoveRight, Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
-	import InboundProductBarcode from '$lib/components/barcodes/InboundProductBarcode.svelte';
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
+	import InboundProductBarcode from '$lib/components/barcodes/InboundProductBarcode.svelte';
 
 	const { params, url } = page;
 	const urlArray = url.pathname.split('/');

@@ -2,6 +2,12 @@ import type { PageServerLoad } from "./$types";
 import { fail, error } from "@sveltejs/kit";
 import db from "$lib/server/db";
 import { CreateOutboundSchema } from "$lib/zod/zod-schemas";
+import { customAlphabet } from 'nanoid';
+
+
+
+// Barcode generator: 12 tekens, alleen cijfers en hoofdletters
+const generateBarcode = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 12)
 
 export const load: PageServerLoad = async ({ params }) => {
     const outbound = await db.outbound.findUnique({
@@ -87,11 +93,9 @@ export const actions = {
     async moveInboundProductToOutbound({ request }: { request: Request }) {
         const formData = await request.formData();
         const serial = formData.get("serial") as string;
-        const outboundNumber = formData.get("outboundNumber") as string; // Using outboundNumber for lookup
-
+        const outboundNumber = formData.get("outboundNumber") as string;
 
         const outboundProduct = await db.$transaction(async (tx) => {
-            // Find the outbound record by its unique outboundNumber
             const outboundRecord = await tx.outbound.findUnique({
                 where: { outboundNumber }
             });
@@ -99,7 +103,6 @@ export const actions = {
                 throw new Error(`Outbound with number ${outboundNumber} not found.`);
             }
 
-            // Find the inbound product by its serial number
             const inboundProduct = await tx.inboundProduct.findFirst({
                 where: { serialnumber: serial }
             });
@@ -110,18 +113,17 @@ export const actions = {
                 throw new Error(`Inbound product with serial ${serial} is already assigned.`);
             }
 
-            // Create a new outbound product, ensuring that only the allowed fields are passed
             const newOutboundProduct = await tx.outboundProduct.create({
                 data: {
                     product: inboundProduct.product,
                     serialnumber: inboundProduct.serialnumber,
-                    value: inboundProduct.value ?? "", // Supply a default if value is null
+                    value: inboundProduct.value ?? "",
+                    barcode: generateBarcode(), // ✅ nieuw
                     outbound: { connect: { id: outboundRecord.id } },
                     originInbound: { connect: { id: inboundProduct.inboundId } }
                 }
             });
 
-            // Update the inbound product's status to "OUT"
             await tx.inboundProduct.update({
                 where: { id: inboundProduct.id },
                 data: { status: "OUT" }
@@ -135,7 +137,6 @@ export const actions = {
             message: "Product moved successfully!",
             outboundProduct
         };
-
     },
 
     async moveBatchToOutbound({ request }: { request: Request }) {
@@ -185,6 +186,7 @@ export const actions = {
                         product: product.product,
                         serialnumber: product.serialnumber,
                         value: product.value ?? "",
+                        barcode: generateBarcode(), // ✅ nieuw
                         outboundId: outboundRecord.id,
                         originInboundId: product.inboundId
                     }))
@@ -210,7 +212,8 @@ export const actions = {
             console.error("moveBatchToOutbound error:", err);
             return fail(500, { success: false, message });
         }
-    },
+    }
+    ,
 
     async deleteOutboundProducts({ request }: { request: Request }) {
         const formData = await request.formData();

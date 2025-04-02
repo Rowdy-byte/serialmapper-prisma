@@ -220,8 +220,6 @@
 		}
 	});
 
-	// Main reactive effect: calculates stats, filters products based on outbound ID and search query,
-	// and updates selected product IDs.
 	$effect(() => {
 		if (!outbound?.id || !outboundProducts) return;
 
@@ -245,8 +243,6 @@
 				product.status?.toLowerCase().includes(searchQuery.toLowerCase());
 			return matchesSearch;
 		});
-
-		outboundProductIds = inboundForThis.map((product) => product.id);
 	});
 
 	// Reactive effect to limit the number of displayed products

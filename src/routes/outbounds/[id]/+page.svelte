@@ -70,7 +70,7 @@
 
 	async function generateQRCodeForOutbound() {
 		if (!outboundProducts || outboundProducts.length === 0) {
-			toast.error('No serial numbers found for this inbound.', toastStyleErr);
+			toast.error('No serial numbers found for this outbound.', toastStyleErr);
 			return;
 		}
 
@@ -80,7 +80,7 @@
 			.filter((sn): sn is string => typeof sn === 'string' && sn.trim() !== '');
 
 		if (allSerials.length === 0) {
-			toast.error('No serials found for this inbound.', toastStyleErr);
+			toast.error('No serials found for this outbound.', toastStyleErr);
 			return;
 		}
 
@@ -150,7 +150,7 @@
 
 				doc.text(`Product: ${outboundProduct.product}`, 5, yOffset);
 				doc.text(`Serial: ${outboundProduct.serialnumber}`, 5, yOffset + 10);
-				doc.text(`Inbound: ${outbound?.outboundNumber || ''}`, 5, yOffset + 20);
+				doc.text(`Outbound: ${outbound?.outboundNumber || ''}`, 5, yOffset + 20);
 
 				const barcodeCanvas = document.createElement('canvas');
 				JsBarcode(barcodeCanvas, outboundProduct.barcode || outboundProduct.serialnumber || '', {

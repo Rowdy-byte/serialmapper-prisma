@@ -597,7 +597,10 @@
 							) {
 								toast.error(result.data.issues.message as string, toastStyleErr);
 							} else {
-								toast.error('An error occurred');
+								toast.error(
+									result.data?.message ? String(result.data.message) : 'An unknown error occurred',
+									toastStyleErr
+								);
 							}
 						}
 						if (result.type === 'success') {

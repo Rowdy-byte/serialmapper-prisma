@@ -111,6 +111,18 @@ export const actions = {
             inboundId: params.id
         });
 
+        const inbound = await db.inbound.findUnique({
+            where: { id: Number(params.id) },
+            select: { inboundNumber: true }
+        });
+
+        if (!inbound?.inboundNumber) {
+            return fail(400, {
+                message: 'Please update the inbound to generate an inboundnumber first.'
+            });
+        }
+
+
         if (!safeParse.success) {
             return fail(400, { issues: safeParse.error.issues });
         }
@@ -283,6 +295,18 @@ export const actions = {
     uploadExcelInboundProducts: async ({ params, request }) => {
         const formData = await request.formData();
         const file = formData.get('excel') as File;
+
+        const inbound = await db.inbound.findUnique({
+            where: { id: Number(params.id) },
+            select: { inboundNumber: true }
+        });
+
+        if (!inbound?.inboundNumber) {
+            return fail(400, {
+                message: 'Please update the inbound to generate an inboundnumber first.'
+            });
+        }
+
 
         if (!file) {
             return fail(400, { message: 'No Excel file provided' });

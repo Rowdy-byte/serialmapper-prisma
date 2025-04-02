@@ -40,7 +40,6 @@
 						label: 'Products',
 						data: dataValues,
 						backgroundColor: [
-							'rgba(249, 115, 22,1)',
 							'rgba(59, 130, 246, 1)',
 							'rgba(34, 197, 94, 1)',
 							'rgba(75, 192, 192, 1)',
@@ -77,5 +76,5 @@
 <canvas
 	bind:this={chartCanvas}
 	id="chartPieOutboundProducts"
-	class="mx-auto max-h-60 rounded-lg bg-gray-900/40 p-3 shadow-2xl"
+	class="mx-auto max-h-60 rounded-lg bg-gray-900/0 p-3"
 ></canvas>

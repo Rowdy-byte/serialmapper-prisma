@@ -7,7 +7,6 @@
 	import { utils, writeFileXLSX } from 'xlsx';
 	import BackToTop from '$lib/components/navigation/BackToTop.svelte';
 	import Stats from '$lib/components/statics/Stats.svelte';
-	import ChartPieStatus from '$lib/components/charts/ChartPieStatus.svelte';
 	import ChartPieOutboundProducts from '$lib/components/charts/ChartPieOutboundProducts.svelte';
 	import jsPDF from 'jspdf';
 	import JsBarcode from 'jsbarcode';
@@ -38,10 +37,8 @@
 	let euroPerMinute = $state(0);
 	let outboundProductIds = $state<number[]>([]);
 
+	let limit = $state<number>();
 	let limitedOutboundProducts = $state<typeof outboundProducts>([]);
-
-	let limit = $state<number>() as undefined | number;
-	let limitedInboundProducts = $state<typeof outboundProducts>([]);
 
 	type QrCodeData = {
 		image: string;
@@ -56,31 +53,72 @@
 
 	let qrCodeImage = $state<string | null>(null);
 
+	// Initialize filteredOutboundProducts from the initial outboundProducts state
 	let filteredOutboundProducts = $state(
 		outboundProducts?.filter(
 			(product: { outboundId: number }) => product.outboundId === Number(outbound?.id)
 		)
 	);
 
-	async function generateQRCodeForInbound() {
+	function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+		const result: T[][] = [];
+		for (let i = 0; i < array.length; i += chunkSize) {
+			result.push(array.slice(i, i + chunkSize));
+		}
+		return result;
+	}
+
+	async function generateQRCodeForOutbound() {
 		if (!outboundProducts || outboundProducts.length === 0) {
-			toast.error('No serial numbers found for this inbound.');
+			toast.error('No serial numbers found for this inbound.', toastStyleErr);
 			return;
 		}
 
-		const serialNumbers = outboundProducts.map((product) => product.serialnumber).join(' ');
-		try {
-			const qrCodeData = await QRCode.toDataURL(serialNumbers, {
-				color: {
-					dark: '#030712',
-					light: '#f8fafc'
-				}
-			});
-			qrCodeImage = qrCodeData;
-		} catch (error) {
-			console.error('Error generating QR code:', error);
-			toast.error('Error generating QR code');
+		const allSerials = outboundProducts
+			.filter((product) => product.outboundId === outbound?.id)
+			.map((product) => product.serialnumber)
+			.filter((sn): sn is string => typeof sn === 'string' && sn.trim() !== '');
+
+		if (allSerials.length === 0) {
+			toast.error('No serials found for this inbound.', toastStyleErr);
+			return;
 		}
+
+		const validLimit = Math.max(1, Math.min(500, qrCodeLimit || 100));
+		const serialChunks = chunkArray(allSerials, validLimit);
+
+		if (serialChunks.length > 1) {
+			toast.success(
+				`There are ${allSerials.length} serial numbers. Generating ${serialChunks.length} QR codes (max ${validLimit} per QR).`,
+				toastStyleSucc
+			);
+		}
+
+		qrCodeImages = [];
+
+		for (const chunk of serialChunks) {
+			const serialString = chunk.join(', ');
+			try {
+				const qrCodeData = await QRCode.toDataURL(serialString, {
+					color: {
+						dark: '#030712',
+						light: '#f8fafc'
+					}
+				});
+				qrCodeImages.push({
+					image: qrCodeData,
+					count: chunk.length
+				});
+			} catch (error) {
+				console.error(
+					'Error generating QR code for chunk:',
+					error instanceof Error ? error.message : error
+				);
+				toast.error('Error generating one of the QR codes', toastStyleErr);
+			}
+		}
+
+		qrModalRef?.showModal();
 	}
 
 	function printSelectedLabels() {
@@ -155,14 +193,65 @@
 		window.location.reload();
 	}
 
+	// Reactive effect for handling form success (updates and moves) and reloading the page
 	$effect(() => {
-		filteredOutboundProducts = outboundProducts?.filter(
-			(product: { outboundId: number; serialnumber?: string; product?: string }) =>
-				product.outboundId === Number(outbound?.id) &&
-				(searchQuery.trim() === '' ||
-					product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					product.product?.toLowerCase().includes(searchQuery.toLowerCase()))
+		switch (true) {
+			case form?.outboundUpdateSuccess:
+				toast.success(form?.message, {
+					duration: 4000,
+					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+				});
+				window.location.reload();
+				break;
+			case form?.movedBatchSuccess:
+				toast.success(form?.message, {
+					duration: 4000,
+					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+				});
+				window.location.reload();
+				break;
+			case form?.movedSingleSuccess:
+				toast.success(form?.message, {
+					duration: 4000,
+					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
+				});
+				window.location.reload();
+				break;
+		}
+	});
+
+	// Main reactive effect: calculates stats, filters products based on outbound ID and search query,
+	// and updates selected product IDs.
+	$effect(() => {
+		if (!outbound?.id || !outboundProducts) return;
+
+		const inboundForThis = outboundProducts.filter((product) => product.outboundId === outbound.id);
+
+		productValue = inboundForThis.reduce(
+			(sum, product) => sum + (parseFloat(product.value ?? '0') || 0),
+			0
 		);
+		productRevenue = parseFloat((inboundForThis.length * 0.1).toFixed(2));
+		timeSaved = 30 - 3;
+		timeSavedPerSerial =
+			inboundForThis.length > 0 ? parseFloat((timeSaved / inboundForThis.length).toFixed(2)) : 0;
+		euroPerMinute = inboundForThis.length > 0 ? parseFloat((productRevenue / 3).toFixed(2)) : 0;
+
+		filteredOutboundProducts = inboundForThis.filter((product) => {
+			const matchesSearch =
+				searchQuery.trim() === '' ||
+				product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				product.status?.toLowerCase().includes(searchQuery.toLowerCase());
+			return matchesSearch;
+		});
+
+		outboundProductIds = inboundForThis.map((product) => product.id);
+	});
+
+	// Reactive effect to limit the number of displayed products
+	$effect(() => {
+		limitedOutboundProducts = filteredOutboundProducts?.slice(0, limit) || [];
 	});
 
 	function handleDeleteOutbound(event: Event) {
@@ -247,69 +336,6 @@
 			outboundProductIds = [...outboundProductIds, id];
 		}
 	}
-
-	$effect(() => {
-		switch (true) {
-			case form?.outboundUpdateSuccess:
-				toast.success(form?.message, {
-					duration: 4000,
-					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				window.location.reload();
-				break;
-			case form?.movedBatchSuccess:
-				toast.success(form?.message, {
-					duration: 4000,
-					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				window.location.reload();
-				break;
-			case form?.movedSingleSuccess:
-				toast.success(form?.message, {
-					duration: 4000,
-					style: 'background-color: #4CAF50; color: #fff; padding: 10px; border-radius: 5px;'
-				});
-				window.location.reload();
-				break;
-		}
-	});
-
-	$effect(() => {
-		const inboundForThis =
-			outboundProducts?.filter((product) => product.outboundId === outbound?.id) || [];
-
-		productValue = inboundForThis.reduce(
-			(sum, product) => sum + (parseFloat(product.value ?? '0') || 0),
-			0
-		);
-
-		productRevenue = parseFloat((inboundForThis.length * 0.1).toFixed(2));
-
-		const oldTime = 30;
-		const newTime = 3;
-
-		timeSaved = oldTime - newTime;
-
-		timeSavedPerSerial =
-			inboundForThis.length > 0 ? parseFloat((timeSaved / inboundForThis.length).toFixed(2)) : 0;
-
-		euroPerMinute =
-			inboundForThis.length > 0 ? parseFloat((productRevenue / newTime).toFixed(2)) : 0;
-
-		filteredOutboundProducts = inboundForThis.filter(
-			(product) =>
-				searchQuery.trim() === '' ||
-				product.serialnumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				product.product?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				product.status?.toLowerCase().includes(searchQuery.toLowerCase())
-		);
-
-		outboundProductIds = inboundForThis.map((product) => product.outboundId);
-	});
-
-	$effect(() => {
-		limitedOutboundProducts = filteredOutboundProducts?.slice(0, limit) || [];
-	});
 </script>
 
 <BackToTop scrollTo="scroll to top" />
@@ -432,7 +458,11 @@
 		<section
 			class="chart-status-section order-5 flex flex-col items-center justify-center rounded-lg bg-gray-900/40 p-4 shadow-md"
 		>
-			<ChartPieOutboundProducts {filteredOutboundProducts} />
+			{#if filteredOutboundProducts && filteredOutboundProducts.length > 0}
+				<ChartPieOutboundProducts {filteredOutboundProducts} />
+			{:else}
+				<h1 class="text-300">No Chart Yet...</h1>
+			{/if}
 		</section>
 		<section
 			class="bg-950 order-8 flex flex-col items-center justify-center rounded-lg p-4 shadow-md"
@@ -539,8 +569,8 @@
 			</form>
 			<button
 				data-tooltip="Generate QR"
-				title="Generate QR Code for Inbound Products"
-				onclick={generateQRCodeForInbound}
+				title="Generate QR Code for Outbound Products"
+				onclick={generateQRCodeForOutbound}
 				class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 			>
 				<QrCode />

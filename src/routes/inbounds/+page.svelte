@@ -73,7 +73,10 @@
 					await applyAction(result);
 				}
 			} finally {
-				loading = false;
+				setTimeout(() => {
+					loading = false;
+				}, 3000);
+
 				await update();
 			}
 		};

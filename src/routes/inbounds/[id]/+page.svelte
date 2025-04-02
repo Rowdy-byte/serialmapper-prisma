@@ -499,7 +499,13 @@
 								) {
 									toast.error(result.data.issues.message as string, toastStyleErr);
 								} else {
-									toast.error('An error occurred');
+									console.error(result);
+									toast.error(
+										result.data?.message
+											? String(result.data.message)
+											: 'An unknown error occurred',
+										toastStyleErr
+									);
 								}
 							}
 							if (result.type === 'success') {
@@ -514,6 +520,7 @@
 					}}
 				>
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
+					<!-- <input hidden type="text" name="inboundNumber" value={inbound?.inboundNumber} /> -->
 					<select
 						disabled={isAddingInboundProduct}
 						class="select select-neutral w-full text-gray-300"

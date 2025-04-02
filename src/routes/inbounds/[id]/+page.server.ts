@@ -160,6 +160,7 @@ export const actions = {
         const inboundId = Number(params.id);
         const formData = await request.formData();
 
+
         const batch = (formData.get('batch') as string)
             .split(/[\s\n]+/)
             .map(serialnumber => serialnumber.trim())
@@ -173,6 +174,17 @@ export const actions = {
 
         if (!safeParse.success) {
             return fail(400, { issues: safeParse.error.issues });
+        }
+
+        const inbound = await db.inbound.findUnique({
+            where: { id: inboundId },
+            select: { inboundNumber: true }
+        });
+
+        if (!inbound?.inboundNumber) {
+            return fail(400, {
+                message: 'Please update the inbound to generate an inboundnumber first.'
+            });
         }
 
         // Check for duplicate serial numbers in the database

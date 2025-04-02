@@ -43,7 +43,7 @@
 			format: 'CODE128',
 			displayValue: true,
 			lineColor: '#000',
-			background: '#6a7282',
+			background: '#fff',
 			width: 1.2,
 			height: 40,
 			margin: 5
@@ -63,7 +63,7 @@
 </script>
 
 <div
-	class=" mx-auto mb-4 flex h-[120px] w-[240px] flex-col items-center justify-center rounded-md border border-gray-500 bg-gray-100 p-2 shadow-md"
+	class=" mx-auto mb-4 flex h-[120px] w-[240px] flex-col items-center justify-center rounded-md border border-gray-500 bg-white p-2 shadow-md"
 >
 	<p class="text-xs font-bold text-black">{inboundProduct.product}</p>
 	<p class="text-xs text-black">Serial: {inboundProduct.serialnumber}</p>

@@ -45,11 +45,11 @@
 
 <div class="container mx-auto py-4">
 	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md">
-		<h1 class="py-4 text-lg font-bold">Inbounds</h1>
+		<h1 class="py-4 text-lg font-bold text-gray-300">Inbounds</h1>
 	</section>
 	<main class="flex flex-col gap-4">
 		<section class="max-w-sm rounded-lg bg-gray-900/40 p-4 shadow-md">
-			<h1 class="pb-4 font-bold">Create Inbound</h1>
+			<h1 class="pb-4 font-bold text-gray-300">Create Inbound</h1>
 			<form
 				class="flex flex-col gap-4"
 				action="?/createInbound"
@@ -91,7 +91,7 @@
 			>
 				<select
 					disabled={form?.success}
-					class="select select-neutral w-full"
+					class="select select-neutral w-full text-gray-300"
 					name="clientName"
 					required
 				>
@@ -105,7 +105,7 @@
 					type="text"
 					name="description"
 					placeholder="Description"
-					class="input input-neutral w-full"
+					class="input input-neutral w-full text-gray-300"
 					required
 				/>
 
@@ -141,16 +141,18 @@
 				<tbody>
 					{#each filterdInbounds as inbound}
 						<tr in:fly={{ y: 20 }} out:slide class="hover:bg-gray-500/20">
-							<td class="border border-gray-500 p-2">{inbound.inboundNumber}</td>
-							<td class="border border-gray-500 p-2">{inbound.clientName}</td>
-							<td class="hidden border border-gray-500 p-2 md:table-cell">{inbound.description}</td>
-							<td class="hidden border border-gray-500 p-2 md:table-cell"
+							<td class="border border-gray-500 p-2 text-gray-300">{inbound.inboundNumber}</td>
+							<td class="border border-gray-500 p-2 text-gray-300">{inbound.clientName}</td>
+							<td class="hidden border border-gray-500 p-2 text-gray-300 md:table-cell"
+								>{inbound.description}</td
+							>
+							<td class="hidden border border-gray-500 p-2 text-gray-300 md:table-cell"
 								>{inbound.isSubscribed ? 'T1' : 'EXA'}</td
 							>
-							<td class="hidden border border-gray-500 p-2 md:table-cell">
+							<td class="hidden border border-gray-500 p-2 text-gray-300 md:table-cell">
 								{new Date(inbound.createdAt).toLocaleDateString()}
 							</td>
-							<td class="border border-gray-500 p-2">
+							<td class="border border-gray-500 p-2 text-gray-300">
 								<a
 									href={`/inbounds/${inbound.id}`}
 									class="text-blue-500 underline"

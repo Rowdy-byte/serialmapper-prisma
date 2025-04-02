@@ -17,6 +17,6 @@
 	} = $props();
 </script>
 
-<button {disabled} {onclick} {formaction} {type} class="btn btn-soft rounded-full">
+<button {disabled} {onclick} {formaction} {type} class="btn btn-soft rounded-full text-gray-300">
 	{@render children()}
 </button>

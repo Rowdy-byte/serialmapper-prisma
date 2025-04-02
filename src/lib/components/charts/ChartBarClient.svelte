@@ -71,5 +71,5 @@
 <canvas
 	bind:this={chartBarClientCanvas}
 	id="chartBarClient"
-	class="mx-auto max-h-60 rounded-lg bg-gray-900/40 p-3 shadow-2xl"
+	class="mx-auto max-h-60 rounded-lg bg-gray-900/0 p-3"
 ></canvas>

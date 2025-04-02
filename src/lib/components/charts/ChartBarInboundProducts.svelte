@@ -71,5 +71,5 @@
 <canvas
 	bind:this={chartBarInboundProducts}
 	id="chartBarInboundProducts"
-	class="xl:max-h-96rounded-lg mx-auto max-h-60 bg-gray-900/40 p-3 shadow-2xl"
+	class="xl:max-h-96rounded-lg mx-auto max-h-60 bg-gray-900/0 p-3"
 ></canvas>

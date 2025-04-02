@@ -27,7 +27,6 @@
 			<a class="flex items-center justify-center text-2xl font-black italic" href="/"
 				>SN<span class="text-md text-orange-500">mapper</span>
 			</a>
-
 			<!-- <img class="w-32" src="/logo.png" alt="serialmapper-logo" /> -->
 		</section>
 		<!-- <section class="ml-1 flex h-2 w-full flex-col rounded-lg bg-gray-900 p-1 shadow-md"></section> -->

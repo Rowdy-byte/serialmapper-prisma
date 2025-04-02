@@ -28,7 +28,7 @@
 	{formaction}
 	data-tooltip={dataTooltip}
 	title={tooltipTitle}
-	class="btn btn-soft rounded-full"
+	class="btn btn-soft rounded-full text-gray-300"
 >
 	{@render children()}
 </button>

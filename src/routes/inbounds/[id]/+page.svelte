@@ -50,7 +50,7 @@
 	let timeSavedPerSerial = $state(0);
 	let inboundProductIds = $state<number[]>([]);
 
-	let limit = $state(100);
+	let limit = $state<number>() as undefined | number;
 	let limitedInboundProducts = $state<typeof inboundProducts>([]);
 
 	type QrCodeData = {
@@ -59,7 +59,7 @@
 	};
 
 	let qrCodeImages = $state<QrCodeData[]>([]);
-	let qrCodeLimit = $state(100); // gebruikersinput voor aantal items per QR
+	let qrCodeLimit = $state<number | undefined>(); // gebruikersinput voor aantal items per QR
 	let inboundProductId = $state<number | null>(null);
 
 	let qrModalRef = $state<HTMLDialogElement | null>(null);
@@ -327,7 +327,9 @@
 	});
 
 	$effect(() => {
-		limitedInboundProducts = filteredInboundProducts?.slice(0, limit) || [];
+		// Convert limit to number and ensure it's a positive number
+		const numLimit = typeof limit === 'number' && limit > 0 ? limit : 10;
+		limitedInboundProducts = filteredInboundProducts?.slice(0, numLimit) || [];
 	});
 </script>
 
@@ -392,7 +394,7 @@
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 		<section class="order-1 flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-2">
-			<h1 class="flex items-center justify-between pb-4 font-bold">Inbound</h1>
+			<h1 class="flex items-center justify-between pb-4 font-bold text-gray-300">Inbound</h1>
 			<form
 				class="flex flex-col gap-4"
 				method="post"
@@ -432,7 +434,11 @@
 					};
 				}}
 			>
-				<select disabled={isUpdatingInbound} class="select select-neutral w-full" name="clientName">
+				<select
+					disabled={isUpdatingInbound}
+					class="select select-neutral w-full text-gray-300"
+					name="clientName"
+				>
 					<option value="clientName">{inbound?.clientName}</option>
 					{#if clients}
 						{#each clients as client}
@@ -445,11 +451,11 @@
 					type="text"
 					name="description"
 					value={inbound?.description}
-					class="input input-neutral w-full"
+					class="input input-neutral w-full text-gray-300"
 				/>
 
-				<fieldset class=" flex items-center rounded-lg bg-gray-950 p-4">
-					<legend class="text-sm font-bold text-gray-500">Customs</legend>
+				<fieldset class=" flex items-center rounded-lg bg-[#1d232a] p-4">
+					<legend class="text-sm text-gray-300">Customs</legend>
 					<input
 						type="checkbox"
 						name="isSubscribed"
@@ -461,10 +467,11 @@
 				<PrimaryBtn disabled={isUpdatingInbound} type={'submit'}>Update Inbound</PrimaryBtn>
 			</form>
 		</section>
-
 		<section class="order-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-3">
 			<section class="rounded-lg bg-gray-900/0 shadow-md">
-				<h1 class="flex items-center justify-between pb-4 font-bold">Add Product to Inbound</h1>
+				<h1 class="flex items-center justify-between pb-4 font-bold text-gray-300">
+					Add Product to Inbound
+				</h1>
 				<form
 					class="flex flex-col gap-4"
 					action="?/addInboundProductToInbound"
@@ -509,7 +516,7 @@
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
 					<select
 						disabled={isAddingInboundProduct}
-						class="select select-neutral w-full"
+						class="select select-neutral w-full text-gray-300"
 						name="product"
 					>
 						<option value="products">-- Select Product --</option>
@@ -523,13 +530,13 @@
 						type="text"
 						name="value"
 						placeholder="Value €"
-						class="input input-neutral w-full"
+						class="input input-neutral w-full text-gray-300"
 					/>
 					<textarea
 						disabled={isAddingInboundProduct}
 						name="serialnumber"
 						placeholder="Enter One Serialnumber"
-						class="textarea textarea-neutral h-24 w-full"
+						class="textarea textarea-neutral h-24 w-full text-gray-300"
 					></textarea>
 					<PrimaryBtn disabled={isAddingInboundProduct} type={'submit'} onclick={handleAddSingle}
 						>Add One</PrimaryBtn
@@ -538,7 +545,7 @@
 						<textarea
 							disabled={isAddingBatchInboundProduct}
 							name="batch"
-							placeholder="Paste or Enter Batch Serialnumbers"
+							placeholder="Paste or Enter Batch Serialnumbers (space separated)"
 							class="textarea textarea-neutral h-24 w-full"
 						></textarea>
 						<div>
@@ -555,8 +562,10 @@
 				</form>
 			</section>
 		</section>
-		<section class="order-3 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md">
-			<h1 class="flex pb-4 font-bold">Upload from Excel</h1>
+		<section
+			class="order-3 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 text-gray-300 shadow-md"
+		>
+			<h1 class="flex pb-4 font-bold text-gray-300">Upload from Excel</h1>
 			<form
 				action="?/uploadExcelInboundProducts"
 				enctype="multipart/form-data"
@@ -613,7 +622,7 @@
 			>
 				<div class="">
 					<input
-						class="file-input file-input-neutral mb-4 rounded-full"
+						class="file-input file-input-neutral mb-4 rounded-full text-gray-300"
 						type="file"
 						name="excel"
 						accept=".xlsx"
@@ -645,7 +654,7 @@
 			{#if filteredInboundProducts && filteredInboundProducts.length > 0}
 				<ChartPieInboundProducts {filteredInboundProducts} />
 			{:else}
-				<h1>No Chart Yet...</h1>
+				<h1 class="text-300">No Chart Yet...</h1>
 			{/if}
 		</section>
 		<section
@@ -654,7 +663,7 @@
 			{#if productStatusIn && productStatusOut}
 				<ChartPieStatus {productStatusIn} {productStatusOut} />
 			{:else}
-				<h1>No Chart Yet...</h1>
+				<h1 class="text-300">No Chart Yet...</h1>
 			{/if}
 		</section>
 		<section
@@ -769,26 +778,26 @@
 				<QrCode />
 			</button>
 		</div>
-		<div class="mb-4 flex flex-col items-center justify-center gap-1">
-			<label for="limit" class="text-sm text-gray-400">Show Amount:</label>
+		<div class=" flex items-center justify-center gap-1">
 			<input
 				type="number"
 				id="limit"
 				min="1"
 				max={filteredInboundProducts?.length || 1}
+				placeholder="Show Qty"
 				bind:value={limit}
-				class="input input-neutral w-24 rounded-full"
+				class="input input-neutral w-24 rounded-full text-gray-300"
 			/>
 		</div>
-		<div class="mb-4 flex flex-col items-center justify-center gap-1">
-			<label for="qrLimit" class="text-sm text-gray-400">Items per QR:</label>
+		<div class=" flex items-center justify-center gap-1">
 			<input
 				id="qrLimit"
 				type="number"
 				min="1"
 				max="500"
+				placeholder="QR Qty"
 				bind:value={qrCodeLimit}
-				class="input input-neutral w-24 rounded-full"
+				class="input input-neutral w-24 rounded-full text-gray-300"
 			/>
 		</div>
 
@@ -798,7 +807,7 @@
 				type="text"
 				name="search"
 				placeholder="Search Products"
-				class="input input-neutral w-full rounded-full pl-10"
+				class="input input-neutral w-full rounded-full pl-10 text-gray-300"
 			/>
 			<div
 				class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
@@ -818,7 +827,7 @@
 							onchange={toggleSelectAll}
 							checked={(limitedInboundProducts ?? []).length > 0 &&
 								limitedInboundProducts?.every((p) => inboundProductIds.includes(p.id))}
-							class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
+							class="checkbox chat-bubble-neutral checkbox-xs ml-1"
 						/>
 					</th>
 					<th class="border border-gray-500 p-2">Product</th>
@@ -832,21 +841,24 @@
 				{#if limitedInboundProducts && limitedInboundProducts.length > 0}
 					{#each limitedInboundProducts as inboundProduct, i}
 						<tr class="hover:bg-gray-500/20">
-							<td class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2">
+							<td
+								class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2 text-gray-300"
+							>
 								<input
 									type="checkbox"
 									onchange={() => toggleSelection(inboundProduct.id)}
 									checked={inboundProductIds.includes(inboundProduct.id)}
-									class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
+									class="checkbox chat-bubble-neutral checkbox-xs mr-1 ml-1"
 								/>
 								{i + 1}
 							</td>
-							<td class="border border-gray-500 p-2">{inboundProduct.product}</td>
-							<td class="border border-gray-500 p-2">{inboundProduct.serialnumber}</td>
+							<td class="border border-gray-500 p-2 text-gray-300">{inboundProduct.product}</td>
+							<td class="border border-gray-500 p-2 text-gray-300">{inboundProduct.serialnumber}</td
+							>
 							<td class="hidden border border-gray-500 p-2 md:table-cell">{inboundProduct.value}</td
 							>
-							<td class="border border-gray-500 p-2">{inboundProduct.status}</td>
-							<td class="border border-gray-500 p-2">
+							<td class="border border-gray-500 p-2 text-gray-300">{inboundProduct.status}</td>
+							<td class="border border-gray-500 p-2 text-gray-300">
 								<a
 									class="text-blue-500 underline"
 									href={`/inbounds/${inbound?.id}/inbound-product/${inboundProduct.id}`}

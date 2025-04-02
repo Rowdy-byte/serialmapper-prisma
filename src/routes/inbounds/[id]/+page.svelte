@@ -67,6 +67,21 @@
 
 	let selectedSerials = $state<string>('');
 
+	let selectedClientName = $state(inbound?.clientName ?? '');
+
+	// Haal client naam uit localStorage bij laden
+	$effect(() => {
+		const saved = localStorage.getItem('selectedClientName');
+		if (saved) selectedClientName = saved;
+	});
+
+	// Sla nieuwe client naam op na wijziging
+	$effect(() => {
+		if (selectedClientName) {
+			localStorage.setItem('selectedClientName', selectedClientName);
+		}
+	});
+
 	function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 		const result: T[][] = [];
 		for (let i = 0; i < array.length; i += chunkSize) {
@@ -408,7 +423,8 @@
 				action="?/updateInbound"
 				use:enhance={() => {
 					loading = true;
-					return async ({ result, update }) => {
+					return async ({ result, update }: { result: any; update: () => Promise<void> }) => {
+						loading = true;
 						try {
 							if (result.type === 'failure') {
 								if (
@@ -429,18 +445,11 @@
 								) {
 									toast.error(result.data.issues.message as string, toastStyleErr);
 								} else {
-									console.error(result);
-									toast.error(
-										result.data?.message
-											? String(result.data.message)
-											: 'An unknown error occurred',
-										toastStyleErr
-									);
+									toast.error('An error occurred');
 								}
-							}
-							if (result.type === 'success') {
-								console.log(result);
-								toast.success('Inbound updated successfully', toastStyleSucc);
+							} else if (result.type === 'success') {
+								toast.success('Inbound Updated Successfully', toastStyleSucc);
+								localStorage.setItem('selectedClientName', selectedClientName);
 								await invalidateAll();
 							} else {
 								await applyAction(result);
@@ -449,7 +458,7 @@
 							setTimeout(() => {
 								loading = false;
 							}, 3000);
-							// await update();
+							window.location.reload();
 						}
 					};
 				}}
@@ -458,14 +467,14 @@
 					disabled={isUpdatingInbound}
 					class="select select-neutral w-full text-gray-300"
 					name="clientName"
+					bind:value={selectedClientName}
 				>
-					<option value="clientName">{inbound?.clientName}</option>
-					{#if clients}
-						{#each clients as client}
-							<option value={client.name}>{client.name}</option>
-						{/each}
-					{/if}
+					<option value="">-- Select Client --</option>
+					{#each clients || [] as client}
+						<option value={client.name}>{client.name}</option>
+					{/each}
 				</select>
+
 				<input
 					disabled={isUpdatingInbound}
 					type="text"

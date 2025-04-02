@@ -6,10 +6,12 @@ import { CreateInboundSchema } from "$lib/zod/zod-schemas";
 export const load: PageServerLoad = async () => {
     const clients = await db.client.findMany();
     const inbounds = await db.inbound.findMany();
+    const clientNames = clients.map(client => client.name);
 
     return {
         clients,
-        inbounds
+        inbounds,
+        clientNames,
     };
 };
 

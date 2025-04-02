@@ -38,8 +38,21 @@
 	let euroPerMinute = $state(0);
 	let outboundProductIds = $state<number[]>([]);
 
-	let limit = $state(100);
 	let limitedOutboundProducts = $state<typeof outboundProducts>([]);
+
+	let limit = $state<number>() as undefined | number;
+	let limitedInboundProducts = $state<typeof outboundProducts>([]);
+
+	type QrCodeData = {
+		image: string;
+		count: number;
+	};
+
+	let qrCodeImages = $state<QrCodeData[]>([]);
+	let qrCodeLimit = $state<number | undefined>(); // gebruikersinput voor aantal items per QR
+	let inboundProductId = $state<number | null>(null);
+
+	let qrModalRef = $state<HTMLDialogElement | null>(null);
 
 	let qrCodeImage = $state<string | null>(null);
 
@@ -421,146 +434,214 @@
 		>
 			<ChartPieOutboundProducts {filteredOutboundProducts} />
 		</section>
+		<section
+			class="bg-950 order-8 flex flex-col items-center justify-center rounded-lg p-4 shadow-md"
+		>
+			<dialog id="qr_modal" class="modal" bind:this={qrModalRef}>
+				<div class="modal-box bg-gray-950 text-white">
+					<h3 class="mb-4 text-lg font-bold">QR Codes</h3>
+					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+						{#each qrCodeImages as { image, count }, i}
+							<div class="flex flex-col items-center gap-2 rounded bg-white/5 p-4">
+								<img src={image} alt="QR Code {i + 1}" class="w-32" />
+								<span class="text-sm text-gray-300">QR {i + 1} – {count} pcs</span>
+							</div>
+						{/each}
+					</div>
+					<div class="modal-action mt-6">
+						<form method="dialog">
+							<button class="btn">Close</button>
+						</form>
+					</div>
+				</div>
+			</dialog>
+		</section>
 	</main>
 
-	<section class="mt-4">
-		<section class="mb-4 flex flex-col items-center justify-between gap-2 sm:flex-row">
-			<div class="flex gap-2">
+	<section class="mb-4 flex flex-col items-center justify-between gap-2 sm:flex-row">
+		<div class="flex gap-2">
+			<button
+				onclick={copySelectedSerialsToClipboard}
+				data-tooltip="Copy selected serialnumbers to clipboard"
+				title="Copy selected serialnumbers to clipboard"
+				class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+				><Copy size="24" strokeWidth="2px" /></button
+			>
+			<button
+				onclick={printSelectedLabels}
+				data-tooltip="Print selected labels"
+				title="Print selected labels"
+				class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+				><Printer size="24" strokeWidth="2px" /></button
+			>
+			<form
+				action="?/deleteOutboundProducts"
+				method="post"
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						if (result.type === 'success') {
+							// ✅ update de lokale UI state direct
+							const deletedIds = Array.isArray(result.data?.deletedIds)
+								? result.data.deletedIds
+								: (JSON.parse(
+										typeof result.data?.deletedIds === 'string' ? result.data.deletedIds : '[]'
+									) as number[]);
+
+							// Verwijder lokaal uit state
+							if (outboundProducts) {
+								// Update the state arrays using array methods instead of reassignment
+								outboundProducts.splice(
+									0,
+									outboundProducts.length,
+									...outboundProducts.filter((p) => !deletedIds.includes(p.id))
+								);
+								filteredOutboundProducts =
+									filteredOutboundProducts?.filter((p) => !deletedIds.includes(p.id)) || [];
+								limitedOutboundProducts =
+									limitedOutboundProducts?.filter((p) => !deletedIds.includes(p.id)) || [];
+							}
+							outboundProductIds = [];
+
+							toast.success('Deleted selected products', toastStyleSucc);
+						} else {
+							await applyAction(result);
+						}
+
+						await update();
+					};
+				}}
+			>
+				<input type="hidden" name="productIds" value={JSON.stringify(outboundProductIds)} />
+				<input type="hidden" name="inboundId" value={outbound?.id} />
 				<button
-					onclick={copySelectedSerialsToClipboard}
-					data-tooltip="Copy selected serialnumbers to clipboard"
-					title="Copy selected serialnumbers to clipboard"
-					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-					><Copy size="24" strokeWidth="2px" /></button
-				>
-				<button
-					onclick={printSelectedLabels}
-					data-tooltip="Print selected labels"
-					title="Print selected labels"
-					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-					><Printer size="24" strokeWidth="2px" /></button
-				>
-				<form action="?/deleteOutboundProducts" method="post" use:enhance>
-					<input type="hidden" name="productIds" value={JSON.stringify(outboundProductIds)} />
-					<button
-						data-tooltip="Delete selected products"
-						title="Delete selected products"
-						type="submit"
-						disabled={outboundProductIds.length === 0}
-						class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all
+					data-tooltip="Delete selected products"
+					title="Delete selected products"
+					type="submit"
+					disabled={outboundProductIds.length === 0}
+					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all
 						"
-					>
-						<Trash2 size="24" strokeWidth="2px" />
-					</button>
-				</form>
-
-				<form action="?/mapSerialnumbersToWorksheet" method="post">
-					<input hidden type="text" name="inboundId" value={outbound?.id} />
-					<button
-						data-tooltip="Map selected serialnumbers to worksheet"
-						title="Map selected serialnumbers to worksheet"
-						class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-						onclick={handleMapSerialToWorksheet}
-						type="button"
-					>
-						<Sheet />
-					</button>
-				</form>
-				<button
-					data-tooltip="Generate QR"
-					title="Generate QR Code for Inbound Products"
-					onclick={generateQRCodeForInbound}
-					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
 				>
-					<QrCode />
+					<Trash2 size="24" strokeWidth="2px" />
 				</button>
-			</div>
-			<div class="mb-4 flex flex-col items-center justify-center gap-1">
-				<label for="limit" class="text-sm text-gray-400">Show Amount:</label>
-				<input
-					type="number"
-					id="limit"
-					min="1"
-					max={filteredOutboundProducts?.length || 1}
-					bind:value={limit}
-					class="input input-neutral w-20 rounded-full"
-				/>
-			</div>
-
-			<form class="relative">
-				<input
-					bind:value={searchQuery}
-					type="text"
-					name="search"
-					placeholder="Search Products"
-					class="input input-neutral w-full rounded-full pl-10"
-				/>
-				<div
-					class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
-				>
-					<Search size="18" />
-				</div>
 			</form>
-		</section>
 
-		<div class="overflow-x-auto">
-			<table class="min-w-full text-left text-sm">
-				<thead>
-					<tr class="text-gray-500">
-						<th class="border border-gray-500 p-2">
-							<input
-								type="checkbox"
-								onchange={toggleSelectAll}
-								checked={(limitedOutboundProducts ?? []).length > 0 &&
-									limitedOutboundProducts?.every((p) => outboundProductIds.includes(p.id))}
-								class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
-							/>
-						</th>
-						<th class="border border-gray-500 p-2">Product</th>
-						<th class="border border-gray-500 p-2">Serialnumber</th>
-						<th class="border border-gray-500 p-2">Value</th>
-						<th class="rounded-tr-lg border border-gray-500 p-2">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#if limitedOutboundProducts && limitedOutboundProducts.length > 0}
-						{#each limitedOutboundProducts as outboundProduct, i (outboundProduct.id)}
-							<tr class="hover:bg-slate-600">
-								<td class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2">
-									<input
-										type="checkbox"
-										onchange={() => toggleSelection(outboundProduct.id)}
-										checked={outboundProductIds.includes(outboundProduct.id)}
-										class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
-									/>
-									{i + 1}
-								</td>
-								<td class="border border-gray-500 p-2">{outboundProduct.product}</td>
-								<td class="border border-gray-500 p-2">{outboundProduct.serialnumber}</td>
-								<td class="border border-gray-500 p-2">{outboundProduct.value}</td>
-								<td
-									class="border border-gray-500 p-2 {i === filteredOutboundProducts.length - 1
-										? 'rounded-br-lg'
-										: ''}"
-								>
-									<a
-										class="text-blue-500 underline"
-										href={`/outbounds/${outbound?.id}/outbound-product/${outboundProduct.id}`}
-										title="View Product Details"
-									>
-										<Eye size="16" />
-									</a>
-								</td>
-							</tr>
-						{/each}
-					{/if}
-				</tbody>
-			</table>
+			<form action="?/mapSerialnumbersToWorksheet" method="post">
+				<input hidden type="text" name="inboundId" value={outbound?.id} />
+				<button
+					data-tooltip="Map selected serialnumbers to worksheet"
+					title="Map selected serialnumbers to worksheet"
+					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+					onclick={handleMapSerialToWorksheet}
+					type="button"
+				>
+					<Sheet />
+				</button>
+			</form>
+			<button
+				data-tooltip="Generate QR"
+				title="Generate QR Code for Inbound Products"
+				onclick={generateQRCodeForInbound}
+				class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
+			>
+				<QrCode />
+			</button>
 		</div>
-		{#if filteredOutboundProducts?.length === 0}
-			<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
-		{/if}
+		<div class=" flex items-center justify-center gap-1">
+			<input
+				type="number"
+				id="limit"
+				min="1"
+				max={filteredOutboundProducts?.length || 1}
+				placeholder="Show Qty"
+				bind:value={limit}
+				class="input input-neutral w-24 rounded-full text-gray-300"
+			/>
+		</div>
+		<div class=" flex items-center justify-center gap-1">
+			<input
+				id="qrLimit"
+				type="number"
+				min="1"
+				max="500"
+				placeholder="QR Qty"
+				bind:value={qrCodeLimit}
+				class="input input-neutral w-24 rounded-full text-gray-300"
+			/>
+		</div>
+
+		<form class="relative">
+			<input
+				bind:value={searchQuery}
+				type="text"
+				name="search"
+				placeholder="Search Products"
+				class="input input-neutral w-full rounded-full pl-10 text-gray-300"
+			/>
+			<div
+				class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
+			>
+				<Search size="18" />
+			</div>
+		</form>
 	</section>
+
+	<div class="overflow-x-auto">
+		<table class="min-w-full text-left text-sm">
+			<thead>
+				<tr class="text-gray-500">
+					<th class="border border-gray-500 p-2">
+						<input
+							type="checkbox"
+							onchange={toggleSelectAll}
+							checked={(limitedOutboundProducts ?? []).length > 0 &&
+								limitedOutboundProducts?.every((p) => outboundProductIds.includes(p.id))}
+							class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
+						/>
+					</th>
+					<th class="border border-gray-500 p-2">Product</th>
+					<th class="border border-gray-500 p-2">Serialnumber</th>
+					<th class="border border-gray-500 p-2">Value</th>
+					<th class="rounded-tr-lg border border-gray-500 p-2">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#if limitedOutboundProducts && limitedOutboundProducts.length > 0}
+					{#each limitedOutboundProducts as outboundProduct, i (outboundProduct.id)}
+						<tr class="hover:bg-slate-600">
+							<td class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2">
+								<input
+									type="checkbox"
+									onchange={() => toggleSelection(outboundProduct.id)}
+									checked={outboundProductIds.includes(outboundProduct.id)}
+									class="checkbox chat-bubble-neutral checkbox-xs ml-1 border-0"
+								/>
+								{i + 1}
+							</td>
+							<td class="border border-gray-500 p-2">{outboundProduct.product}</td>
+							<td class="border border-gray-500 p-2">{outboundProduct.serialnumber}</td>
+							<td class="border border-gray-500 p-2">{outboundProduct.value}</td>
+							<td
+								class="border border-gray-500 p-2 {i === filteredOutboundProducts.length - 1
+									? 'rounded-br-lg'
+									: ''}"
+							>
+								<a
+									class="text-blue-500 underline"
+									href={`/outbounds/${outbound?.id}/outbound-product/${outboundProduct.id}`}
+									title="View Product Details"
+								>
+									<Eye size="16" />
+								</a>
+							</td>
+						</tr>
+					{/each}
+				{/if}
+			</tbody>
+		</table>
+	</div>
+	{#if filteredOutboundProducts?.length === 0}
+		<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
+	{/if}
 
 	<!-- Map Serialnumbers & Delete Section -->
 </div>

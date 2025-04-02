@@ -212,27 +212,28 @@ export const actions = {
         }
     },
 
-    async deleteOutboundProducts({ request }: { params: { id: string }, request: Request }) {
+    async deleteOutboundProducts({ request }: { request: Request }) {
         const formData = await request.formData();
-        const rawProductIds = formData.get("productIds");
-        // const outboundId = Number(params.id);
+        const rawProductIds = formData.get('productIds');
 
         if (!rawProductIds) {
-            return fail(400, { message: "No products selected" });
+            return fail(400, { message: 'No products selected' });
         }
 
-        // Parse the JSON string into an array
         const productIds = JSON.parse(rawProductIds as string);
 
         if (!Array.isArray(productIds) || productIds.length === 0) {
-            return fail(400, { message: "Invalid product selection" });
+            return fail(400, { message: 'Invalid product selection' });
         }
 
         await db.outboundProduct.deleteMany({
             where: { id: { in: productIds } }
         });
 
-        // throw redirect(302, `/outbounds/${outboundId}`);
+        return {
+            success: true,
+            deletedIds: productIds
+        };
 
     },
 

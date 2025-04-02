@@ -13,9 +13,12 @@
 	let { data, form }: PageProps = $props();
 
 	let searchQuery = $state('');
-	const clients = data.clients;
+
+	const clients = $state(data.clients);
 
 	let filterdInbounds = $state(data.inbounds);
+
+	let loading = $state(false);
 
 	function handleCreateInbound(event: Event) {
 		if (!confirm('Are you sure you want to create this inbound?')) {
@@ -39,9 +42,51 @@
 			return true;
 		});
 	});
+
+	function enhanceForm() {
+		return async ({ result, update }: { result: any; update: () => Promise<void> }) => {
+			loading = true;
+			try {
+				if (result.type === 'failure') {
+					if (
+						result.data?.issues &&
+						Array.isArray(result.data.issues) &&
+						result.data.issues.length > 0
+					) {
+						toast.error(
+							result.data.issues.map((issue: { message: string }) => issue.message).join(', '),
+							toastStyleErr
+						);
+					} else if (
+						result.data?.issues &&
+						typeof result.data.issues === 'object' &&
+						'message' in result.data.issues
+					) {
+						toast.error(result.data.issues.message as string, toastStyleErr);
+					} else {
+						toast.error('An error occurred');
+					}
+				} else if (result.type === 'success') {
+					toast.success('Inbound Created Successfully', toastStyleSucc);
+					await invalidateAll();
+				} else {
+					await applyAction(result);
+				}
+			} finally {
+				loading = false;
+				await update();
+			}
+		};
+	}
 </script>
 
 <BackToTop scrollTo="scroll to top" />
+
+{#if loading}
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+		<span class="loader"></span>
+	</div>
+{/if}
 
 <div class="container mx-auto py-4">
 	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md">
@@ -55,39 +100,7 @@
 				action="?/createInbound"
 				onsubmit={handleCreateInbound}
 				method="post"
-				use:enhance={() => {
-					return async ({ result, update }) => {
-						console.log(result);
-						if (result.type === 'failure') {
-							if (
-								result.data?.issues &&
-								Array.isArray(result.data.issues) &&
-								result.data.issues.length > 0
-							) {
-								toast.error(
-									result.data.issues.map((issue: { message: string }) => issue.message).join(', '),
-									toastStyleErr
-								);
-							} else if (
-								result.data?.issues &&
-								typeof result.data.issues === 'object' &&
-								'message' in result.data.issues
-							) {
-								toast.error(result.data.issues.message as string, toastStyleErr);
-							} else {
-								toast.error('An error occurred');
-							}
-						}
-						if (result.type === 'success') {
-							console.log(result);
-							toast.success('Inbound Created Successfully', toastStyleSucc);
-							await invalidateAll();
-						} else {
-							await applyAction(result);
-						}
-						await update();
-					};
-				}}
+				use:enhance={enhanceForm}
 			>
 				<select
 					disabled={form?.success}
@@ -172,3 +185,78 @@
 		<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md"></section>
 	</main>
 </div>
+
+<style>
+	.loader {
+		transform: rotateZ(45deg);
+		perspective: 1000px;
+		border-radius: 50%;
+		width: 48px;
+		height: 48px;
+		color: #e5e7eb;
+	}
+	.loader:before,
+	.loader:after {
+		content: '';
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: inherit;
+		height: inherit;
+		border-radius: 50%;
+		transform: rotateX(70deg);
+		animation: 1s spin linear infinite;
+	}
+	.loader:after {
+		color: #f97316;
+		transform: rotateY(70deg);
+		animation-delay: 0.4s;
+	}
+
+	@keyframes rotate {
+		0% {
+			transform: translate(-50%, -50%) rotateZ(0deg);
+		}
+		100% {
+			transform: translate(-50%, -50%) rotateZ(360deg);
+		}
+	}
+
+	@keyframes rotateccw {
+		0% {
+			transform: translate(-50%, -50%) rotate(0deg);
+		}
+		100% {
+			transform: translate(-50%, -50%) rotate(-360deg);
+		}
+	}
+
+	@keyframes spin {
+		0%,
+		100% {
+			box-shadow: 0.2em 0px 0 0px currentcolor;
+		}
+		12% {
+			box-shadow: 0.2em 0.2em 0 0 currentcolor;
+		}
+		25% {
+			box-shadow: 0 0.2em 0 0px currentcolor;
+		}
+		37% {
+			box-shadow: -0.2em 0.2em 0 0 currentcolor;
+		}
+		50% {
+			box-shadow: -0.2em 0 0 0 currentcolor;
+		}
+		62% {
+			box-shadow: -0.2em -0.2em 0 0 currentcolor;
+		}
+		75% {
+			box-shadow: 0px -0.2em 0 0 currentcolor;
+		}
+		87% {
+			box-shadow: 0.2em -0.2em 0 0 currentcolor;
+		}
+	}
+</style>

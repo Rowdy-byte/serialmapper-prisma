@@ -35,8 +35,8 @@
 		doc.setFontSize(10);
 		doc.setFont('helvetica', 'bold');
 		doc.text(`Product: ${inboundProduct.product}`, 5, 10);
-		doc.text(`Serial: ${inboundProduct.serialnumber}`, 5, 20);
-		doc.text(`Inbound: ${inbound.inboundNumber}`, 5, 30);
+		doc.text(`Serial: ${inboundProduct.serialnumber}`, 5, 15);
+		doc.text(`Inbound: ${inbound.inboundNumber}`, 5, 20);
 
 		const barcodeCanvas = document.createElement('canvas');
 		JsBarcode(barcodeCanvas, inboundProduct.barcode, {
@@ -44,13 +44,13 @@
 			displayValue: true,
 			lineColor: '#000',
 			background: '#fff',
-			width: 1.2,
-			height: 40,
+			width: 1,
+			height: 20,
 			margin: 5
 		});
 
-		const barcodeImage = barcodeCanvas.toDataURL('image/png');
-		doc.addImage(barcodeImage, 'PNG', 5, 40, 80, 20);
+		const barcodeImage = barcodeCanvas.toDataURL('image/png', 1.0);
+		doc.addImage(barcodeImage, 'PNG', 3, 25, 80, 20, undefined, 'FAST');
 
 		doc.save(`${inbound.inboundNumber}_${inboundProduct.serialnumber}.pdf`);
 

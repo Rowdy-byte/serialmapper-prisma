@@ -13,7 +13,7 @@
 
 	$effect(() => {
 		pathname = page.url.pathname;
-		pathname, (currentPage = page.url.pathname);
+		currentPage = page.url.pathname;
 	});
 
 	const links = [

@@ -26,6 +26,7 @@
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
 	import { goto, invalidateAll } from '$app/navigation';
+	import { fade } from 'svelte/transition';
 
 	let { data }: PageProps = $props();
 
@@ -381,30 +382,38 @@
 				action="?/deleteInbound"
 				use:enhance={() => {
 					return async ({ result, update }) => {
-						if (result.type === 'failure') {
-							if (
-								result.data?.issues &&
-								Array.isArray(result.data.issues) &&
-								result.data.issues.length > 0
-							) {
-								toast.error(
-									result.data.issues.map((issue: { message: string }) => issue.message).join(', '),
-									toastStyleErr
-								);
-							} else if (
-								result.data?.issues &&
-								typeof result.data.issues === 'object' &&
-								'message' in result.data.issues
-							) {
-								toast.error(result.data.issues.message as string, toastStyleErr);
-							} else {
-								toast.error('Inbound Has Products', toastStyleErr);
+						try {
+							if (result.type === 'failure') {
+								if (
+									result.data?.issues &&
+									Array.isArray(result.data.issues) &&
+									result.data.issues.length > 0
+								) {
+									toast.error(
+										result.data.issues
+											.map((issue: { message: string }) => issue.message)
+											.join(', '),
+										toastStyleErr
+									);
+								} else if (
+									result.data?.issues &&
+									typeof result.data.issues === 'object' &&
+									'message' in result.data.issues
+								) {
+									toast.error(result.data.issues.message as string, toastStyleErr);
+								} else {
+									toast.error('Inbound Has Products', toastStyleErr);
+								}
 							}
-						}
-						if (result.type === 'success') {
-							console.log(result);
-							toast.success('Inbound Deleted Successfully', toastStyleSucc);
-							goto('/inbounds');
+							if (result.type === 'success') {
+								console.log(result);
+								toast.success('Inbound deleted successfully', toastStyleSucc);
+								goto('/inbounds');
+							}
+						} finally {
+							setTimeout(() => {
+								loading = false;
+							}, 3000);
 						}
 					};
 				}}
@@ -455,7 +464,7 @@
 									toast.error('An error occurred');
 								}
 							} else if (result.type === 'success') {
-								toast.success('Inbound Updated Successfully', toastStyleSucc);
+								toast.success('Inbound updated successfully', toastStyleSucc);
 								localStorage.setItem('selectedClientName', selectedClientName);
 								await invalidateAll();
 							} else {
@@ -889,7 +898,7 @@
 			<tbody>
 				{#if limitedInboundProducts && limitedInboundProducts.length > 0}
 					{#each limitedInboundProducts as inboundProduct, i}
-						<tr class="hover:bg-gray-500/20">
+						<tr class="hover:bg-gray-500/20" transition:fade>
 							<td
 								class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2 text-gray-300"
 							>

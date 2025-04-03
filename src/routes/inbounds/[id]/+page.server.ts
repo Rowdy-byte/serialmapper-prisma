@@ -363,7 +363,7 @@ export const actions = {
         const uniqueRows = rowsToInsert.filter((r) => !existingSerials.has(r.serialnumber));
 
         if (uniqueRows.length === 0) {
-            return fail(400, { message: 'No new products to import' });
+            return fail(400, { message: 'Serials already IN' });
         }
 
         await db.inboundProduct.createMany({

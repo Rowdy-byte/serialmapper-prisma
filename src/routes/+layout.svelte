@@ -4,13 +4,16 @@
 	import HamburgerMenu from '$lib/components/navigation/HamburgerMenu.svelte';
 	import { Toaster } from 'svelte-french-toast';
 	import { page } from '$app/state';
+	import { fade } from 'svelte/transition';
 
 	let { children } = $props();
 
 	let pathname = $state();
+	let currentPage = $state();
 
 	$effect(() => {
 		pathname = page.url.pathname;
+		pathname, (currentPage = page.url.pathname);
 	});
 
 	const links = [
@@ -55,12 +58,12 @@
 		</section>
 	</nav>
 </section>
-
-<main class="relative flex min-h-screen flex-grow flex-col bg-gray-950 p-2">
-	<div class="z-50">
-		<Toaster />
-	</div>
-
-	{@render children()}
+<div class="z-50">
+	<Toaster />
+</div>
+<main class="relative flex min-h-screen flex-grow flex-col bg-gray-950 p-2" transition:fade>
+	{#key currentPage}
+		{@render children()}
+	{/key}
 </main>
 <Footer />

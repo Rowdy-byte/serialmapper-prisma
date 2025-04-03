@@ -77,5 +77,5 @@
 <canvas
 	bind:this={chartPieInboundProducts}
 	id="chartPieInboundProducts"
-	class="mx-auto max-h-60 rounded-lg bg-gray-900/0 p-3"
+	class="mx-auto max-w-48 rounded-lg bg-gray-900/0 p-3 md:max-w-60"
 ></canvas>

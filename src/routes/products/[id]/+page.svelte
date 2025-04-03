@@ -1,7 +1,8 @@
 <script lang="ts">
+	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
+	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
 	import type { PageProps } from './$types';
-	import { goto } from '$app/navigation';
-	import { CircleHelp, Trash2 } from '@lucide/svelte';
+	import { Trash2 } from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 
 	let { data, form }: PageProps = $props();
@@ -50,60 +51,51 @@
 </script>
 
 <div class="container mx-auto py-4">
-	<section class="mb-4 flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
+	<section
+		class="mb-4 flex items-center justify-between gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md"
+	>
 		<h1 class="py-4 text-lg font-bold">Product Details</h1>
+		<form method="post" action="?/deleteProduct" class="flex gap-2">
+			<SecondaryBtn
+				type={'button'}
+				onclick={handleDeleteProduct}
+				dataTooltip="Delete Product"
+				tooltipTitle="Delete Product"
+			>
+				<Trash2 />
+			</SecondaryBtn>
+		</form>
 	</section>
 
 	<main class="flex flex-col gap-4">
-		<section class="max-w-sm rounded-lg bg-gray-900 p-4 shadow-md">
+		<section class="max-w-sm rounded-lg bg-gray-900/40 p-4 shadow-md">
 			<h1 class="pb-4 font-bold">Product</h1>
-			<form class="flex flex-col gap-4" method="post">
+			<form class="flex flex-col gap-4" method="post" action="?/updateProduct">
 				<input
 					type="text"
 					name="name"
 					value={product?.name}
 					placeholder="Name"
-					class="rounded-md border
-	            bg-gray-950 p-3 text-sm text-gray-500"
+					class="input input-neutral w-full"
 				/>
 				<input
 					type="text"
 					name="description"
 					value={product?.description}
 					placeholder="Description"
-					class="rounded-md border
-	            bg-gray-950 p-3 text-sm text-gray-500"
+					class="input input-neutral w-full"
 				/>
 				<input
 					type="text"
 					name="number"
 					value={product?.number}
 					placeholder="Number"
-					class="rounded-md border
-	            bg-gray-950 p-3 text-sm text-gray-500"
+					class="input input-neutral w-full"
 				/>
+				<PrimaryBtn type={'submit'} onclick={handleUpdateProduct}>Update</PrimaryBtn>
+			</form>
+		</section>
 
-				<button
-					formaction="?/updateProduct"
-					onclick={handleUpdateProduct}
-					class="rounded-full bg-orange-500 p-3 text-sm font-bold text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit">Update</button
-				>
-			</form>
-		</section>
-		<section class="flex max-w-sm flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md">
-			<h1 class="flex w-full items-center justify-between font-bold">Delete Product</h1>
-			<form method="post" class="flex gap-2">
-				<button
-					formaction="?/deleteProduct"
-					onclick={handleDeleteProduct}
-					class=" rounded-full bg-orange-500 p-3 text-sm text-white hover:cursor-pointer hover:bg-orange-600 hover:text-gray-800 hover:shadow-md hover:transition-all"
-					type="submit"
-				>
-					<Trash2 />
-				</button>
-			</form>
-		</section>
-		<section class="flex flex-col gap-4 rounded-lg bg-gray-900 p-4 shadow-md"></section>
+		<section class="flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md"></section>
 	</main>
 </div>

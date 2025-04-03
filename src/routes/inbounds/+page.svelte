@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { Eye, Search } from '@lucide/svelte';
-	import { fly, slide } from 'svelte/transition';
+	import { fade, fly, slide } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
 	import { invalidateAll } from '$app/navigation';
 	import BackToTop from '$lib/components/navigation/BackToTop.svelte';
@@ -156,8 +156,17 @@
 				</thead>
 				<tbody>
 					{#each filterdInbounds as inbound}
-						<tr in:fly={{ y: 20 }} out:slide class="hover:bg-gray-500/20">
-							<td class="border border-gray-500 p-2 text-gray-300">{inbound.inboundNumber}</td>
+						<tr transition:fade class="hover:bg-gray-500/20">
+							<td
+								class={`border border-gray-500 p-2 text-gray-300 ${
+									inbound.inboundNumber === '' ? 'text-[8px] text-orange-500 italic' : ''
+								}`}
+							>
+								{inbound.inboundNumber === ''
+									? 'Update Required (details page)'
+									: inbound.inboundNumber}
+							</td>
+
 							<td class="border border-gray-500 p-2 text-gray-300">{inbound.clientName}</td>
 							<td class="hidden border border-gray-500 p-2 text-gray-300 md:table-cell"
 								>{inbound.description}</td

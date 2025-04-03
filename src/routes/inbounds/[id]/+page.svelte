@@ -363,7 +363,14 @@
 		<ul class="text-gray-500">
 			<li class="text-center">
 				<a href="/inbounds" class="font-bold transition-all">
-					<span class="hover:text-blue-500"> Inbound </span>: {inbound?.inboundNumber}
+					<span class={`hover:text-blue-500 `}> Inbound: </span>
+					<span
+						class={`hover:text-blue-500 ${inbound?.inboundNumber === '' ? 'text-[8px] font-normal text-orange-500 italic' : ''}`}
+					>
+						{inbound?.inboundNumber === ''
+							? 'Update Inbound to generate number'
+							: inbound?.inboundNumber}
+					</span>
 				</a>
 			</li>
 		</ul>

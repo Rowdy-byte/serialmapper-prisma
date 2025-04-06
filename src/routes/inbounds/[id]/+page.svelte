@@ -35,10 +35,27 @@
 	let isAddingBatchInboundProduct = $state(false);
 	let loading = $state(false);
 
-	const clients = $state(data.clients);
-	const inbound = $state(data.inbound);
-	const products = $state(data.products);
+	let clients = $state(data.clients);
+	let inbound = $state(data.inbound);
+	let products = $state(data.products);
 	let inboundProducts = $state(data.inboundProducts);
+
+	let refreshKey = $state<number>(0);
+
+	function updateInboundNumber(newNumber: string) {
+		if (inbound) {
+			inbound = {
+				id: inbound.id,
+				description: inbound.description,
+				clientName: inbound.clientName,
+				inboundNumber: newNumber,
+				isSubscribed: inbound.isSubscribed,
+				createdAt: inbound.createdAt,
+				clientId: inbound.clientId
+			};
+			refreshKey++;
+		}
+	}
 
 	let searchQuery = $state('');
 
@@ -68,7 +85,12 @@
 
 	let selectedSerials = $state<string>('');
 
-	let selectedClientName = $state(inbound?.clientName ?? '');
+	let selectedClientName = $state('');
+
+	// Initialize selectedClientName after state declaration
+	$effect(() => {
+		selectedClientName = inbound?.clientName ?? '';
+	});
 
 	// Haal client naam uit localStorage bij laden
 	$effect(() => {
@@ -365,13 +387,16 @@
 			<li class="text-center">
 				<a href="/inbounds" class="font-bold transition-all">
 					<span class={`hover:text-blue-500 `}> Inbound: </span>
-					<span
-						class={`hover:text-blue-500 ${inbound?.inboundNumber === '' ? 'text-[8px] font-normal text-orange-500 italic' : ''}`}
-					>
-						{inbound?.inboundNumber === ''
-							? 'Update Inbound to generate number'
-							: inbound?.inboundNumber}
-					</span>
+					{#key refreshKey}
+						<span
+							transition:fade
+							class={`hover:text-blue-500 ${inbound?.inboundNumber === '' ? 'text-[8px] font-normal text-orange-500 italic' : ''}`}
+						>
+							{inbound?.inboundNumber === ''
+								? 'Update Inbound to generate number'
+								: inbound?.inboundNumber}
+						</span>
+					{/key}
 				</a>
 			</li>
 		</ul>
@@ -466,15 +491,20 @@
 							} else if (result.type === 'success') {
 								toast.success('Inbound updated successfully', toastStyleSucc);
 								localStorage.setItem('selectedClientName', selectedClientName);
-								await invalidateAll();
+								// Zorg ervoor dat de server de bijgewerkte inbound teruggeeft
+								if (result.data && result.data.inbound) {
+									inbound = result.data.inbound;
+									// Verhoog de refreshKey om de key-block geforceerd te her-renderen
+									refreshKey++;
+								}
 							} else {
 								await applyAction(result);
 							}
 						} finally {
 							setTimeout(() => {
 								loading = false;
-							}, 3000);
-							window.location.reload();
+							}, 1000);
+							await invalidateAll();
 						}
 					};
 				}}
@@ -523,7 +553,9 @@
 					enctype="multipart/form-data"
 					method="post"
 					use:enhance={() => {
-						return async ({ result, update }) => {
+						loading = true;
+						return async ({ result, update }: { result: any; update: () => Promise<void> }) => {
+							loading = true;
 							try {
 								if (result.type === 'failure') {
 									if (
@@ -544,25 +576,25 @@
 									) {
 										toast.error(result.data.issues.message as string, toastStyleErr);
 									} else {
-										console.error(result);
-										toast.error(
-											result.data?.message
-												? String(result.data.message)
-												: 'An unknown error occurred',
-											toastStyleErr
-										);
+										toast.error('An error occurred');
 									}
-								}
-								if (result.type === 'success') {
-									console.log(result);
-									toast.success('Added product successfully', toastStyleSucc);
-									await invalidateAll();
+								} else if (result.type === 'success') {
+									toast.success('Inbound updated successfully', toastStyleSucc);
+									localStorage.setItem('selectedClientName', selectedClientName);
+									// Zorg ervoor dat de server de bijgewerkte inbound teruggeeft
+									if (result.data && result.data.inbound) {
+										inbound = result.data.inbound;
+										// Verhoog de refreshKey om de key-block geforceerd te her-renderen
+										refreshKey++;
+									}
 								} else {
 									await applyAction(result);
 								}
 							} finally {
-								loading = false;
-								await update();
+								setTimeout(() => {
+									loading = false;
+								}, 1000);
+								await invalidateAll();
 							}
 						};
 					}}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	// import '../global.css';
 	import Footer from '$lib/components/Footer.svelte';
 	import HamburgerMenu from '$lib/components/navigation/HamburgerMenu.svelte';
 	import { Toaster } from 'svelte-french-toast';
@@ -20,7 +21,8 @@
 		{ linkName: 'Inbounds', linkPath: '/inbounds' },
 		{ linkName: 'Outbounds', linkPath: '/outbounds' },
 		{ linkName: 'Products', linkPath: '/products' },
-		{ linkName: 'Clients', linkPath: '/clients' }
+		{ linkName: 'Clients', linkPath: '/clients' },
+		{ linkName: 'Docs', linkPath: '/docs' }
 	];
 </script>
 

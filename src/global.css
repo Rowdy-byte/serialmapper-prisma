@@ -1,0 +1,12 @@
+.markdown-wrapper h1,
+.markdown-wrapper h2,
+.markdown-wrapper h3,
+.markdown-wrapper p,
+.markdown-wrapper ul,
+.markdown-wrapper ol {
+    all: unset;
+    /* óf specifiek: */
+    font-weight: normal;
+    font-size: 1rem;
+    margin: 0;
+}

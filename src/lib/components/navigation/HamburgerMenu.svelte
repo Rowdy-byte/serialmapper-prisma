@@ -11,7 +11,8 @@
 		{ linkName: 'Inbounds', linkPath: '/inbounds' },
 		{ linkName: 'Outbounds', linkPath: '/outbounds' },
 		{ linkName: 'Products', linkPath: '/products' },
-		{ linkName: 'Clients', linkPath: '/clients' }
+		{ linkName: 'Clients', linkPath: '/clients' },
+		{ linkName: 'Docs', linkPath: '/docs' }
 	];
 
 	function toggle() {
@@ -51,7 +52,7 @@
 			{#each links as { linkName, linkPath }}
 				{#if pathname !== linkPath}
 					<a onclick={toggle} class="transition-all hover:text-blue-500" href={linkPath}
-						>{linkName}</a
+						>{linkName.toUpperCase()}</a
 					>
 				{/if}
 				{#if pathname === linkPath}
@@ -59,7 +60,7 @@
 						onclick={toggle}
 						class="rounded-md bg-gray-800 p-2 text-blue-500 hover:cursor-pointer"
 						href={linkPath}
-						class:selected={pathname === linkPath}>{linkName}</a
+						class:selected={pathname === linkPath}>{linkName.toUpperCase()}</a
 					>
 				{/if}
 			{/each}

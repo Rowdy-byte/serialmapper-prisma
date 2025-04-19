@@ -4,7 +4,7 @@
 	import { fly, slide } from 'svelte/transition';
 	import toast from 'svelte-french-toast';
 	import { enhance } from '$app/forms';
-	import { invalidate, invalidateAll } from '$app/navigation';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import BackToTop from '$lib/components/navigation/BackToTop.svelte';
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 	import { toastStyleErr } from '$lib/components/toast/toastStyle';
@@ -40,7 +40,7 @@
 		if (!confirm('Are you sure you want to create this inbound?')) {
 			event.preventDefault();
 		}
-		// invalidate('outbounds');
+		invalidate('outbounds');
 	}
 
 	if (form?.success) {

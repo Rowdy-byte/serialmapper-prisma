@@ -15,6 +15,7 @@
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 	import { toastStyleErr } from '$lib/components/toast/toastStyle';
 	import { toastStyleSucc } from '$lib/components/toast/toastStyle';
+	import { fade } from 'svelte/transition';
 
 	let { data, form }: PageProps = $props();
 
@@ -23,12 +24,35 @@
 	let isAddingBatchOutboundProduct = $state(false);
 
 	const clients = $state(data.clients);
-	const outbound = $state(data.outbound);
+	let outbound = $state(data.outbound);
 	const products = $state(data.products);
 	const outboundProducts = $state(data.outboundProducts);
 
 	let searchQuery = $state('');
 	let loading = $state(false);
+
+	let selectedClientName = $state('');
+
+	let refreshKey = $state<number>(0);
+
+	function updateOutboundNumber(newNumber: string) {
+		if (outbound) {
+			outbound = {
+				id: outbound.id,
+				description: outbound.description,
+				clientName: outbound.clientName,
+				outboundNumber: newNumber,
+				createdAt: outbound.createdAt,
+				client: outbound.client
+			};
+			refreshKey++;
+		}
+	}
+
+	// Initialize selectedClientName after state declaration
+	$effect(() => {
+		selectedClientName = outbound?.clientName ?? '';
+	});
 
 	let productValue = $state(0);
 	let productRevenue = $state(0);
@@ -345,7 +369,17 @@
 		<ul class="text-gray-500">
 			<li class="font-bold">
 				<a href="/outbounds" class="transition-all hover:text-blue-500">
-					Outbound: <span class="">{outbound?.outboundNumber}</span>
+					Outbound:
+					{#key refreshKey}
+						<span
+							transition:fade
+							class={`hover:text-blue-500 ${outbound?.outboundNumber === '' ? 'text-[8px] font-normal text-orange-500 italic' : ''}`}
+						>
+							{outbound?.outboundNumber === ''
+								? 'Update Inbound to generate number'
+								: outbound?.outboundNumber}
+						</span>
+					{/key}
 				</a>
 			</li>
 		</ul>
@@ -381,8 +415,8 @@
 							}
 							if (result.type === 'success') {
 								console.log(result);
-								toast.success('Inbound deleted successfully', toastStyleSucc);
-								goto('/inbounds');
+								toast.success('Outbound deleted successfully', toastStyleSucc);
+								goto('/outbounds');
 							}
 						} finally {
 							setTimeout(() => {
@@ -419,49 +453,61 @@
 				action="?/updateOutbound"
 				method="post"
 				use:enhance={() => {
-					return async ({ result, update }) => {
-						console.log(result);
-						if (result.type === 'failure') {
-							if (
-								result.data?.issues &&
-								Array.isArray(result.data.issues) &&
-								result.data.issues.length > 0
-							) {
-								toast.error(
-									result.data.issues.map((issue: { message: string }) => issue.message).join(', '),
-									toastStyleErr
-								);
-							} else if (
-								result.data?.issues &&
-								typeof result.data.issues === 'object' &&
-								'message' in result.data.issues
-							) {
-								toast.error(result.data.issues.message as string, toastStyleErr);
+					loading = true;
+					return async ({ result, update }: { result: any; update: () => Promise<void> }) => {
+						loading = true;
+						try {
+							if (result.type === 'failure') {
+								if (
+									result.data?.issues &&
+									Array.isArray(result.data.issues) &&
+									result.data.issues.length > 0
+								) {
+									toast.error(
+										result.data.issues
+											.map((issue: { message: string }) => issue.message)
+											.join(', '),
+										toastStyleErr
+									);
+								} else if (
+									result.data?.issues &&
+									typeof result.data.issues === 'object' &&
+									'message' in result.data.issues
+								) {
+									toast.error(result.data.issues.message as string, toastStyleErr);
+								} else {
+									toast.error('An error occurred');
+								}
+							} else if (result.type === 'success') {
+								toast.success('Inbound updated successfully', toastStyleSucc);
+								localStorage.setItem('selectedClientName', selectedClientName);
+								if (result.data && result.data.inbound) {
+									outbound = result.data.inbound;
+									refreshKey++;
+								}
 							} else {
-								toast.error('An error occurred');
+								await applyAction(result);
 							}
-						}
-						if (result.type === 'success') {
-							console.log(result);
-							toast.success('Inbound Updated Successfully', toastStyleSucc);
+						} finally {
+							setTimeout(() => {
+								loading = false;
+							}, 1000);
 							await invalidateAll();
-						} else {
-							await applyAction(result);
+							window.location.reload();
 						}
 					};
 				}}
 			>
 				<select
 					disabled={isUpdatingOutbound}
-					class="select select-neutral w-full"
+					class="select select-neutral w-full text-gray-300"
 					name="clientName"
+					bind:value={selectedClientName}
 				>
-					<option value="clientName">{outbound?.clientName}</option>
-					{#if clients}
-						{#each clients as client}
-							<option value={client.name}>{client.name}</option>
-						{/each}
-					{/if}
+					<option value="">-- Select Client --</option>
+					{#each clients || [] as client}
+						<option value={client.name}>{client.name}</option>
+					{/each}
 				</select>
 				<input
 					disabled={isUpdatingOutbound}
@@ -714,3 +760,78 @@
 
 	<!-- Map Serialnumbers & Delete Section -->
 </div>
+
+<style>
+	.loader {
+		transform: rotateZ(45deg);
+		perspective: 1000px;
+		border-radius: 50%;
+		width: 48px;
+		height: 48px;
+		color: #e5e7eb;
+	}
+	.loader:before,
+	.loader:after {
+		content: '';
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: inherit;
+		height: inherit;
+		border-radius: 50%;
+		transform: rotateX(70deg);
+		animation: 1s spin linear infinite;
+	}
+	.loader:after {
+		color: #f97316;
+		transform: rotateY(70deg);
+		animation-delay: 0.4s;
+	}
+
+	@keyframes rotate {
+		0% {
+			transform: translate(-50%, -50%) rotateZ(0deg);
+		}
+		100% {
+			transform: translate(-50%, -50%) rotateZ(360deg);
+		}
+	}
+
+	@keyframes rotateccw {
+		0% {
+			transform: translate(-50%, -50%) rotate(0deg);
+		}
+		100% {
+			transform: translate(-50%, -50%) rotate(-360deg);
+		}
+	}
+
+	@keyframes spin {
+		0%,
+		100% {
+			box-shadow: 0.2em 0px 0 0px currentcolor;
+		}
+		12% {
+			box-shadow: 0.2em 0.2em 0 0 currentcolor;
+		}
+		25% {
+			box-shadow: 0 0.2em 0 0px currentcolor;
+		}
+		37% {
+			box-shadow: -0.2em 0.2em 0 0 currentcolor;
+		}
+		50% {
+			box-shadow: -0.2em 0 0 0 currentcolor;
+		}
+		62% {
+			box-shadow: -0.2em -0.2em 0 0 currentcolor;
+		}
+		75% {
+			box-shadow: 0px -0.2em 0 0 currentcolor;
+		}
+		87% {
+			box-shadow: 0.2em -0.2em 0 0 currentcolor;
+		}
+	}
+</style>

@@ -491,10 +491,8 @@
 							} else if (result.type === 'success') {
 								toast.success('Inbound updated successfully', toastStyleSucc);
 								localStorage.setItem('selectedClientName', selectedClientName);
-								// Zorg ervoor dat de server de bijgewerkte inbound teruggeeft
 								if (result.data && result.data.inbound) {
 									inbound = result.data.inbound;
-									// Verhoog de refreshKey om de key-block geforceerd te her-renderen
 									refreshKey++;
 								}
 							} else {
@@ -505,6 +503,7 @@
 								loading = false;
 							}, 1000);
 							await invalidateAll();
+							window.location.reload();
 						}
 					};
 				}}

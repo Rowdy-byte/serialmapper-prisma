@@ -88,6 +88,7 @@
 						filterdoutbounds = [result.data.outbound, ...filterdoutbounds];
 					}
 					await invalidateAll();
+					window.location.reload();
 				} else {
 					await applyAction(result);
 				}
@@ -181,12 +182,15 @@
 				<tbody>
 					{#each filterdoutbounds as outbound}
 						<tr in:fly={{ y: 20 }} out:slide class="hover:bg-orange-800/20">
-							<td class="border border-gray-500 p-2"
-								>{outbound.outboundNumber === ''
-									? 'Update Required (details page)'
-									: outbound.outboundNumber}</td
+							<td
+								class={`border border-gray-500 p-2 text-gray-300 ${
+									outbound.outboundNumber === '' ? 'text-[8px] text-orange-500 italic' : ''
+								}`}
 							>
-							<td class="border border-gray-500 p-2">{outbound.clientName}</td>
+								{outbound.outboundNumber === ''
+									? 'Update Required (details page)'
+									: outbound.outboundNumber}
+							</td><td class="border border-gray-500 p-2">{outbound.clientName}</td>
 							<td class="hidden border border-gray-500 p-2 md:table-cell">{outbound.description}</td
 							>
 							<td class="hidden border border-gray-500 p-2 md:table-cell">

@@ -28,6 +28,7 @@
 	const outboundProducts = $state(data.outboundProducts);
 
 	let searchQuery = $state('');
+	let loading = $state(false);
 
 	let productValue = $state(0);
 	let productRevenue = $state(0);
@@ -140,37 +141,32 @@
 		let yOffset = 10;
 		const labelHeight = 50;
 
-		selectedProducts.forEach(
-			(
-				outboundProduct: { product: string; serialnumber: string; barcode?: string },
-				index: number
-			) => {
-				doc.setFont('helvetica', 'bold');
-				doc.setFontSize(10);
+		selectedProducts.forEach((outboundProduct, index: number) => {
+			doc.setFont('helvetica', 'bold');
+			doc.setFontSize(10);
 
-				doc.text(`Product: ${outboundProduct.product}`, 5, yOffset);
-				doc.text(`Serial: ${outboundProduct.serialnumber}`, 5, yOffset + 10);
-				doc.text(`Outbound: ${outbound?.outboundNumber || ''}`, 5, yOffset + 20);
+			doc.text(`Product: ${outboundProduct.product}`, 5, yOffset);
+			doc.text(`Serial: ${outboundProduct.serialnumber}`, 5, yOffset + 10);
+			doc.text(`Outbound: ${outbound?.outboundNumber || ''}`, 5, yOffset + 20);
 
-				const barcodeCanvas = document.createElement('canvas');
-				JsBarcode(barcodeCanvas, outboundProduct.barcode || outboundProduct.serialnumber || '', {
-					format: 'CODE128',
-					displayValue: false,
-					width: 1.2,
-					height: 40
-				});
+			const barcodeCanvas = document.createElement('canvas');
+			JsBarcode(barcodeCanvas, outboundProduct.barcode || outboundProduct.serialnumber || '', {
+				format: 'CODE128',
+				displayValue: false,
+				width: 1.2,
+				height: 40
+			});
 
-				const barcodeImage = barcodeCanvas.toDataURL('image/png');
-				doc.addImage(barcodeImage, 'PNG', 5, yOffset + 25, 80, 20);
+			const barcodeImage = barcodeCanvas.toDataURL('image/png');
+			doc.addImage(barcodeImage, 'PNG', 5, yOffset + 25, 80, 20);
 
-				yOffset += labelHeight;
+			yOffset += labelHeight;
 
-				if (yOffset > 270 && index !== selectedProducts.length - 1) {
-					doc.addPage();
-					yOffset = 10;
-				}
+			if (yOffset > 270 && index !== selectedProducts.length - 1) {
+				doc.addPage();
+				yOffset = 10;
 			}
-		);
+		});
 
 		doc.save(`bulk_stickers_${outbound?.outboundNumber}.pdf`);
 	}
@@ -336,6 +332,12 @@
 
 <BackToTop scrollTo="scroll to top" />
 
+{#if loading}
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+		<span class="loader"></span>
+	</div>
+{/if}
+
 <div class="container mx-auto px-4 py-4">
 	<section
 		class="breadcrums text-md mb-4 flex items-center justify-between rounded-lg bg-gray-900/40 p-4 shadow-md"
@@ -348,7 +350,48 @@
 			</li>
 		</ul>
 		<div>
-			<form onsubmit={handleDeleteOutbound} action="?/deleteOutbound" use:enhance>
+			<form
+				onsubmit={handleDeleteOutbound}
+				method="post"
+				action="?/deleteOutbound"
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						try {
+							if (result.type === 'failure') {
+								if (
+									result.data?.issues &&
+									Array.isArray(result.data.issues) &&
+									result.data.issues.length > 0
+								) {
+									toast.error(
+										result.data.issues
+											.map((issue: { message: string }) => issue.message)
+											.join(', '),
+										toastStyleErr
+									);
+								} else if (
+									result.data?.issues &&
+									typeof result.data.issues === 'object' &&
+									'message' in result.data.issues
+								) {
+									toast.error(result.data.issues.message as string, toastStyleErr);
+								} else {
+									toast.error('Inbound Has Products', toastStyleErr);
+								}
+							}
+							if (result.type === 'success') {
+								console.log(result);
+								toast.success('Inbound deleted successfully', toastStyleSucc);
+								goto('/inbounds');
+							}
+						} finally {
+							setTimeout(() => {
+								loading = false;
+							}, 3000);
+						}
+					};
+				}}
+			>
 				<SecondaryBtn
 					dataTooltip={'Delete Outbound'}
 					tooltipTitle={'Delete Outbound'}

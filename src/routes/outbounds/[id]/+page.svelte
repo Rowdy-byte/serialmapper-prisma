@@ -414,9 +414,10 @@
 								}
 							}
 							if (result.type === 'success') {
-								console.log(result);
 								toast.success('Outbound deleted successfully', toastStyleSucc);
-								goto('/outbounds');
+								await invalidateAll();
+								await goto('/outbounds');
+								window.location.reload();
 							}
 						} finally {
 							setTimeout(() => {

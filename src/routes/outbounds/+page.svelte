@@ -84,6 +84,9 @@
 					}
 				} else if (result.type === 'success') {
 					toast.success('Outbound Created Successfully', toastStyleSucc);
+					if (result.data?.outbound) {
+						filterdoutbounds = [result.data.outbound, ...filterdoutbounds];
+					}
 					await invalidateAll();
 				} else {
 					await applyAction(result);

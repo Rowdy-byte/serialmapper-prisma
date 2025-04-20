@@ -3,8 +3,6 @@
 	let { children } = $props();
 </script>
 
-<div
-	class="prose container mx-auto mb-4 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md"
->
+<div class="prose mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 	{@render children()}
 </div>

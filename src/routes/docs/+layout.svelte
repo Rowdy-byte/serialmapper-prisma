@@ -4,7 +4,7 @@
 </script>
 
 <div
-	class="prose mx-auto flex h-full w-full max-w-4xl flex-col items-center justify-center gap-4 bg-gray-950 p-4 text-white"
+	class="prose container mx-auto mb-4 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 shadow-md"
 >
 	{@render children()}
 </div>

@@ -439,7 +439,7 @@
 	</section>
 	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 		<section
-			class="order-2 grid grid-cols-2 gap-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-4"
+			class="order-3 grid grid-cols-2 gap-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-4"
 		>
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
@@ -447,7 +447,7 @@
 			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
 		</section>
 
-		<section class="order-3 flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-2">
+		<section class="order-1 flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-2">
 			<h1 class="flex items-center justify-between pb-4 font-bold">Outbound</h1>
 			<form
 				class="flex flex-col gap-4"
@@ -523,7 +523,7 @@
 			</form>
 		</section>
 
-		<section class="order-5 flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-3">
+		<section class="order-2 flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-3">
 			<h1 class="flex items-center justify-between pb-4 font-bold">
 				Move Batch of Products to Outbound
 			</h1>

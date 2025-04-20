@@ -27,8 +27,8 @@
 </script>
 
 <section class="sticky top-0 left-0 z-50 container mx-auto bg-gray-950 p-2 md:p-0">
-	<nav class=" flex items-center justify-between py-8">
-		<section class="flex items-center rounded-full bg-transparent">
+	<nav class=" flex items-center justify-between pt-8">
+		<section class="flex items-center rounded bg-transparent">
 			<!-- <a class="flex items-center justify-center text-2xl font-black italic" href="/"
 				>SN<span class="text-md text-orange-500">mapper</span>
 			</a> -->

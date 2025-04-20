@@ -43,7 +43,7 @@
 <!-- <Hamburger bind:open --layer-width="24px" --layer-height="1px" --color="white" /> -->
 <!-- replace hamburger with button -->
 <button
-	class="rounded-full bg-gray-800 p-2 font-bold text-blue-500 hover:cursor-pointer"
+	class="rounded bg-transparent p-2 font-bold text-blue-500 hover:cursor-pointer"
 	onclick={toggle}
 	aria-label="Toggle navigation menu"
 >

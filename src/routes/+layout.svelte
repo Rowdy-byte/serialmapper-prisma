@@ -28,11 +28,11 @@
 
 <section class="sticky top-0 left-0 z-50 container mx-auto bg-gray-950 p-2 md:p-0">
 	<nav class=" flex items-center justify-between py-8">
-		<section class="flex h-full items-center rounded-full bg-gray-900/40 p-2">
-			<a class="flex items-center justify-center text-2xl font-black italic" href="/"
+		<section class="flex items-center rounded-full bg-transparent">
+			<!-- <a class="flex items-center justify-center text-2xl font-black italic" href="/"
 				>SN<span class="text-md text-orange-500">mapper</span>
-			</a>
-			<!-- <img class="w-32" src="/logo.png" alt="serialmapper-logo" /> -->
+			</a> -->
+			<img class="w-32" src="/logo.png" alt="serialmapper-logo" />
 		</section>
 		<!-- <section class="ml-1 flex h-2 w-full flex-col rounded-lg bg-gray-900 p-1 shadow-md"></section> -->
 		<section class="flex h-full items-center gap-2">
@@ -53,7 +53,7 @@
 						>
 					{/if}
 				{/each}
-				<a href="/docs" class="ml-8 rounded bg-orange-500 px-2 font-bold">DOCS</a>
+				<a href="/docs" class="ml-8 rounded bg-[#f5812c] px-2 font-bold">DOCS</a>
 			</div>
 			<div class="text-white md:hidden">
 				<HamburgerMenu />

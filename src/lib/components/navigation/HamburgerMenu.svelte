@@ -40,13 +40,23 @@
 	});
 </script>
 
-<Hamburger bind:open --layer-width="24px" --layer-height="1px" --color="white" />
+<!-- <Hamburger bind:open --layer-width="24px" --layer-height="1px" --color="white" /> -->
+<!-- replace hamburger with button -->
+<button
+	class="rounded-full bg-gray-800 p-2 font-bold text-blue-500 hover:cursor-pointer"
+	onclick={toggle}
+	aria-label="Toggle navigation menu"
+>
+	OPTIONS
+</button>
+
+<!-- <Hamburger bind:open /> -->
 
 {#if open}
 	<nav
 		use:clickOutside
 		transition:fade={{ duration: 200 }}
-		class=" absolute top-20 left-0 z-10 flex h-96 w-full items-center justify-center border-b-1 border-slate-500 bg-gray-950 text-white"
+		class=" absolute left-0 z-10 flex h-96 w-full items-center justify-center border-b-1 border-slate-500 bg-gray-950 text-white"
 	>
 		<div class="flex flex-col gap-1 p-4 text-start text-xl font-bold">
 			{#each links as { linkName, linkPath }}

@@ -47,7 +47,7 @@
 	onclick={toggle}
 	aria-label="Toggle navigation menu"
 >
-	OPTIONS
+	MENU
 </button>
 
 <!-- <Hamburger bind:open /> -->
@@ -56,7 +56,7 @@
 	<nav
 		use:clickOutside
 		transition:fade={{ duration: 200 }}
-		class=" absolute left-0 z-10 flex h-96 w-full items-center justify-center border-b-1 border-slate-500 bg-gray-950 text-white"
+		class=" absolute top-0 left-0 z-10 flex h-96 w-full items-center justify-center border-b-1 border-slate-500 bg-gray-950 text-white"
 	>
 		<div class="flex flex-col gap-1 p-4 text-start text-xl font-bold">
 			{#each links as { linkName, linkPath }}

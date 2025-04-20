@@ -18,3 +18,13 @@ To get started, follow these steps:
    - **Client**: The client associated with the inbound.
    - **Description**: A brief description of the inbound.
 3. Click on the **Create Inbound** button.
+
+<!-- img max width 50% -->
+
+![Alt text](/docs/create-inbound.png 'a title')
+
+4. You will see a success message indicating that the inbound has been created successfully. No inboundnumber is generated at this point. As the text in orange indicates.
+
+![Alt text](/docs/create-inbound2.png 'a title')
+
+5. Click on eye icon to view the inbound details.

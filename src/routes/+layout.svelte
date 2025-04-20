@@ -26,7 +26,7 @@
 	];
 </script>
 
-<section class="sticky top-0 left-0 z-50 container mx-auto bg-gray-950">
+<section class="sticky top-0 left-0 z-50 container mx-auto bg-gray-950 p-2 md:p-0">
 	<nav class=" flex items-center justify-between py-8">
 		<section class="flex h-full items-center rounded-full bg-gray-900/40 p-2">
 			<a class="flex items-center justify-center text-2xl font-black italic" href="/"

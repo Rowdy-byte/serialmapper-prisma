@@ -29,10 +29,12 @@
 <section class="sticky top-0 left-0 z-50 container mx-auto bg-gray-950 p-2 md:p-0">
 	<nav class=" flex items-center justify-between pt-8">
 		<section class="flex items-center rounded bg-transparent">
-			<!-- <a class="flex items-center justify-center text-2xl font-black italic" href="/"
-				>SN<span class="text-md text-orange-500">mapper</span>
-			</a> -->
-			<img class="w-32" src="/logo.png" alt="serialmapper-logo" />
+			<a class="flex items-center justify-center text-2xl font-black italic" href="/">
+				<!-- SN<span class="text-md text-orange-500">mapper</span> -->
+			</a>
+			<a class="" href="/">
+				<img class="w-32" src="/logo.png" alt="serialmapper-logo" />
+			</a>
 		</section>
 		<!-- <section class="ml-1 flex h-2 w-full flex-col rounded-lg bg-gray-900 p-1 shadow-md"></section> -->
 		<section class="flex h-full items-center gap-2">

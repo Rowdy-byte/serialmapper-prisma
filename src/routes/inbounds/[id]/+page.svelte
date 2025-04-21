@@ -680,34 +680,25 @@
 						placeholder="Value €"
 						class="input input-neutral w-full text-gray-300"
 					/>
+
 					<textarea
-						disabled={isAddingInboundProduct}
-						name="serialnumber"
-						placeholder="Enter One Serialnumber"
-						class="textarea textarea-neutral h-24 w-full text-gray-300"
+						disabled={isAddingBatchInboundProduct}
+						bind:value={scannedResults}
+						name="batch"
+						placeholder="Paste or Enter Batch Serialnumbers (space separated)"
+						class="textarea textarea-neutral h-24 w-full"
 					></textarea>
-					<PrimaryBtn disabled={isAddingInboundProduct} type={'submit'} onclick={handleAddSingle}
-						>Add One</PrimaryBtn
-					>
-					<section class="flex flex-col gap-4 pt-8">
-						<textarea
+					<div>
+						<PrimaryBtn
 							disabled={isAddingBatchInboundProduct}
-							bind:value={scannedResults}
-							name="batch"
-							placeholder="Paste or Enter Batch Serialnumbers (space separated)"
-							class="textarea textarea-neutral h-24 w-full"
-						></textarea>
-						<div>
-							<PrimaryBtn
-								disabled={isAddingBatchInboundProduct}
-								type={'submit'}
-								formaction="?/addBatchInboundProductToInbound"
-								onclick={handleAddBatch}
-							>
-								Add Batch
-							</PrimaryBtn>
-						</div>
-					</section>
+							type={'submit'}
+							formaction="?/addBatchInboundProductToInbound"
+							onclick={handleAddBatch}
+						>
+							Add Batch
+						</PrimaryBtn>
+					</div>
+
 					<div class="scanner-ui">
 						{#if cameras.length > 0}
 							<label

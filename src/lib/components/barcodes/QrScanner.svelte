@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { Html5QrcodeScanner } from 'html5-qrcode';
+	import { onMount, onDestroy } from 'svelte';
 
-	let { scannedResults = $bindable(), ...props } = $props();
+	let scannedResults = '';
 
 	function onScanSuccess(decodedText: string) {
 		if (!scannedResults.includes(decodedText)) {
@@ -13,14 +14,22 @@
 		// meestal negeren
 	}
 
-	$effect(() => {
-		const scanner = new Html5QrcodeScanner(
+	let scanner: Html5QrcodeScanner;
+
+	onMount(() => {
+		scanner = new Html5QrcodeScanner(
 			'reader',
-			{ fps: 10, qrbox: { width: 400, height: 250 } },
-			false // geen verbose logs
+			{ fps: 10, qrbox: { width: 250, height: 250 } },
+			false
 		);
 
 		scanner.render(onScanSuccess, onScanFailure);
+	});
+
+	onDestroy(() => {
+		if (scanner) {
+			scanner.clear().catch((e) => console.error('Error clearing scanner', e));
+		}
 	});
 </script>
 

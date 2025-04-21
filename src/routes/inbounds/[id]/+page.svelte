@@ -629,12 +629,12 @@
 						>Add One</PrimaryBtn
 					>
 					<section class="flex flex-col gap-4 pt-8">
-						<textarea
+						<QrScanner
 							disabled={isAddingBatchInboundProduct}
 							name="batch"
 							placeholder="Paste or Enter Batch Serialnumbers (space separated)"
 							class="textarea textarea-neutral h-24 w-full"
-						></textarea>
+						></QrScanner>
 						<div>
 							<PrimaryBtn
 								disabled={isAddingBatchInboundProduct}
@@ -649,9 +649,9 @@
 				</form>
 			</section>
 		</section>
-		<section>
-			<QrScanner />
-		</section>
+		<!-- <section>
+			<QrScanner  bind:value={}/>
+		</section> -->
 		<section
 			class="order-3 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 text-gray-300 shadow-md"
 		>

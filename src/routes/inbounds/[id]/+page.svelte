@@ -649,7 +649,7 @@
 				</form>
 			</section>
 		</section>
-		<section>
+		<section class="order-5 flex flex-col rounded-lg bg-gray-900/40 p-4 text-gray-300 shadow-md">
 			<QrScanner />
 		</section>
 		<section

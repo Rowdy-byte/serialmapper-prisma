@@ -364,8 +364,9 @@
 				{ deviceId: { exact: selectedCameraId } },
 				config,
 				(decodedText: string, decodedResult: Html5QrcodeResult) => {
-					if (!scannedResults.includes(decodedText)) {
-						scannedResults += decodedText + '\n';
+					if (!scannedResults.split(/[\s,\n]+/).includes(decodedText.trim())) {
+						scannedResults +=
+							scannedResults.trim().length > 0 ? '\n' + decodedText.trim() : decodedText.trim();
 					}
 				},
 				(errorMessage: string) => {

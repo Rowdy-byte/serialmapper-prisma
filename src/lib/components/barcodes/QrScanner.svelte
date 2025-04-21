@@ -90,9 +90,12 @@
 		{/if}
 	</div>
 
-	<textarea
-		bind:value={scannedResults}
-		rows="6"
-		class="textarea textarea-neutral mx-auto mt-4 block w-full max-w-md rounded border p-2"
-	></textarea>
+	<form action="?/addBatchInboundProductToInbound" method="post">
+		<textarea
+			bind:value={scannedResults}
+			rows="6"
+			class="textarea textarea-neutral mx-auto mt-4 block w-full max-w-md rounded border p-2"
+		></textarea>
+		<button type="submit" class="btn btn-neutral mt-4">Add Scan</button>
+	</form>
 </div>

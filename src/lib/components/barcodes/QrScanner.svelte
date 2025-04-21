@@ -1,47 +1,25 @@
 <script lang="ts">
-	import { Html5Qrcode } from 'html5-qrcode';
-	import { onDestroy } from 'svelte';
-
-	let qrScanner: Html5Qrcode | null = $state(null);
-	let scannerElementId = 'qr-reader';
+	import { onMount } from 'svelte';
+	import { Html5QrcodeScanner } from 'html5-qrcode';
 
 	function onScanSuccess(decodedText: string) {
-		console.log('QR Code gescand:', decodedText);
-		// Hier kun je bijvoorbeeld een store updaten of een fetch doen
+		console.log('✅ QR Code gevonden:', decodedText);
+		// hier kun je evt. redirect of actie doen
 	}
 
-	$effect(() => {
-		qrScanner = new Html5Qrcode(scannerElementId);
+	function onScanFailure(error: string) {
+		// console.warn("⛔ Scan fout:", error); // optioneel
+	}
 
-		qrScanner.start(
-			{ facingMode: 'environment' },
-			{ fps: 10, qrbox: 250 },
-			onScanSuccess,
-			(errorMessage) => {
-				console.warn('Scan error:', errorMessage);
-			}
+	onMount(() => {
+		const scanner = new Html5QrcodeScanner(
+			'reader',
+			{ fps: 10, qrbox: { width: 250, height: 250 } },
+			false // verbose logging aan/uit
 		);
 
-		return () => {
-			qrScanner?.stop().then(() => {
-				qrScanner?.clear();
-			});
-		};
-	});
-
-	onDestroy(() => {
-		qrScanner?.stop().then(() => {
-			qrScanner?.clear();
-		});
+		scanner.render(onScanSuccess, onScanFailure);
 	});
 </script>
 
-<div id={scannerElementId}></div>
-
-<style>
-	#qr-reader {
-		width: 100%;
-		max-width: 400px;
-		margin: auto;
-	}
-</style>
+<div id="reader" class="mx-auto" style="width: 100%; max-width: 400px;"></div>

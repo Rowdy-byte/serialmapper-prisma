@@ -23,9 +23,6 @@ importers:
       chart.js:
         specifier: ^4.4.8
         version: 4.4.8
-      html5-qrcode:
-        specifier: ^2.3.8
-        version: 2.3.8
       jimp:
         specifier: ^1.6.0
         version: 1.6.0
@@ -105,6 +102,9 @@ importers:
       globals:
         specifier: ^16.0.0
         version: 16.0.0
+      html5-qrcode:
+        specifier: ^2.3.8
+        version: 2.3.8
       mdsvex:
         specifier: ^0.12.3
         version: 0.12.3(svelte@5.20.5)

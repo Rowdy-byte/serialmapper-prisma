@@ -174,7 +174,7 @@ export const actions = {
 
 
         const batch = (formData.get('batch') as string)
-            .split(/[\s\n]+/)
+            .split(/[\s,\n]+/)
             .map(serialnumber => serialnumber.trim())
             .filter(serialnumber => serialnumber.length > 0);
 

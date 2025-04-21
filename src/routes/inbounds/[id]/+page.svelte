@@ -27,6 +27,7 @@
 	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { fade } from 'svelte/transition';
+	import QrScanner from '$lib/components/barcodes/QrScanner.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -647,6 +648,9 @@
 					</section>
 				</form>
 			</section>
+		</section>
+		<section>
+			<QrScanner />
 		</section>
 		<section
 			class="order-3 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 text-gray-300 shadow-md"

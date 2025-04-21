@@ -27,13 +27,13 @@
 </script>
 
 <section class="sticky top-0 left-0 z-50 w-full bg-gray-950 p-2 md:p-0">
-	<nav class=" mx-auto flex w-full max-w-4xl items-center justify-between pt-8">
+	<nav class="container mx-auto flex w-full items-center justify-between">
 		<section class="flex items-center rounded">
 			<a class="flex items-center justify-center text-2xl font-black italic" href="/">
 				<!-- SN<span class="text-md text-orange-500">mapper</span> -->
 			</a>
 			<a class="" href="/">
-				<img class="logo" src="/logo.png" alt="serialmapper-logo" />
+				<img class="logo w-24 md:w-28" src="/logo.png" alt="serialmapper-logo" />
 			</a>
 		</section>
 		<!-- <section class="ml-1 flex h-2 w-full flex-col rounded-lg bg-gray-900 p-1 shadow-md"></section> -->
@@ -72,9 +72,3 @@
 	{/key}
 </main>
 <Footer />
-
-<style>
-	.logo {
-		width: 128px;
-	}
-</style>

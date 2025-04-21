@@ -9,7 +9,6 @@
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 	import { toastStyleErr } from '$lib/components/toast/toastStyle';
 	import { toastStyleSucc } from '$lib/components/toast/toastStyle';
-	import { Html5Qrcode } from 'html5-qrcode';
 
 	let { data, form }: PageProps = $props();
 

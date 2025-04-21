@@ -28,6 +28,15 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { fade } from 'svelte/transition';
 	import QrScanner from '$lib/components/barcodes/QrScanner.svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import { Html5Qrcode } from 'html5-qrcode';
+	import type { Html5QrcodeCameraScanConfig, Html5QrcodeResult } from 'html5-qrcode';
+
+	let scannedResults = $state('');
+	let scanning = $state(false);
+	let html5QrCode: Html5Qrcode | undefined = $state();
+	let cameras = $state<Array<{ id: string; label: string }>>([]);
+	let selectedCameraId = $state<string | null>(null);
 
 	let { data }: PageProps = $props();
 
@@ -327,6 +336,58 @@
 						status: product.status
 					}).some((value) => value?.toLowerCase().includes(lowerCaseQuery)))
 		);
+	});
+
+	onMount(async () => {
+		try {
+			const devices = await Html5Qrcode.getCameras();
+			cameras = devices;
+			if (devices.length > 0) {
+				selectedCameraId = devices[0].id;
+			}
+		} catch (err) {
+			console.error('Camera ophalen faalde:', err);
+		}
+	});
+
+	async function startScanner() {
+		if (!selectedCameraId) return;
+
+		html5QrCode = new Html5Qrcode('reader');
+		const config: Html5QrcodeCameraScanConfig = {
+			fps: 10,
+			qrbox: { width: 250, height: 250 }
+		};
+
+		try {
+			await html5QrCode.start(
+				{ deviceId: { exact: selectedCameraId } },
+				config,
+				(decodedText: string, decodedResult: Html5QrcodeResult) => {
+					if (!scannedResults.includes(decodedText)) {
+						scannedResults += decodedText + '\n';
+					}
+				},
+				(errorMessage: string) => {
+					console.warn(errorMessage);
+				}
+			);
+			scanning = true;
+		} catch (err) {
+			console.error('Start scanner faalde:', err);
+		}
+	}
+
+	async function stopScanner() {
+		if (html5QrCode && scanning) {
+			await html5QrCode.stop();
+			await html5QrCode.clear();
+			scanning = false;
+		}
+	}
+
+	onDestroy(() => {
+		stopScanner();
 	});
 
 	$effect(() => {
@@ -631,6 +692,7 @@
 					<section class="flex flex-col gap-4 pt-8">
 						<textarea
 							disabled={isAddingBatchInboundProduct}
+							bind:value={scannedResults}
 							name="batch"
 							placeholder="Paste or Enter Batch Serialnumbers (space separated)"
 							class="textarea textarea-neutral h-24 w-full"
@@ -646,12 +708,41 @@
 							</PrimaryBtn>
 						</div>
 					</section>
+					<div class="scanner-ui">
+						{#if cameras.length > 0}
+							<label
+								for="camera-select"
+								class="flex items-center justify-between pb-4 font-bold text-gray-300"
+								>Choose Camera:</label
+							>
+							<select
+								id="camera-select"
+								bind:value={selectedCameraId}
+								disabled={scanning}
+								class="select select-neutral mb-4"
+							>
+								{#each cameras as cam}
+									<option value={cam.id}>{cam.label || 'Camera without name'}</option>
+								{/each}
+							</select>
+						{:else}
+							<p>No camera found or no permission.</p>
+						{/if}
+
+						<div id="reader" class="mx-auto w-full max-w-md rounded border"></div>
+
+						<div class="controls mt-4 text-center">
+							{#if !scanning}
+								<button onclick={startScanner} class="btn btn-neutral">Start scanner</button>
+							{:else}
+								<button onclick={stopScanner} class="btn btn-neutral">Stop scanner</button>
+							{/if}
+						</div>
+					</div>
 				</form>
 			</section>
 		</section>
-		<section class="order-4 flex flex-col rounded-lg bg-gray-900/40 p-4 text-gray-300 shadow-md">
-			<QrScanner />
-		</section>
+
 		<section
 			class="order-3 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 text-gray-300 shadow-md"
 		>

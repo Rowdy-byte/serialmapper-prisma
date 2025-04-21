@@ -649,7 +649,7 @@
 				</form>
 			</section>
 		</section>
-		<section class="order-5 flex flex-col rounded-lg bg-gray-900/40 p-4 text-gray-300 shadow-md">
+		<section class="order-4 flex flex-col rounded-lg bg-gray-900/40 p-4 text-gray-300 shadow-md">
 			<QrScanner />
 		</section>
 		<section
@@ -734,7 +734,7 @@
 			</form>
 		</section>
 		<section
-			class="order-4 grid grid-cols-2 gap-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-4"
+			class="order-5 grid grid-cols-2 gap-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-4"
 		>
 			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
 			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />

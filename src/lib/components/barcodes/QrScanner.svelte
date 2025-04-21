@@ -19,7 +19,12 @@
 	onMount(() => {
 		scanner = new Html5QrcodeScanner(
 			'reader',
-			{ fps: 10, qrbox: { width: 250, height: 250 } },
+			{
+				fps: 10,
+				qrbox: { width: 250, height: 250 },
+				rememberLastUsedCamera: true,
+				aspectRatio: 1.0
+			},
 			false
 		);
 

@@ -30,32 +30,35 @@
 	<nav class="container mx-auto flex w-full items-center justify-between">
 		<section class="flex items-center rounded">
 			<a class="flex items-center justify-center text-2xl font-black italic" href="/">
-				<!-- SN<span class="text-md text-orange-500">mapper</span> -->
+				SN<span class="text-md text-orange-500">mapper</span>
 			</a>
-			<a class="" href="/">
+			<!-- <a class="" href="/">
 				<img class="logo w-24 md:w-28" src="/logo.png" alt="serialmapper-logo" />
-			</a>
+			</a> -->
 		</section>
 		<!-- <section class="ml-1 flex h-2 w-full flex-col rounded-lg bg-gray-900 p-1 shadow-md"></section> -->
 		<section class="flex h-full items-center gap-2">
-			<div class="hidden items-center gap-2 md:flex">
+			<div class="hidden items-center gap-2 py-4 md:flex">
 				{#each links as { linkName, linkPath }}
 					{#if pathname !== linkPath}
 						<a
-							class="rounded-md p-2 font-bold text-gray-300 hover:cursor-pointer hover:bg-gray-800 hover:text-blue-500"
+							class="rounded-md p-2 font-medium text-gray-300 hover:cursor-pointer hover:bg-gray-800 hover:text-blue-500"
 							href={linkPath}
-							class:selected={pathname === linkPath}>{linkName.toUpperCase()}</a
+							class:selected={pathname === linkPath}>{linkName}</a
 						>
 					{/if}
 					{#if pathname === linkPath}
 						<a
-							class="rounded-md bg-gray-800 p-2 text-blue-500"
+							class="rounded-md bg-gray-800 p-2 font-bold text-blue-500"
 							href={linkPath}
-							class:selected={pathname === linkPath}>{linkName.toUpperCase()}</a
+							class:selected={pathname === linkPath}>{linkName}</a
 						>
 					{/if}
 				{/each}
-				<a href="/docs" class="ml-8 rounded-full bg-[#f5812c] px-4 py-2 font-bold">DOCS</a>
+				<a
+					href="/docs"
+					class="ml-8 rounded-lg bg-orange-500/40 px-4 py-2 font-bold hover:bg-orange-500">Docs</a
+				>
 			</div>
 			<div class="text-white md:hidden">
 				<HamburgerMenu />

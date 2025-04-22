@@ -77,6 +77,7 @@
 		<div class="flex flex-col gap-1 p-4 text-start text-xl font-bold">
 			<a
 				href="/docs"
+				onclick={toggle}
 				class=" rounded-lg border border-orange-500 px-4 py-2 font-bold text-orange-500 hover:bg-orange-500 hover:text-white"
 				>Docs</a
 			>

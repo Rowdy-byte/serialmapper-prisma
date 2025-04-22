@@ -26,7 +26,7 @@
 	];
 </script>
 
-<section class="sticky top-0 left-0 z-50 w-full bg-gray-950 p-2 md:p-0">
+<section class="sticky top-0 left-0 z-50 w-full bg-gray-950 p-2">
 	<nav class="container mx-auto flex w-full items-center justify-between">
 		<section class="flex items-center rounded">
 			<a class="flex items-center justify-center text-2xl font-black italic" href="/">

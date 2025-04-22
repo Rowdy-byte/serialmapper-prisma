@@ -723,11 +723,11 @@
 
 						<div id="reader" class="mx-auto w-full max-w-md rounded border"></div>
 
-						<div class="controls mt-4 text-center">
+						<div class="controls mt-4">
 							{#if !scanning}
-								<button onclick={startScanner} class="btn btn-neutral">Start scanner</button>
+								<PrimaryBtn onclick={startScanner} type={'button'}>Start Scanner</PrimaryBtn>
 							{:else}
-								<button onclick={stopScanner} class="btn btn-neutral">Stop scanner</button>
+								<PrimaryBtn onclick={stopScanner} type={'button'}>Stop Scanner</PrimaryBtn>
 							{/if}
 						</div>
 					</div>

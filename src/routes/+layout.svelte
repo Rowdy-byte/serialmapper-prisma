@@ -57,7 +57,8 @@
 				{/each}
 				<a
 					href="/docs"
-					class="ml-8 rounded-lg bg-orange-500/40 px-4 py-2 font-bold hover:bg-orange-500">Docs</a
+					class="ml-8 rounded-lg border border-orange-500 px-4 py-2 font-bold text-orange-500 hover:bg-orange-500 hover:text-white"
+					>Docs</a
 				>
 			</div>
 			<div class="text-white md:hidden">

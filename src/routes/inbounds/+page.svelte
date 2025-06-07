@@ -204,11 +204,7 @@
 						/>
 					</div>
 
-					<PrimaryBtn
-						disabled={form?.success || loading}
-						type="submit"
-						class="flex w-full items-center justify-center gap-2"
-					>
+					<PrimaryBtn disabled={form?.success || loading} type="submit">
 						{#if loading}
 							<div
 								class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"

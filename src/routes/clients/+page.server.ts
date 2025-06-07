@@ -18,7 +18,7 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
 
-    async default({ request }: { request: Request }) {
+    async createClient({ request }: { request: Request }) {
 
         await new Promise((fulfil) => setTimeout(fulfil, 2000));
 

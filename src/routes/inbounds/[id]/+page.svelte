@@ -614,6 +614,7 @@
 	<!-- Stats Overview -->
 	<div class="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
 		{#each stats as stat, index}
+			{@const IconComponent = stat.icon}
 			<div
 				class="rounded-xl border {stat.borderColor} {stat.bgColor} p-4 backdrop-blur-sm"
 				in:fly={{ y: 20, delay: index * 100 }}
@@ -625,7 +626,7 @@
 						<p class="text-xs text-gray-500">{stat.subtitle}</p>
 					</div>
 					<div class="rounded-lg {stat.bgColor} p-2">
-						<svelte:component this={stat.icon} class="h-4 w-4 {stat.color}" />
+						<IconComponent class="h-4 w-4 {stat.color}" />
 					</div>
 				</div>
 			</div>
@@ -655,9 +656,22 @@
 							try {
 								if (result.type === 'success') {
 									toast.success('Inbound updated successfully', toastStyleSucc);
-									if (result.data?.inbound) {
-										inbound = result.data.inbound;
-										refreshKey++;
+									if (
+										result.data?.inbound &&
+										typeof result.data.inbound === 'object' &&
+										result.data.inbound !== null &&
+										'id' in result.data.inbound
+									) {
+										const updatedInbound = result.data.inbound as typeof inbound;
+										if (
+											updatedInbound &&
+											'description' in updatedInbound &&
+											'clientName' in updatedInbound &&
+											'inboundNumber' in updatedInbound
+										) {
+											inbound = updatedInbound;
+											refreshKey++;
+										}
 									}
 								} else if (result.type === 'failure') {
 									toast.error('Update failed', toastStyleErr);
@@ -688,8 +702,11 @@
 					</div>
 
 					<div>
-						<label class="mb-2 block text-sm font-medium text-gray-300">Description</label>
+						<label for="description" class="mb-2 block text-sm font-medium text-gray-300"
+							>Description</label
+						>
 						<input
+							id="description"
 							disabled={isUpdatingInbound}
 							type="text"
 							name="description"
@@ -736,9 +753,22 @@
 							try {
 								if (result.type === 'success') {
 									toast.success('Product added successfully', toastStyleSucc);
-									if (result.data?.inbound) {
-										inbound = result.data.inbound;
-										refreshKey++;
+									if (
+										result.data?.inbound &&
+										typeof result.data.inbound === 'object' &&
+										result.data.inbound !== null &&
+										'id' in result.data.inbound
+									) {
+										const updatedInbound = result.data.inbound as typeof inbound;
+										if (
+											updatedInbound &&
+											'description' in updatedInbound &&
+											'clientName' in updatedInbound &&
+											'inboundNumber' in updatedInbound
+										) {
+											inbound = updatedInbound;
+											refreshKey++;
+										}
 									}
 								} else if (result.type === 'failure') {
 									toast.error('Failed to add product', toastStyleErr);
@@ -801,7 +831,6 @@
 						disabled={isAddingBatchInboundProduct}
 						type="submit"
 						formaction="?/addBatchInboundProductToInbound"
-						class="w-full"
 					>
 						Add Batch
 					</PrimaryBtn>
@@ -831,11 +860,9 @@
 
 						<div class="flex gap-2">
 							{#if !scanning}
-								<PrimaryBtn onclick={startScanner} type="button" class="flex-1">
-									Start Scanner
-								</PrimaryBtn>
+								<PrimaryBtn onclick={startScanner} type="button">Start Scanner</PrimaryBtn>
 							{:else}
-								<SecondaryBtn onclick={stopScanner} type="button" class="flex-1">
+								<SecondaryBtn onclick={stopScanner} type="button" dataTooltip="" tooltipTitle="">
 									Stop Scanner
 								</SecondaryBtn>
 							{/if}
@@ -878,7 +905,7 @@
 						name="excel"
 						accept=".xlsx"
 					/>
-					<PrimaryBtn type="submit" class="w-full">Upload File</PrimaryBtn>
+					<PrimaryBtn type="submit">Upload File</PrimaryBtn>
 				</form>
 			</div>
 		</aside>

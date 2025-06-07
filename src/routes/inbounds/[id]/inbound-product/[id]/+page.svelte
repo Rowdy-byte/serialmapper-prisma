@@ -224,12 +224,16 @@
 					>
 						<ArrowLeft class="h-5 w-5" />
 					</a>
-					<div>
-						<h1 class="text-3xl font-bold tracking-tight text-white">Inbound Product Detail</h1>
-						<div class="mt-1 flex items-center gap-2 text-sm text-gray-400">
-							<span>Inbound: <span class="font-mono">{inbound?.inboundNumber}</span></span>
+					<div class="">
+						<h1 class="flex items-center gap-2 text-3xl font-bold tracking-tight text-white">
+							<span class="">{inbound?.inboundNumber}</span>
 							<MoveRight class="h-4 w-4" />
-							<span>Product #{currentIndex + 1}</span>
+							<span class="flex items-center gap-2"
+								>Product <MoveRight class="h-4 w-4" /> {currentIndex + 1}</span
+							>
+						</h1>
+						<div class="mt-1 flex items-center gap-2 text-sm text-gray-400">
+							Inbound Product Details
 						</div>
 					</div>
 				</div>
@@ -325,8 +329,11 @@
 					>
 						<div class="grid gap-4 sm:grid-cols-2">
 							<div class="sm:col-span-2">
-								<label class="mb-2 block text-sm font-medium text-gray-300">Product Name</label>
+								<label for="product" class="mb-2 block text-sm font-medium text-gray-300"
+									>Product Name</label
+								>
 								<input
+									id="product"
 									bind:value={editForm.product}
 									name="product"
 									type="text"
@@ -337,8 +344,11 @@
 							</div>
 
 							<div>
-								<label class="mb-2 block text-sm font-medium text-gray-300">Serial Number</label>
+								<label for="serialnumber" class="mb-2 block text-sm font-medium text-gray-300"
+									>Serial Number</label
+								>
 								<input
+									id="serialnumber"
 									bind:value={editForm.serialnumber}
 									name="serialnumber"
 									type="text"
@@ -349,8 +359,11 @@
 							</div>
 
 							<div>
-								<label class="mb-2 block text-sm font-medium text-gray-300">Value (€)</label>
+								<label for="value" class="mb-2 block text-sm font-medium text-gray-300"
+									>Value (€)</label
+								>
 								<input
+									id="value"
 									bind:value={editForm.value}
 									name="value"
 									type="number"
@@ -363,12 +376,7 @@
 						</div>
 
 						<div class="flex gap-3 pt-4">
-							<PrimaryBtn
-								type="submit"
-								disabled={loading}
-								class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
-								onclick={handleUpdateInboundProduct}
-							>
+							<PrimaryBtn type="submit" disabled={loading} onclick={handleUpdateInboundProduct}>
 								{#if loading}
 									<div
 										class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
@@ -380,7 +388,12 @@
 								{/if}
 							</PrimaryBtn>
 
-							<SecondaryBtn onclick={cancelEditing} type="button" class="flex items-center gap-2">
+							<SecondaryBtn
+								onclick={cancelEditing}
+								type="button"
+								dataTooltip="cancel-edit"
+								tooltipTitle="Cancel editing"
+							>
 								<X class="h-4 w-4" />
 								Cancel
 							</SecondaryBtn>
@@ -468,9 +481,7 @@
 							<div class="rounded-lg bg-gray-800/30 p-4">
 								<span class="text-sm text-gray-400">Last Updated</span>
 								<p class="text-white">
-									{new Date(
-										currentProduct?.updatedAt || currentProduct?.createdAt || Date.now()
-									).toLocaleString()}
+									{new Date(currentProduct?.createdAt || Date.now()).toLocaleString()}
 								</p>
 							</div>
 						</div>

@@ -154,6 +154,140 @@
 		qrModalRef?.showModal();
 	}
 
+	function downloadQRCode(imageData: string, index: number) {
+		try {
+			const link = document.createElement('a');
+			link.href = imageData;
+			link.download = `qr-code-${inbound?.inboundNumber || 'inbound'}-${index}.png`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			toast.success(`QR Code #${index} downloaded`, toastStyleSucc);
+		} catch (error) {
+			console.error('Download error:', error);
+			toast.error('Failed to download QR code', toastStyleErr);
+		}
+	}
+
+	function downloadAllQRCodes() {
+		if (qrCodeImages.length === 0) {
+			toast.error('No QR codes to download', toastStyleErr);
+			return;
+		}
+
+		qrCodeImages.forEach((qr, index) => {
+			setTimeout(() => {
+				downloadQRCode(qr.image, index + 1);
+			}, index * 200); // Stagger downloads to avoid browser blocking
+		});
+
+		toast.success(`All ${qrCodeImages.length} QR codes downloaded`, toastStyleSucc);
+	}
+
+	function printAllQRCodes() {
+		if (qrCodeImages.length === 0) {
+			toast.error('No QR codes to print', toastStyleErr);
+			return;
+		}
+
+		const printWindow = window.open('', '_blank');
+		if (!printWindow) {
+			toast.error('Unable to open print window. Please allow popups.', toastStyleErr);
+			return;
+		}
+
+		const html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>QR Codes - ${inbound?.inboundNumber || 'Inbound'}</title>
+                <style>
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 0; 
+                        padding: 20px; 
+                        background: white;
+                        color: black;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 30px;
+                        border-bottom: 2px solid #333;
+                        padding-bottom: 20px;
+                    }
+                    .qr-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                        gap: 30px;
+                        margin-bottom: 30px;
+                    }
+                    .qr-item {
+                        text-align: center;
+                        border: 1px solid #ddd;
+                        padding: 20px;
+                        border-radius: 8px;
+                        page-break-inside: avoid;
+                    }
+                    .qr-item img {
+                        max-width: 150px;
+                        height: auto;
+                        margin-bottom: 10px;
+                    }
+                    .qr-info {
+                        font-size: 14px;
+                        color: #666;
+                    }
+                    @media print {
+                        body { margin: 0; padding: 10px; }
+                        .qr-item { break-inside: avoid; }
+                        @page { margin: 1cm; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>QR Codes for Inbound #${inbound?.inboundNumber || 'Unknown'}</h1>
+                    <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+                    <p>Total Items: ${qrCodeImages.reduce((sum, qr) => sum + qr.count, 0)}</p>
+                </div>
+                <div class="qr-grid">
+                    ${qrCodeImages
+											.map(
+												(qr, i) => `
+                        <div class="qr-item">
+                            <img src="${qr.image}" alt="QR Code ${i + 1}" />
+                            <div class="qr-info">
+                                <strong>QR Code #${i + 1}</strong><br>
+                                ${qr.count} item${qr.count === 1 ? '' : 's'}
+                            </div>
+                        </div>
+                    `
+											)
+											.join('')}
+                </div>
+            </body>
+            </html>
+        `;
+
+		try {
+			printWindow.document.write(html);
+			printWindow.document.close();
+
+			printWindow.onload = () => {
+				setTimeout(() => {
+					printWindow.print();
+					printWindow.close();
+				}, 500);
+			};
+
+			toast.success('QR codes sent to printer', toastStyleSucc);
+		} catch (error) {
+			console.error('Print error:', error);
+			toast.error('Failed to print QR codes', toastStyleErr);
+			printWindow.close();
+		}
+	}
+
 	const inboundProduct =
 		data.inboundProducts?.map((product) => (product.inboundId === inbound?.id ? product : null)) ||
 		[];
@@ -1200,22 +1334,175 @@
 
 <!-- QR Code Modal -->
 <dialog id="qr_modal" class="modal" bind:this={qrModalRef}>
-	<div class="modal-box max-w-4xl border border-gray-700 bg-gray-900 text-white">
-		<h3 class="mb-4 text-lg font-bold">QR Codes for Inbound</h3>
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+	<div
+		class="modal-box max-w-6xl border border-gray-700/50 bg-gray-900/95 text-white shadow-2xl backdrop-blur-sm"
+	>
+		<!-- Modal Header -->
+		<div class="mb-6 border-b border-gray-700/50 pb-4">
+			<div class="flex items-center justify-between">
+				<div class="flex items-center gap-3">
+					<div class="rounded-lg bg-blue-500/10 p-2">
+						<QrCode class="h-6 w-6 text-blue-400" />
+					</div>
+					<div>
+						<h3 class="text-xl font-bold text-white">QR Codes Generated</h3>
+						<p class="text-sm text-gray-400">
+							{qrCodeImages.length} QR code{qrCodeImages.length === 1 ? '' : 's'} for inbound #{inbound?.inboundNumber}
+						</p>
+					</div>
+				</div>
+				<form method="dialog">
+					<button
+						type="button"
+						class="rounded-lg bg-gray-800/50 p-2 text-gray-400 transition-colors hover:bg-gray-700/50 hover:text-white"
+						onclick={() => qrModalRef?.close()}
+					>
+						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</button>
+				</form>
+			</div>
+		</div>
+
+		<!-- QR Code Grid -->
+		<div class="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{#each qrCodeImages as { image, count }, i}
-				<div class="flex flex-col items-center gap-2 rounded-lg bg-white/5 p-4">
-					<img src={image} alt="QR Code {i + 1}" class="h-32 w-32" />
-					<span class="text-sm text-gray-300">QR {i + 1} – {count} items</span>
+				<div
+					class="group relative rounded-xl border border-gray-700/50 bg-gray-800/30 p-6 transition-all hover:border-blue-500/30 hover:bg-gray-800/50"
+				>
+					<!-- QR Code Image -->
+					<div class="mb-4 flex justify-center">
+						<div class="rounded-xl bg-white p-4 shadow-lg">
+							<img
+								src={image}
+								alt="QR Code {i + 1}"
+								class="h-32 w-32 transition-transform group-hover:scale-105"
+							/>
+						</div>
+					</div>
+
+					<!-- QR Code Info -->
+					<div class="space-y-2 text-center">
+						<div class="flex items-center justify-center gap-2">
+							<QrCode class="h-4 w-4 text-blue-400" />
+							<span class="font-medium text-white">QR Code #{i + 1}</span>
+						</div>
+						<div class="flex items-center justify-center gap-2 text-sm text-gray-400">
+							<Package class="h-3 w-3" />
+							<span>{count} item{count === 1 ? '' : 's'}</span>
+						</div>
+					</div>
+
+					<!-- Download Button -->
+					<button
+						type="button"
+						onclick={() => downloadQRCode(image, i + 1)}
+						class="absolute top-3 right-3 rounded-lg bg-blue-600/20 p-2 text-blue-400 opacity-0 transition-all group-hover:opacity-100 hover:bg-blue-600/30"
+						title="Download QR Code"
+					>
+						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+							/>
+						</svg>
+					</button>
 				</div>
 			{/each}
 		</div>
-		<div class="modal-action mt-6">
-			<form method="dialog">
-				<button class="btn btn-outline">Close</button>
-			</form>
+
+		<!-- Summary Stats -->
+		{#if qrCodeImages.length > 0}
+			<div
+				class="mb-6 grid grid-cols-2 gap-4 rounded-xl border border-gray-700/50 bg-gray-800/30 p-4"
+			>
+				<div class="text-center">
+					<div class="text-2xl font-bold text-white">
+						{qrCodeImages.reduce((sum, qr) => sum + qr.count, 0)}
+					</div>
+					<div class="text-sm text-gray-400">Total Items</div>
+				</div>
+				<div class="text-center">
+					<div class="text-2xl font-bold text-white">{qrCodeImages.length}</div>
+					<div class="text-sm text-gray-400">QR Codes</div>
+				</div>
+			</div>
+		{/if}
+
+		<!-- Modal Actions -->
+		<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+			<div class="flex items-center gap-2 text-sm text-gray-400">
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+					/>
+				</svg>
+				<span>Scan QR codes to quickly process items</span>
+			</div>
+
+			<div class="flex gap-3">
+				<!-- Download All Button -->
+				<button
+					type="button"
+					onclick={downloadAllQRCodes}
+					class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700"
+				>
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+						/>
+					</svg>
+					Download All
+				</button>
+
+				<!-- Print All Button -->
+				<button
+					type="button"
+					onclick={printAllQRCodes}
+					class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+				>
+					<Printer class="h-4 w-4" />
+					Print All
+				</button>
+
+				<!-- Close Button -->
+				<button
+					type="button"
+					onclick={() => qrModalRef?.close()}
+					class="inline-flex items-center gap-2 rounded-lg border border-gray-600 bg-gray-800/50 px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-700/50"
+				>
+					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
+					</svg>
+					Close
+				</button>
+			</div>
 		</div>
 	</div>
+
+	<!-- Modal Backdrop -->
+	<form method="dialog" class="modal-backdrop">
+		<button type="button" onclick={() => qrModalRef?.close()}>close</button>
+	</form>
 </dialog>
 
 <style>

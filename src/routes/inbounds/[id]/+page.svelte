@@ -8,11 +8,21 @@
 		Eye,
 		Printer,
 		QrCode,
-		ScanQrCode,
 		Search,
 		Sheet,
 		Trash2,
-		Upload
+		Upload,
+		Package,
+		TrendingUp,
+		Users,
+		DollarSign,
+		Clock,
+		BarChart3,
+		Camera,
+		Settings,
+		ArrowLeft,
+		CheckCircle,
+		AlertCircle
 	} from '@lucide/svelte';
 	import toast from 'svelte-french-toast';
 	import { utils, writeFileXLSX } from 'xlsx';
@@ -26,8 +36,7 @@
 	import PrimaryBtn from '$lib/components/PrimaryBtn.svelte';
 	import SecondaryBtn from '$lib/components/SecondaryBtn.svelte';
 	import { goto, invalidateAll } from '$app/navigation';
-	import { fade } from 'svelte/transition';
-	import QrScanner from '$lib/components/barcodes/QrScanner.svelte';
+	import { fade, fly } from 'svelte/transition';
 	import { onMount, onDestroy } from 'svelte';
 	import { Html5Qrcode } from 'html5-qrcode';
 	import type { Html5QrcodeCameraScanConfig, Html5QrcodeResult } from 'html5-qrcode';
@@ -51,6 +60,23 @@
 	let inboundProducts = $state(data.inboundProducts);
 
 	let refreshKey = $state<number>(0);
+	let searchQuery = $state('');
+	let productValue = $state(0);
+	let productRevenue = $state(0);
+	let productStatusIn = $state();
+	let productStatusOut = $state();
+	let timeSaved = $state(0);
+	let euroPerMinute = $state(0);
+	let timeSavedPerSerial = $state(0);
+	let inboundProductIds = $state<number[]>([]);
+	let limit = $state<number>() as undefined | number;
+	let limitedInboundProducts = $state<typeof inboundProducts>([]);
+	let qrCodeImages = $state<Array<{ image: string; count: number }>>([]);
+	let qrCodeLimit = $state<number | undefined>();
+	let qrModalRef = $state<HTMLDialogElement | null>(null);
+	let selectedSerials = $state<string>('');
+	let selectedClientName = $state('');
+	let filteredInboundProducts = $state<typeof inboundProducts>([]);
 
 	function updateInboundNumber(newNumber: string) {
 		if (inbound) {
@@ -66,54 +92,6 @@
 			refreshKey++;
 		}
 	}
-
-	let searchQuery = $state('');
-
-	let productValue = $state(0);
-	let productRevenue = $state(0);
-	let productStatusIn = $state();
-	let productStatusOut = $state();
-
-	let timeSaved = $state(0);
-	let euroPerMinute = $state(0);
-	let timeSavedPerSerial = $state(0);
-	let inboundProductIds = $state<number[]>([]);
-
-	let limit = $state<number>() as undefined | number;
-	let limitedInboundProducts = $state<typeof inboundProducts>([]);
-
-	type QrCodeData = {
-		image: string;
-		count: number;
-	};
-
-	let qrCodeImages = $state<QrCodeData[]>([]);
-	let qrCodeLimit = $state<number | undefined>(); // gebruikersinput voor aantal items per QR
-	let inboundProductId = $state<number | null>(null);
-
-	let qrModalRef = $state<HTMLDialogElement | null>(null);
-
-	let selectedSerials = $state<string>('');
-
-	let selectedClientName = $state('');
-
-	// Initialize selectedClientName after state declaration
-	$effect(() => {
-		selectedClientName = inbound?.clientName ?? '';
-	});
-
-	// Haal client naam uit localStorage bij laden
-	$effect(() => {
-		const saved = localStorage.getItem('selectedClientName');
-		if (saved) selectedClientName = saved;
-	});
-
-	// Sla nieuwe client naam op na wijziging
-	$effect(() => {
-		if (selectedClientName) {
-			localStorage.setItem('selectedClientName', selectedClientName);
-		}
-	});
 
 	function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 		const result: T[][] = [];
@@ -229,11 +207,22 @@
 		doc.save(`bulk_stickers_${inbound?.inboundNumber}.pdf`);
 	}
 
-	let filteredInboundProducts = $state<typeof inboundProducts>([]);
-
 	$effect(() => {
 		filteredInboundProducts =
 			inboundProducts?.filter((product) => product.inboundId === inbound?.id) || [];
+	});
+
+	// Haal client naam uit localStorage bij laden
+	$effect(() => {
+		const saved = localStorage.getItem('selectedClientName');
+		if (saved) selectedClientName = saved;
+	});
+
+	// Sla nieuwe client naam op na wijziging
+	$effect(() => {
+		if (selectedClientName) {
+			localStorage.setItem('selectedClientName', selectedClientName);
+		}
 	});
 
 	function handleDeleteInbound(event: Event) {
@@ -433,698 +422,786 @@
 		const numLimit = typeof limit === 'number' && limit > 0 ? limit : 10;
 		limitedInboundProducts = filteredInboundProducts?.slice(0, numLimit) || [];
 	});
+
+	// Initialize selectedClientName after state declaration
+	$effect(() => {
+		selectedClientName = inbound?.clientName ?? '';
+	});
+
+	// Haal client naam uit localStorage bij laden
+	$effect(() => {
+		const saved = localStorage.getItem('selectedClientName');
+		if (saved) selectedClientName = saved;
+	});
+
+	// Sla nieuwe client naam op na wijziging
+	$effect(() => {
+		if (selectedClientName) {
+			localStorage.setItem('selectedClientName', selectedClientName);
+		}
+	});
+
+	// Calculate stats for overview cards - moved to reactive derivation
+	let stats = $state([
+		{
+			title: 'Total Products',
+			value: 0,
+			subtitle: 'Items in inbound',
+			icon: Package,
+			color: 'text-blue-400',
+			bgColor: 'bg-blue-500/10',
+			borderColor: 'border-blue-500/20'
+		},
+		{
+			title: 'Total Value',
+			value: '€0.00',
+			subtitle: 'Inventory value',
+			icon: DollarSign,
+			color: 'text-green-400',
+			bgColor: 'bg-green-500/10',
+			borderColor: 'border-green-500/20'
+		},
+		{
+			title: 'Time Saved',
+			value: '0min',
+			subtitle: 'Per serial number',
+			icon: Clock,
+			color: 'text-purple-400',
+			bgColor: 'bg-purple-500/10',
+			borderColor: 'border-purple-500/20'
+		},
+		{
+			title: 'Selected Items',
+			value: 0,
+			subtitle: 'Ready for action',
+			icon: CheckCircle,
+			color: 'text-orange-400',
+			bgColor: 'bg-orange-500/10',
+			borderColor: 'border-orange-500/20'
+		}
+	]);
+
+	// Update stats reactively
+	$effect(() => {
+		stats = [
+			{
+				title: 'Total Products',
+				value: filteredInboundProducts?.length || 0,
+				subtitle: 'Items in inbound',
+				icon: Package,
+				color: 'text-blue-400',
+				bgColor: 'bg-blue-500/10',
+				borderColor: 'border-blue-500/20'
+			},
+			{
+				title: 'Total Value',
+				value: `€${productValue.toFixed(2)}`,
+				subtitle: 'Inventory value',
+				icon: DollarSign,
+				color: 'text-green-400',
+				bgColor: 'bg-green-500/10',
+				borderColor: 'border-green-500/20'
+			},
+			{
+				title: 'Time Saved',
+				value: `${timeSavedPerSerial}min`,
+				subtitle: 'Per serial number',
+				icon: Clock,
+				color: 'text-purple-400',
+				bgColor: 'bg-purple-500/10',
+				borderColor: 'border-purple-500/20'
+			},
+			{
+				title: 'Selected Items',
+				value: inboundProductIds.length,
+				subtitle: 'Ready for action',
+				icon: CheckCircle,
+				color: 'text-orange-400',
+				bgColor: 'bg-orange-500/10',
+				borderColor: 'border-orange-500/20'
+			}
+		];
+	});
 </script>
 
 <BackToTop scrollTo="scroll to top" />
+
+<!-- Loading Overlay -->
 {#if loading}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-		<span class="loader"></span>
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+		<div class="flex items-center gap-3 rounded-lg bg-gray-900 px-6 py-4 shadow-xl">
+			<div
+				class="h-8 w-8 animate-spin rounded-full border-4 border-gray-600 border-t-blue-500"
+			></div>
+			<span class="text-gray-300">Processing...</span>
+		</div>
 	</div>
 {/if}
 
-<div class="container mx-auto py-4">
-	<section
-		class="breadcrums text-md mb-4 flex items-center justify-between rounded-lg bg-gray-900/40 p-4 shadow-md"
-	>
-		<ul class="text-gray-500">
-			<li class="text-center">
-				<a href="/inbounds" class="font-bold transition-all">
-					<span class={`hover:text-blue-500 `}> Inbound: </span>
-					{#key refreshKey}
-						<span
-							transition:fade
-							class={`hover:text-blue-500 ${inbound?.inboundNumber === '' ? 'text-[8px] font-normal text-orange-500 italic' : ''}`}
+<div class="container mx-auto max-w-7xl px-4 py-6">
+	<!-- Page Header -->
+	<div class="mb-8">
+		<div class="border-b border-gray-700 pb-6">
+			<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+				<div class="flex items-center gap-4">
+					<a
+						href="/inbounds"
+						class="rounded-lg bg-gray-800/50 p-2 text-gray-400 transition-colors hover:text-white"
+					>
+						<ArrowLeft class="h-5 w-5" />
+					</a>
+					<div>
+						<h1 class="text-3xl font-bold tracking-tight text-white">
+							{#key refreshKey}
+								<span transition:fade>
+									{inbound?.inboundNumber === '' ? 'Pending Inbound' : inbound?.inboundNumber}
+								</span>
+							{/key}
+						</h1>
+						<p class="mt-1 text-sm text-gray-400">
+							{inbound?.description || 'No description'}
+						</p>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-2">
+					<span
+						class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {inbound?.isSubscribed
+							? 'bg-blue-500/20 text-blue-400'
+							: 'bg-gray-500/20 text-gray-400'}"
+					>
+						{inbound?.isSubscribed ? 'T1 Client' : 'EXA Client'}
+					</span>
+
+					<!-- Delete Button -->
+					<form
+						method="post"
+						action="?/deleteInbound"
+						use:enhance={() => {
+							return async ({ result, update }) => {
+								try {
+									if (result.type === 'failure') {
+										toast.error('Cannot delete inbound with products', toastStyleErr);
+									}
+									if (result.type === 'success') {
+										toast.success('Inbound deleted successfully', toastStyleSucc);
+										goto('/inbounds');
+									}
+								} finally {
+									loading = false;
+								}
+							};
+						}}
+					>
+						<button
+							type="submit"
+							onclick={(e) => {
+								if (!confirm('Are you sure you want to delete this inbound?')) {
+									e.preventDefault();
+								}
+							}}
+							class="rounded-lg border border-red-500/20 bg-red-600/10 p-2 text-red-400 transition-colors hover:bg-red-600/20"
+							title="Delete Inbound"
 						>
-							{inbound?.inboundNumber === ''
-								? 'Update Inbound to generate number'
-								: inbound?.inboundNumber}
-						</span>
-					{/key}
-				</a>
-			</li>
-		</ul>
-		<div class="flex items-center gap-2">
-			<form
-				method="post"
-				onsubmit={handleDeleteInbound}
-				action="?/deleteInbound"
-				use:enhance={() => {
-					return async ({ result, update }) => {
-						try {
-							if (result.type === 'failure') {
-								if (
-									result.data?.issues &&
-									Array.isArray(result.data.issues) &&
-									result.data.issues.length > 0
-								) {
-									toast.error(
-										result.data.issues
-											.map((issue: { message: string }) => issue.message)
-											.join(', '),
-										toastStyleErr
-									);
-								} else if (
-									result.data?.issues &&
-									typeof result.data.issues === 'object' &&
-									'message' in result.data.issues
-								) {
-									toast.error(result.data.issues.message as string, toastStyleErr);
-								} else {
-									toast.error('Inbound Has Products', toastStyleErr);
-								}
-							}
-							if (result.type === 'success') {
-								console.log(result);
-								toast.success('Inbound deleted successfully', toastStyleSucc);
-								goto('/inbounds');
-							}
-						} finally {
-							setTimeout(() => {
-								loading = false;
-							}, 3000);
-						}
-					};
-				}}
-			>
-				<SecondaryBtn
-					dataTooltip={'Delete Inbound'}
-					tooltipTitle={'Delete Inbound'}
-					type={'submit'}
-				>
-					<Trash2 />
-				</SecondaryBtn>
-			</form>
-			<div class="flex items-center gap-4"></div>
+							<Trash2 class="h-4 w-4" />
+						</button>
+					</form>
+				</div>
+			</div>
 		</div>
-	</section>
-	<main class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-		<section class="order-1 flex flex-col rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-2">
-			<h1 class="flex items-center justify-between pb-4 font-bold text-gray-300">Inbound</h1>
-			<form
-				class="flex flex-col gap-4"
-				method="post"
-				onsubmit={handleUpdateInbound}
-				action="?/updateInbound"
-				use:enhance={() => {
-					loading = true;
-					return async ({ result, update }: { result: any; update: () => Promise<void> }) => {
-						loading = true;
-						try {
-							if (result.type === 'failure') {
-								if (
-									result.data?.issues &&
-									Array.isArray(result.data.issues) &&
-									result.data.issues.length > 0
-								) {
-									toast.error(
-										result.data.issues
-											.map((issue: { message: string }) => issue.message)
-											.join(', '),
-										toastStyleErr
-									);
-								} else if (
-									result.data?.issues &&
-									typeof result.data.issues === 'object' &&
-									'message' in result.data.issues
-								) {
-									toast.error(result.data.issues.message as string, toastStyleErr);
-								} else {
-									toast.error('An error occurred');
-								}
-							} else if (result.type === 'success') {
-								toast.success('Inbound updated successfully', toastStyleSucc);
-								localStorage.setItem('selectedClientName', selectedClientName);
-								if (result.data && result.data.inbound) {
-									inbound = result.data.inbound;
-									refreshKey++;
-								}
-							} else {
-								await applyAction(result);
-							}
-						} finally {
-							setTimeout(() => {
-								loading = false;
-							}, 1000);
-							await invalidateAll();
-							window.location.reload();
-						}
-					};
-				}}
+	</div>
+
+	<!-- Stats Overview -->
+	<div class="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+		{#each stats as stat, index}
+			<div
+				class="rounded-xl border {stat.borderColor} {stat.bgColor} p-4 backdrop-blur-sm"
+				in:fly={{ y: 20, delay: index * 100 }}
 			>
-				<select
-					disabled={isUpdatingInbound}
-					class="select select-neutral w-full text-gray-300"
-					name="clientName"
-					bind:value={selectedClientName}
-				>
-					<option value="">-- Select Client --</option>
-					{#each clients || [] as client}
-						<option value={client.name}>{client.name}</option>
-					{/each}
-				</select>
+				<div class="flex items-center justify-between">
+					<div class="flex-1">
+						<p class="text-sm text-gray-400">{stat.title}</p>
+						<p class="mt-1 text-2xl font-bold text-white">{stat.value}</p>
+						<p class="text-xs text-gray-500">{stat.subtitle}</p>
+					</div>
+					<div class="rounded-lg {stat.bgColor} p-2">
+						<svelte:component this={stat.icon} class="h-4 w-4 {stat.color}" />
+					</div>
+				</div>
+			</div>
+		{/each}
+	</div>
 
-				<input
-					disabled={isUpdatingInbound}
-					type="text"
-					name="description"
-					value={inbound?.description}
-					class="input input-neutral w-full text-gray-300"
-				/>
+	<!-- Main Content Grid -->
+	<div class="grid gap-6 lg:grid-cols-12">
+		<!-- Left Sidebar - Forms -->
+		<aside class="space-y-6 lg:col-span-4">
+			<!-- Update Inbound Form -->
+			<div class="rounded-xl border border-gray-700/50 bg-gray-900/40 p-6 backdrop-blur-sm">
+				<div class="mb-4 flex items-center gap-3">
+					<div class="rounded-lg bg-blue-500/10 p-2">
+						<Settings class="h-5 w-5 text-blue-400" />
+					</div>
+					<h2 class="text-lg font-semibold text-white">Update Inbound</h2>
+				</div>
 
-				<fieldset class=" flex items-center rounded-lg bg-[#1d232a] p-4">
-					<legend class="text-sm text-gray-300">Customs</legend>
-					<input
-						type="checkbox"
-						name="isSubscribed"
-						checked={inbound?.isSubscribed}
-						value="on"
-						class="checkbox checkbox-xs chat-bubble-neutral"
-					/>
-				</fieldset>
-				<PrimaryBtn disabled={isUpdatingInbound} type={'submit'}>Update Inbound</PrimaryBtn>
-			</form>
-		</section>
-		<section class="order-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-3">
-			<section class="rounded-lg bg-gray-900/0 shadow-md">
-				<h1 class="flex items-center justify-between pb-4 font-bold text-gray-300">
-					Add Product to Inbound
-				</h1>
 				<form
-					class="flex flex-col gap-4"
+					class="space-y-4"
+					method="post"
+					action="?/updateInbound"
+					use:enhance={() => {
+						loading = true;
+						return async ({ result, update }) => {
+							try {
+								if (result.type === 'success') {
+									toast.success('Inbound updated successfully', toastStyleSucc);
+									if (result.data?.inbound) {
+										inbound = result.data.inbound;
+										refreshKey++;
+									}
+								} else if (result.type === 'failure') {
+									toast.error('Update failed', toastStyleErr);
+								}
+							} finally {
+								loading = false;
+								await invalidateAll();
+							}
+						};
+					}}
+				>
+					<div>
+						<label for="clientName" class="mb-2 block text-sm font-medium text-gray-300"
+							>Client</label
+						>
+						<select
+							id="clientName"
+							disabled={isUpdatingInbound}
+							class="select select-neutral w-full border-gray-600 bg-gray-800/50 text-gray-300"
+							name="clientName"
+							bind:value={selectedClientName}
+						>
+							<option value="">-- Select Client --</option>
+							{#each clients || [] as client}
+								<option value={client.name}>{client.name}</option>
+							{/each}
+						</select>
+					</div>
+
+					<div>
+						<label class="mb-2 block text-sm font-medium text-gray-300">Description</label>
+						<input
+							disabled={isUpdatingInbound}
+							type="text"
+							name="description"
+							value={inbound?.description}
+							class="input input-neutral w-full border-gray-600 bg-gray-800/50 text-gray-300"
+							placeholder="Enter description"
+						/>
+					</div>
+
+					<div class="flex items-center gap-3 rounded-lg bg-gray-800/30 p-4">
+						<input
+							type="checkbox"
+							id="isSubscribed"
+							name="isSubscribed"
+							checked={inbound?.isSubscribed}
+							value="on"
+							class="checkbox checkbox-sm"
+						/>
+						<label for="isSubscribed" class="text-sm text-gray-300">T1 Subscription</label>
+					</div>
+
+					<div class="w-full">
+						<PrimaryBtn disabled={isUpdatingInbound} type="submit">Update Inbound</PrimaryBtn>
+					</div>
+				</form>
+			</div>
+
+			<!-- Add Product Form -->
+			<div class="rounded-xl border border-gray-700/50 bg-gray-900/40 p-6 backdrop-blur-sm">
+				<div class="mb-4 flex items-center gap-3">
+					<div class="rounded-lg bg-green-500/10 p-2">
+						<Package class="h-5 w-5 text-green-400" />
+					</div>
+					<h2 class="text-lg font-semibold text-white">Add Products</h2>
+				</div>
+
+				<form
+					class="space-y-4"
 					action="?/addInboundProductToInbound"
-					enctype="multipart/form-data"
 					method="post"
 					use:enhance={() => {
 						loading = true;
-						return async ({ result, update }: { result: any; update: () => Promise<void> }) => {
-							loading = true;
+						return async ({ result, update }) => {
 							try {
-								if (result.type === 'failure') {
-									if (
-										result.data?.issues &&
-										Array.isArray(result.data.issues) &&
-										result.data.issues.length > 0
-									) {
-										toast.error(
-											result.data.issues
-												.map((issue: { message: string }) => issue.message)
-												.join(', '),
-											toastStyleErr
-										);
-									} else if (
-										result.data?.issues &&
-										typeof result.data.issues === 'object' &&
-										'message' in result.data.issues
-									) {
-										toast.error(result.data.issues.message as string, toastStyleErr);
-									} else {
-										toast.error('An error occurred');
-									}
-								} else if (result.type === 'success') {
-									toast.success('Inbound updated successfully', toastStyleSucc);
-									localStorage.setItem('selectedClientName', selectedClientName);
-									// Zorg ervoor dat de server de bijgewerkte inbound teruggeeft
-									if (result.data && result.data.inbound) {
+								if (result.type === 'success') {
+									toast.success('Product added successfully', toastStyleSucc);
+									if (result.data?.inbound) {
 										inbound = result.data.inbound;
-										// Verhoog de refreshKey om de key-block geforceerd te her-renderen
 										refreshKey++;
 									}
-								} else {
-									await applyAction(result);
+								} else if (result.type === 'failure') {
+									toast.error('Failed to add product', toastStyleErr);
 								}
 							} finally {
-								setTimeout(() => {
-									loading = false;
-								}, 1000);
+								loading = false;
 								await invalidateAll();
 							}
 						};
 					}}
 				>
 					<input hidden type="text" name="inboundId" value={inbound?.id} />
-					<!-- <input hidden type="text" name="inboundNumber" value={inbound?.inboundNumber} /> -->
-					<select
-						disabled={isAddingInboundProduct}
-						class="select select-neutral w-full text-gray-300"
-						name="product"
-					>
-						<option value="products">-- Select Product --</option>
-						{#if products}
-							{#each products as product}
-								<option value={product.name}>{product.number}</option>
-							{/each}
-						{/if}
-					</select>
-					<input
-						type="text"
-						name="value"
-						placeholder="Value €"
-						class="input input-neutral w-full text-gray-300"
-					/>
 
-					<textarea
-						disabled={isAddingBatchInboundProduct}
-						bind:value={scannedResults}
-						name="batch"
-						placeholder="Paste or Enter Batch Serialnumbers (space separated)"
-						class="textarea textarea-neutral h-24 w-full"
-					></textarea>
 					<div>
-						<PrimaryBtn
-							disabled={isAddingBatchInboundProduct}
-							type={'submit'}
-							formaction="?/addBatchInboundProductToInbound"
-							onclick={handleAddBatch}
+						<label for="product" class="mb-2 block text-sm font-medium text-gray-300">Product</label
 						>
-							Add Batch
-						</PrimaryBtn>
+						<select
+							id="product"
+							disabled={isAddingInboundProduct}
+							class="select select-neutral w-full border-gray-600 bg-gray-800/50 text-gray-300"
+							name="product"
+						>
+							<option value="">-- Select Product --</option>
+							{#if products}
+								{#each products as product}
+									<option value={product.name}>{product.number}</option>
+								{/each}
+							{/if}
+						</select>
 					</div>
 
-					<div class="scanner-ui">
-						{#if cameras.length > 0}
-							<label
-								for="camera-select"
-								class="flex items-center justify-between pb-4 font-bold text-gray-300"
-								>Choose Camera:</label
-							>
-							<select
-								id="camera-select"
-								bind:value={selectedCameraId}
-								disabled={scanning}
-								class="select select-neutral mb-4"
-							>
-								{#each cameras as cam}
-									<option value={cam.id}>{cam.label || 'Camera without name'}</option>
-								{/each}
-							</select>
-						{:else}
-							<p>No camera found or no permission.</p>
-						{/if}
+					<div>
+						<label for="value" class="mb-2 block text-sm font-medium text-gray-300">Value (€)</label
+						>
+						<input
+							id="value"
+							type="number"
+							step="0.01"
+							name="value"
+							placeholder="0.00"
+							class="input input-neutral w-full border-gray-600 bg-gray-800/50 text-gray-300"
+						/>
+					</div>
 
-						<div id="reader" class="mx-auto w-full max-w-md rounded border"></div>
+					<div>
+						<label for="batch" class="mb-2 block text-sm font-medium text-gray-300"
+							>Batch Serial Numbers</label
+						>
+						<textarea
+							id="batch"
+							disabled={isAddingBatchInboundProduct}
+							bind:value={scannedResults}
+							name="batch"
+							placeholder="Enter serial numbers (one per line or space separated)"
+							class="textarea textarea-neutral h-24 w-full border-gray-600 bg-gray-800/50 text-gray-300"
+						></textarea>
+					</div>
 
-						<div class="controls mt-4">
+					<PrimaryBtn
+						disabled={isAddingBatchInboundProduct}
+						type="submit"
+						formaction="?/addBatchInboundProductToInbound"
+						class="w-full"
+					>
+						Add Batch
+					</PrimaryBtn>
+				</form>
+
+				<!-- QR Scanner Section -->
+				<div class="mt-6 space-y-4">
+					<div class="flex items-center gap-3">
+						<div class="rounded-lg bg-purple-500/10 p-2">
+							<Camera class="h-5 w-5 text-purple-400" />
+						</div>
+						<h3 class="font-medium text-white">QR Scanner</h3>
+					</div>
+
+					{#if cameras.length > 0}
+						<select
+							bind:value={selectedCameraId}
+							disabled={scanning}
+							class="select select-neutral w-full border-gray-600 bg-gray-800/50 text-gray-300"
+						>
+							{#each cameras as cam}
+								<option value={cam.id}>{cam.label || 'Camera'}</option>
+							{/each}
+						</select>
+
+						<div id="reader" class="overflow-hidden rounded-lg border border-gray-600"></div>
+
+						<div class="flex gap-2">
 							{#if !scanning}
-								<PrimaryBtn onclick={startScanner} type={'button'}>Start Scanner</PrimaryBtn>
+								<PrimaryBtn onclick={startScanner} type="button" class="flex-1">
+									Start Scanner
+								</PrimaryBtn>
 							{:else}
-								<PrimaryBtn onclick={stopScanner} type={'button'}>Stop Scanner</PrimaryBtn>
+								<SecondaryBtn onclick={stopScanner} type="button" class="flex-1">
+									Stop Scanner
+								</SecondaryBtn>
 							{/if}
 						</div>
+					{:else}
+						<p class="text-sm text-gray-400">No cameras available</p>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Upload Excel -->
+			<div class="rounded-xl border border-gray-700/50 bg-gray-900/40 p-6 backdrop-blur-sm">
+				<div class="mb-4 flex items-center gap-3">
+					<div class="rounded-lg bg-orange-500/10 p-2">
+						<Upload class="h-5 w-5 text-orange-400" />
 					</div>
-				</form>
-			</section>
-		</section>
+					<h2 class="text-lg font-semibold text-white">Upload Excel</h2>
+				</div>
 
-		<section
-			class="order-3 flex flex-col gap-4 rounded-lg bg-gray-900/40 p-4 text-gray-300 shadow-md"
-		>
-			<h1 class="flex pb-4 font-bold text-gray-300">Upload from Excel</h1>
-			<form
-				action="?/uploadExcelInboundProducts"
-				enctype="multipart/form-data"
-				method="post"
-				use:enhance={() => {
-					return async ({ result, update }) => {
-						console.log(result);
-						if (result.type === 'failure') {
-							if (
-								result.data?.issues &&
-								Array.isArray(result.data.issues) &&
-								result.data.issues.length > 0
-							) {
-								toast.error(
-									result.data.issues.map((issue: { message: string }) => issue.message).join(', '),
-									toastStyleErr
-								);
-							} else if (
-								result.data?.issues &&
-								typeof result.data.issues === 'object' &&
-								'message' in result.data.issues
-							) {
-								toast.error(result.data.issues.message as string, toastStyleErr);
-							} else {
-								toast.error(
-									result.data?.message ? String(result.data.message) : 'An unknown error occurred',
-									toastStyleErr
-								);
+				<form
+					action="?/uploadExcelInboundProducts"
+					enctype="multipart/form-data"
+					method="post"
+					class="space-y-4"
+					use:enhance={() => {
+						return async ({ result, update }) => {
+							if (result.type === 'success') {
+								toast.success('Excel uploaded successfully', toastStyleSucc);
+								await invalidateAll();
+							} else if (result.type === 'failure') {
+								toast.error('Upload failed', toastStyleErr);
 							}
-						}
-						if (result.type === 'success') {
-							console.log(result);
-							const message =
-								typeof result.data?.message === 'string'
-									? result.data.message
-									: 'Upload successful';
-
-							// Update the local state with new data if available
-							if (result.data?.newProducts && Array.isArray(result.data.newProducts)) {
-								inboundProducts = [...(inboundProducts || []), ...result.data.newProducts];
-								// Force refresh the filtered products
-								filteredInboundProducts = inboundProducts.filter(
-									(product) => product.inboundId === inbound?.id
-								);
-								// Update the limited display
-								limitedInboundProducts = filteredInboundProducts.slice(0, limit);
-							}
-
-							toast.success(message, toastStyleSucc);
-							await invalidateAll();
-						} else {
-							await applyAction(result);
-						}
-						await update();
-					};
-				}}
-			>
-				<div class="">
+							await update();
+						};
+					}}
+				>
 					<input
-						class="file-input file-input-neutral mb-4 rounded-full text-gray-300"
+						class="file-input file-input-neutral w-full border-gray-600 bg-gray-800/50 text-gray-300"
 						type="file"
 						name="excel"
 						accept=".xlsx"
 					/>
-				</div>
-				<div>
-					<SecondaryBtn
-						disabled={isAddingBatchInboundProduct}
-						type={'submit'}
-						dataTooltip={'Upload with Excel'}
-						tooltipTitle={'Upload with Excel'}
-					>
-						<Upload />
-					</SecondaryBtn>
-				</div>
-			</form>
-		</section>
-		<section
-			class="order-5 grid grid-cols-2 gap-2 rounded-lg bg-gray-900/40 p-4 shadow-md lg:order-4"
-		>
-			<Stats statsName="VALUE" statsValue={productValue} prefix="€ " />
-			<Stats statsName="OLD REV" statsValue={productRevenue} prefix="€ " />
-			<Stats statsName="T-SAVED / SN" statsValue={timeSavedPerSerial} suffix=" min" />
-			<Stats statsName="EURO / MIN" statsValue={euroPerMinute} prefix="€ " />
-		</section>
-		<section
-			class="chart-status-section order-6 flex flex-col items-center justify-center rounded-lg bg-gray-900/40 p-4 shadow-md"
-		>
-			{#if filteredInboundProducts && filteredInboundProducts.length > 0}
-				<ChartPieInboundProducts {filteredInboundProducts} />
-			{:else}
-				<h1 class="text-300">No Chart Yet...</h1>
-			{/if}
-		</section>
-		<section
-			class="chart-status-section order-7 flex flex-col items-center justify-center rounded-lg bg-gray-900/40 p-4 shadow-md"
-		>
-			{#if productStatusIn && productStatusOut}
-				<ChartPieStatus {productStatusIn} {productStatusOut} />
-			{:else}
-				<h1 class="text-300">No Chart Yet...</h1>
-			{/if}
-		</section>
-		<section
-			class="bg-950 order-8 flex flex-col items-center justify-center rounded-lg p-4 shadow-md"
-		>
-			<dialog id="qr_modal" class="modal" bind:this={qrModalRef}>
-				<div class="modal-box bg-gray-950 text-white">
-					<h3 class="mb-4 text-lg font-bold">QR Codes</h3>
-					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-						{#each qrCodeImages as { image, count }, i}
-							<div class="flex flex-col items-center gap-2 rounded bg-white/5 p-4">
-								<img src={image} alt="QR Code {i + 1}" class="w-32" />
-								<span class="text-sm text-gray-300">QR {i + 1} – {count} pcs</span>
-							</div>
-						{/each}
+					<PrimaryBtn type="submit" class="w-full">Upload File</PrimaryBtn>
+				</form>
+			</div>
+		</aside>
+
+		<!-- Main Content -->
+		<main class="space-y-6 lg:col-span-8">
+			<!-- Charts Section -->
+			<div class="grid gap-6 md:grid-cols-2">
+				<!-- Product Distribution Chart -->
+				<div class="rounded-xl border border-gray-700/50 bg-gray-900/40 p-6 backdrop-blur-sm">
+					<div class="mb-4 flex items-center gap-3">
+						<div class="rounded-lg bg-blue-500/10 p-2">
+							<BarChart3 class="h-5 w-5 text-blue-400" />
+						</div>
+						<h3 class="text-lg font-semibold text-white">Product Distribution</h3>
 					</div>
-					<div class="modal-action mt-6">
-						<form method="dialog">
-							<button class="btn">Close</button>
+					{#if filteredInboundProducts && filteredInboundProducts.length > 0}
+						<ChartPieInboundProducts {filteredInboundProducts} />
+					{:else}
+						<div class="flex h-32 items-center justify-center text-gray-400">
+							<p>No data available</p>
+						</div>
+					{/if}
+				</div>
+
+				<!-- Status Chart -->
+				<div class="rounded-xl border border-gray-700/50 bg-gray-900/40 p-6 backdrop-blur-sm">
+					<div class="mb-4 flex items-center gap-3">
+						<div class="rounded-lg bg-green-500/10 p-2">
+							<TrendingUp class="h-5 w-5 text-green-400" />
+						</div>
+						<h3 class="text-lg font-semibold text-white">Status Overview</h3>
+					</div>
+					{#if productStatusIn && productStatusOut}
+						<ChartPieStatus {productStatusIn} {productStatusOut} />
+					{:else}
+						<div class="flex h-32 items-center justify-center text-gray-400">
+							<p>No status data</p>
+						</div>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Products Table -->
+			<div class="rounded-xl border border-gray-700/50 bg-gray-900/40 backdrop-blur-sm">
+				<!-- Table Header -->
+				<div class="border-b border-gray-700/50 p-6">
+					<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+						<h3 class="text-lg font-semibold text-white">Products</h3>
+
+						<!-- Controls -->
+						<div class="flex flex-wrap items-center gap-3">
+							<!-- Search -->
+							<div class="relative">
+								<input
+									bind:value={searchQuery}
+									type="text"
+									placeholder="Search products..."
+									class="input input-neutral w-full rounded-full border-gray-600 bg-gray-800/50 pr-4 pl-10 text-gray-300"
+								/>
+								<Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+							</div>
+
+							<!-- Limit -->
+							<input
+								type="number"
+								min="1"
+								max={filteredInboundProducts?.length || 1}
+								placeholder="Limit"
+								bind:value={limit}
+								class="input input-neutral w-20 border-gray-600 bg-gray-800/50 text-gray-300"
+							/>
+
+							<!-- QR Limit -->
+							<input
+								type="number"
+								min="1"
+								max="500"
+								placeholder="QR Qty"
+								bind:value={qrCodeLimit}
+								class="input input-neutral w-24 border-gray-600 bg-gray-800/50 text-gray-300"
+							/>
+						</div>
+					</div>
+
+					<!-- Action Buttons -->
+					<div class="mt-4 flex flex-wrap gap-2">
+						<button
+							onclick={copySelectedSerialsToClipboard}
+							class="btn btn-sm btn-outline gap-2"
+							title="Copy selected serial numbers"
+						>
+							<Copy class="h-4 w-4" />
+							Copy
+						</button>
+
+						<button
+							onclick={printSelectedLabels}
+							class="btn btn-sm btn-outline gap-2"
+							title="Print selected labels"
+						>
+							<Printer class="h-4 w-4" />
+							Print
+						</button>
+
+						<button
+							onclick={generateQRCodeForInbound}
+							class="btn btn-sm btn-outline gap-2"
+							title="Generate QR codes"
+						>
+							<QrCode class="h-4 w-4" />
+							QR Code
+						</button>
+
+						<button
+							onclick={mapSerialToWorksheet}
+							class="btn btn-sm btn-outline gap-2"
+							title="Export to Excel"
+						>
+							<Sheet class="h-4 w-4" />
+							Export
+						</button>
+
+						<!-- Delete Selected -->
+						<form
+							action="?/deleteInboundProducts"
+							method="post"
+							class="inline"
+							use:enhance={() => {
+								return async ({ result, update }) => {
+									if (result.type === 'success') {
+										toast.success('Products deleted', toastStyleSucc);
+										inboundProductIds = [];
+									}
+									await update();
+								};
+							}}
+						>
+							<input type="hidden" name="productIds" value={JSON.stringify(inboundProductIds)} />
+							<input type="hidden" name="inboundId" value={inbound?.id} />
+							<button
+								type="submit"
+								disabled={inboundProductIds.length === 0}
+								class="btn btn-sm btn-error gap-2"
+								title="Delete selected products"
+							>
+								<Trash2 class="h-4 w-4" />
+								Delete
+							</button>
 						</form>
 					</div>
 				</div>
-			</dialog>
-		</section>
-	</main>
 
-	<section class="mb-4 flex flex-col items-center justify-between gap-2 sm:flex-row">
-		<div class="flex gap-2">
-			<button
-				onclick={copySelectedSerialsToClipboard}
-				data-tooltip="Copy selected serialnumbers to clipboard"
-				title="Copy selected serialnumbers to clipboard"
-				class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-				><Copy size="24" strokeWidth="2px" /></button
-			>
-			<button
-				onclick={printSelectedLabels}
-				data-tooltip="Print selected labels"
-				title="Print selected labels"
-				class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-				><Printer size="24" strokeWidth="2px" /></button
-			>
-			<form
-				action="?/deleteInboundProducts"
-				method="post"
-				use:enhance={() => {
-					return async ({ result, update }) => {
-						if (result.type === 'success') {
-							// ✅ update de lokale UI state direct
-							const deletedIds = Array.isArray(result.data?.deletedIds)
-								? result.data.deletedIds
-								: (JSON.parse(
-										typeof result.data?.deletedIds === 'string' ? result.data.deletedIds : '[]'
-									) as number[]);
+				<!-- Desktop Table -->
+				<div class="hidden overflow-x-auto md:block">
+					<table class="table w-full">
+						<thead>
+							<tr class="border-b border-gray-700/50">
+								<th class="p-4">
+									<input
+										type="checkbox"
+										onchange={toggleSelectAll}
+										checked={(limitedInboundProducts ?? []).length > 0 &&
+											limitedInboundProducts?.every((p) => inboundProductIds.includes(p.id))}
+										class="checkbox checkbox-sm"
+									/>
+								</th>
+								<th class="p-4 text-left font-medium text-gray-300">#</th>
+								<th class="p-4 text-left font-medium text-gray-300">Product</th>
+								<th class="p-4 text-left font-medium text-gray-300">Serial Number</th>
+								<th class="p-4 text-left font-medium text-gray-300">Value</th>
+								<th class="p-4 text-left font-medium text-gray-300">Status</th>
+								<th class="p-4 text-left font-medium text-gray-300">Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#if limitedInboundProducts && limitedInboundProducts.length > 0}
+								{#each limitedInboundProducts as product, i (product.id)}
+									<tr
+										class="border-b border-gray-700/30 transition-colors hover:bg-gray-800/50"
+										transition:fade
+									>
+										<td class="p-4">
+											<input
+												type="checkbox"
+												onchange={() => toggleSelection(product.id)}
+												checked={inboundProductIds.includes(product.id)}
+												class="checkbox checkbox-sm"
+											/>
+										</td>
+										<td class="p-4 text-gray-300">{i + 1}</td>
+										<td class="p-4 text-gray-300">{product.product}</td>
+										<td class="p-4 font-mono text-sm text-gray-300">{product.serialnumber}</td>
+										<td class="p-4 text-gray-300">€{product.value || '0.00'}</td>
+										<td class="p-4">
+											<span
+												class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium {product.status ===
+												'IN'
+													? 'bg-green-500/20 text-green-400'
+													: 'bg-red-500/20 text-red-400'}"
+											>
+												{product.status}
+											</span>
+										</td>
+										<td class="p-4">
+											<a
+												href="/inbounds/{inbound?.id}/inbound-product/{product.id}"
+												class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white transition-colors hover:bg-blue-700"
+											>
+												<Eye class="h-4 w-4" />
+												View
+											</a>
+										</td>
+									</tr>
+								{/each}
+							{/if}
+						</tbody>
+					</table>
+				</div>
 
-							// Verwijder lokaal uit state
-							if (inboundProducts) {
-								// Update the state arrays using array methods instead of reassignment
-								inboundProducts.splice(
-									0,
-									inboundProducts.length,
-									...inboundProducts.filter((p) => !deletedIds.includes(p.id))
-								);
-								filteredInboundProducts =
-									filteredInboundProducts?.filter((p) => !deletedIds.includes(p.id)) || [];
-								limitedInboundProducts =
-									limitedInboundProducts?.filter((p) => !deletedIds.includes(p.id)) || [];
-							}
-							inboundProductIds = [];
-
-							toast.success('Deleted selected products', toastStyleSucc);
-						} else {
-							await applyAction(result);
-						}
-
-						await update();
-					};
-				}}
-			>
-				<input type="hidden" name="productIds" value={JSON.stringify(inboundProductIds)} />
-				<input type="hidden" name="inboundId" value={inbound?.id} />
-				<button
-					data-tooltip="Delete selected products"
-					title="Delete selected products"
-					type="submit"
-					disabled={inboundProductIds.length === 0}
-					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all
-						"
-				>
-					<Trash2 size="24" strokeWidth="2px" />
-				</button>
-			</form>
-
-			<form action="?/mapSerialnumbersToWorksheet" method="post">
-				<input hidden type="text" name="inboundId" value={inbound?.id} />
-				<button
-					data-tooltip="Map selected serialnumbers to worksheet"
-					title="Map selected serialnumbers to worksheet"
-					class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-					onclick={handleMapSerialToWorksheet}
-					type="button"
-				>
-					<Sheet />
-				</button>
-			</form>
-			<button
-				data-tooltip="Generate QR"
-				title="Generate QR Code for Inbound Products"
-				onclick={generateQRCodeForInbound}
-				class="flex rounded-full bg-gray-900 p-2 text-sm font-bold text-blue-500 hover:cursor-pointer hover:border-gray-400 hover:text-blue-800 hover:shadow-md hover:transition-all"
-			>
-				<QrCode />
-			</button>
-		</div>
-		<div class=" flex items-center justify-center gap-1">
-			<input
-				type="number"
-				id="limit"
-				min="1"
-				max={filteredInboundProducts?.length || 1}
-				placeholder="Show Qty"
-				bind:value={limit}
-				class="input input-neutral w-24 rounded-full text-gray-300"
-			/>
-		</div>
-		<div class=" flex items-center justify-center gap-1">
-			<input
-				id="qrLimit"
-				type="number"
-				min="1"
-				max="500"
-				placeholder="QR Qty"
-				bind:value={qrCodeLimit}
-				class="input input-neutral w-24 rounded-full text-gray-300"
-			/>
-		</div>
-
-		<form class="relative">
-			<input
-				bind:value={searchQuery}
-				type="text"
-				name="search"
-				placeholder="Search Products"
-				class="input input-neutral w-full rounded-full pl-10 text-gray-300"
-			/>
-			<div
-				class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400"
-			>
-				<Search size="18" />
-			</div>
-		</form>
-	</section>
-
-	<section class="mb-4 flex flex-col gap-4 overflow-x-auto rounded-lg bg-gray-900/40 p-4 shadow-md">
-		<table class=" table min-w-full text-left text-sm">
-			<thead>
-				<tr class="text-gray-500">
-					<th class="border border-gray-500 p-2">
-						<input
-							type="checkbox"
-							onchange={toggleSelectAll}
-							checked={(limitedInboundProducts ?? []).length > 0 &&
-								limitedInboundProducts?.every((p) => inboundProductIds.includes(p.id))}
-							class="checkbox chat-bubble-neutral checkbox-xs ml-1"
-						/>
-					</th>
-					<th class="border border-gray-500 p-2">Product</th>
-					<th class="border border-gray-500 p-2">Serialnumber</th>
-					<th class="hidden border border-gray-500 p-2 md:table-cell">Value €</th>
-					<th class="border border-gray-500 p-2">Status</th>
-					<th class="border border-gray-500 p-2">Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#if limitedInboundProducts && limitedInboundProducts.length > 0}
-					{#each limitedInboundProducts as inboundProduct, i}
-						<tr class="hover:bg-gray-500/20" transition:fade>
-							<td
-								class="table-cell-flex justify-evenly space-x-2 border border-gray-500 p-2 text-gray-300"
+				<!-- Mobile Cards -->
+				<div class="block space-y-4 p-6 md:hidden">
+					{#if limitedInboundProducts && limitedInboundProducts.length > 0}
+						{#each limitedInboundProducts as product, i (product.id)}
+							<div
+								class="rounded-lg border border-gray-700/50 bg-gray-800/30 p-4"
+								transition:fly={{ y: 20, delay: i * 50 }}
 							>
-								<input
-									type="checkbox"
-									onchange={() => toggleSelection(inboundProduct.id)}
-									checked={inboundProductIds.includes(inboundProduct.id)}
-									class="checkbox chat-bubble-neutral checkbox-xs mr-1 ml-1"
-								/>
-								{i + 1}
-							</td>
-							<td class="border border-gray-500 p-2 text-gray-300">{inboundProduct.product}</td>
-							<td class="border border-gray-500 p-2 text-gray-300">{inboundProduct.serialnumber}</td
-							>
-							<td class="hidden border border-gray-500 p-2 md:table-cell">{inboundProduct.value}</td
-							>
-							<td class="border border-gray-500 p-2 text-gray-300">{inboundProduct.status}</td>
-							<td class="border border-gray-500 p-2 text-gray-300">
+								<div class="mb-3 flex items-center justify-between">
+									<div class="flex items-center gap-3">
+										<input
+											type="checkbox"
+											onchange={() => toggleSelection(product.id)}
+											checked={inboundProductIds.includes(product.id)}
+											class="checkbox checkbox-sm"
+										/>
+										<span class="text-sm text-gray-400">#{i + 1}</span>
+									</div>
+									<span
+										class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium {product.status ===
+										'IN'
+											? 'bg-green-500/20 text-green-400'
+											: 'bg-red-500/20 text-red-400'}"
+									>
+										{product.status}
+									</span>
+								</div>
+
+								<div class="mb-4 space-y-2 text-sm">
+									<div class="flex justify-between">
+										<span class="text-gray-400">Product:</span>
+										<span class="text-gray-300">{product.product}</span>
+									</div>
+									<div class="flex justify-between">
+										<span class="text-gray-400">Serial:</span>
+										<span class="font-mono text-gray-300">{product.serialnumber}</span>
+									</div>
+									<div class="flex justify-between">
+										<span class="text-gray-400">Value:</span>
+										<span class="text-gray-300">€{product.value || '0.00'}</span>
+									</div>
+								</div>
+
 								<a
-									class="text-blue-500 underline"
-									href={`/inbounds/${inbound?.id}/inbound-product/${inboundProduct.id}`}
-									title="View Product Details"
+									href="/inbounds/{inbound?.id}/inbound-product/{product.id}"
+									class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white transition-colors hover:bg-blue-700"
 								>
-									<Eye size="16" />
+									<Eye class="h-4 w-4" />
+									View Details
 								</a>
-							</td>
-						</tr>
-					{/each}
+							</div>
+						{/each}
+					{/if}
+				</div>
+
+				<!-- Empty State -->
+				{#if filteredInboundProducts?.length === 0}
+					<div class="p-12 text-center">
+						<Package class="mx-auto mb-4 h-12 w-12 text-gray-500" />
+						<h3 class="mb-2 text-lg font-medium text-gray-300">No products found</h3>
+						<p class="text-sm text-gray-500">
+							{searchQuery
+								? 'Try adjusting your search criteria'
+								: 'Start by adding products to this inbound'}
+						</p>
+					</div>
 				{/if}
-			</tbody>
-		</table>
-	</section>
-	{#if filteredInboundProducts?.length === 0}
-		<p class="mt-2 rounded-md bg-gray-500 p-1 text-sm">No products found.</p>
-	{/if}
+			</div>
+		</main>
+	</div>
 </div>
 
+<!-- QR Code Modal -->
+<dialog id="qr_modal" class="modal" bind:this={qrModalRef}>
+	<div class="modal-box max-w-4xl border border-gray-700 bg-gray-900 text-white">
+		<h3 class="mb-4 text-lg font-bold">QR Codes for Inbound</h3>
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			{#each qrCodeImages as { image, count }, i}
+				<div class="flex flex-col items-center gap-2 rounded-lg bg-white/5 p-4">
+					<img src={image} alt="QR Code {i + 1}" class="h-32 w-32" />
+					<span class="text-sm text-gray-300">QR {i + 1} – {count} items</span>
+				</div>
+			{/each}
+		</div>
+		<div class="modal-action mt-6">
+			<form method="dialog">
+				<button class="btn btn-outline">Close</button>
+			</form>
+		</div>
+	</div>
+</dialog>
+
 <style>
-	.loader {
-		transform: rotateZ(45deg);
-		perspective: 1000px;
-		border-radius: 50%;
-		width: 48px;
-		height: 48px;
-		color: #e5e7eb;
-	}
-	.loader:before,
-	.loader:after {
-		content: '';
-		display: block;
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: inherit;
-		height: inherit;
-		border-radius: 50%;
-		transform: rotateX(70deg);
-		animation: 1s spin linear infinite;
-	}
-	.loader:after {
-		color: #f97316;
-		transform: rotateY(70deg);
-		animation-delay: 0.4s;
+	/* Custom focus styles and transitions */
+	:global(.input:focus, .select:focus, .textarea:focus) {
+		outline: none;
+		border-color: #3b82f6;
+		box-shadow: 0 0 0 1px #3b82f6;
 	}
 
-	@keyframes rotate {
-		0% {
-			transform: translate(-50%, -50%) rotateZ(0deg);
-		}
-		100% {
-			transform: translate(-50%, -50%) rotateZ(360deg);
-		}
-	}
-
-	@keyframes rotateccw {
-		0% {
-			transform: translate(-50%, -50%) rotate(0deg);
-		}
-		100% {
-			transform: translate(-50%, -50%) rotate(-360deg);
-		}
-	}
-
-	@keyframes spin {
-		0%,
-		100% {
-			box-shadow: 0.2em 0px 0 0px currentcolor;
-		}
-		12% {
-			box-shadow: 0.2em 0.2em 0 0 currentcolor;
-		}
-		25% {
-			box-shadow: 0 0.2em 0 0px currentcolor;
-		}
-		37% {
-			box-shadow: -0.2em 0.2em 0 0 currentcolor;
-		}
-		50% {
-			box-shadow: -0.2em 0 0 0 currentcolor;
-		}
-		62% {
-			box-shadow: -0.2em -0.2em 0 0 currentcolor;
-		}
-		75% {
-			box-shadow: 0px -0.2em 0 0 currentcolor;
-		}
-		87% {
-			box-shadow: 0.2em -0.2em 0 0 currentcolor;
-		}
+	:global(.transition-colors) {
+		transition-property: color, background-color, border-color;
+		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+		transition-duration: 150ms;
 	}
 </style>

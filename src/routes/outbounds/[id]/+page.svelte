@@ -932,6 +932,13 @@
 															<QrCode class="h-3 w-3" />
 														</button>
 													{/if}
+													<a
+														href="/outbounds/{outbound?.id}/outbound-product/{product.id}"
+														class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white transition-colors hover:bg-blue-700"
+													>
+														<Eye class="h-4 w-4" />
+														View
+													</a>
 												</div>
 											</td>
 										</tr>
